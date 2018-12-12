@@ -271,14 +271,14 @@ function drawInheritanceDiagram() {
         { name: "System.Text.Parsing.ParsingObject", id: "diagram_node_0", level: 0, subject: false, hasDerivedNodes: true, link: "../../System.Text.Parsing/doc/class_ParsingObject_7DEF54CB93890E63DE64B53AA974CF41FBA38B34.html" },
         { name: "System.Text.Parsing.Parser", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: true, link: "../../System.Text.Parsing/doc/class_Parser_59591398FA427ADC5EC015FB52651571177DB77D.html" },
         { name: "System.Text.Parsing.UnaryParser", id: "diagram_node_2", level: 2, subject: true, hasDerivedNodes: true, link: "../../System.Text.Parsing/doc/class_UnaryParser_74354A3C3770DC721B12D0E37FAE9B6A88FFA71A.html" },
-        { name: "System.Text.Parsing.ActionParser", id: "diagram_node_4", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing/doc/class_ActionParser_385EDA747091FB7696618E1D724163BDC876257A.html" },
+        { name: "System.Text.Parsing.ActionParser", id: "diagram_node_3", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing/doc/class_ActionParser_385EDA747091FB7696618E1D724163BDC876257A.html" },
         { name: "System.Text.Parsing.ExpectationParser", id: "diagram_node_5", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing/doc/class_ExpectationParser_0DFEF78F7EA112E6F20DC00ECFD31592FD692CAB.html" },
         { name: "System.Text.Parsing.GroupingParser", id: "diagram_node_6", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing/doc/class_GroupingParser_0B8944BA76A80C0D8EA52FF873060693FEA67ADE.html" },
-        { name: "System.Text.Parsing.KleeneStarParser", id: "diagram_node_8", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing/doc/class_KleeneStarParser_8B553023A6E0AA98D08C756A40F526859BF46D2D.html" },
-        { name: "System.Text.Parsing.ListParser", id: "diagram_node_3", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing/doc/class_ListParser_6C5E029D107D595D5B50385D50A9B16ABEBE48E6.html" },
+        { name: "System.Text.Parsing.KleeneStarParser", id: "diagram_node_7", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing/doc/class_KleeneStarParser_8B553023A6E0AA98D08C756A40F526859BF46D2D.html" },
+        { name: "System.Text.Parsing.ListParser", id: "diagram_node_4", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing/doc/class_ListParser_6C5E029D107D595D5B50385D50A9B16ABEBE48E6.html" },
         { name: "System.Text.Parsing.OptionalParser", id: "diagram_node_9", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing/doc/class_OptionalParser_F2758E0656F6FF0FCFAFB3BADC90975486CE943A.html" },
         { name: "System.Text.Parsing.PositiveParser", id: "diagram_node_10", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing/doc/class_PositiveParser_773062827D5C6002110C7D897D790DAEEE06A502.html" },
-        { name: "System.Text.Parsing.TokenParser", id: "diagram_node_7", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing/doc/class_TokenParser_319753BA62AEDA94D46A4D47AEE13AEC1B1F3B72.html" }];
+        { name: "System.Text.Parsing.TokenParser", id: "diagram_node_8", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing/doc/class_TokenParser_319753BA62AEDA94D46A4D47AEE13AEC1B1F3B72.html" }];
     drawDiagram(diagramNodes);
 }
 

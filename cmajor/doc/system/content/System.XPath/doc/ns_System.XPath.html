@@ -368,45 +368,45 @@
     <td xml:space="preserve"><a href="../../System.XPath/doc/ns_System.XPath.html#function_CompareNodeSets_6686FDFEA2030539A374A945F4A4BC3B6DF7C741">CompareNodeSets</a>(<a href="../../System.XPath/doc/class_XPathContext_54EB2271A3739C07EC41BC345CC60F436CFAB6BB.html">XPathContext</a>&amp;&nbsp;context, <a href="../../System.XPath/doc/class_XPathObject_91D53F03F45FCACE5D10959D030939A3CBB38F3E.html">XPathObject</a>*&nbsp;left, <a href="../../System.XPath/doc/class_XPathObject_91D53F03F45FCACE5D10959D030939A3CBB38F3E.html">XPathObject</a>*&nbsp;right, <a href="../../System.XPath/doc/enumerated_type_Operator_70B4E9510AF8D8320A81B0066C9BD6BBC5BA8173.html">Operator</a>&nbsp;comparisonOp)</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span></td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;RETURN_TYPE</td>
     <td xml:space="preserve"><a href="../../System.XPath/doc/ns_System.XPath.html#function_DebugParsing_127992BF29D2037C02619D446B8763B482EB975A">DebugParsing</a>()</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span></td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;RETURN_TYPE</td>
     <td xml:space="preserve"><a href="../../System.XPath/doc/ns_System.XPath.html#function_DebugQuery_49550C4D8ECCEDA4037BA09CBCE165C74644EB22">DebugQuery</a>()</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a>&lt;<a href="../../System.XPath/doc/class_XPathObject_91D53F03F45FCACE5D10959D030939A3CBB38F3E.html">XPathObject</a>></td>
-    <td xml:space="preserve"><a href="../../System.XPath/doc/ns_System.XPath.html#function_Evaluate_BAADC9F9757ECDA2C151920B9C3805CAD33229D9">Evaluate</a>(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">uchar</span>>&amp;&nbsp;xpathExpression, <a href="../../System.Dom/doc/class_DomDocument_975632F3AA8CF3FEC1D51FB0E91F580D6EBA16C8.html">DomDocument</a>*&nbsp;document)</td>
+    <td xml:space="preserve"><a href="../../System.XPath/doc/ns_System.XPath.html#function_Evaluate_BAADC9F9757ECDA2C151920B9C3805CAD33229D9">Evaluate</a>(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;TEMPLATE_ARGUMENT_TYPE>&amp;&nbsp;xpathExpression, <a href="../../System.Dom/doc/class_DomDocument_975632F3AA8CF3FEC1D51FB0E91F580D6EBA16C8.html">DomDocument</a>*&nbsp;document)</td>
     <td xml:space="preserve">Compiles the given XPath <a href="grammar_XPathExpressionGrammar_D814D198200E8CD6C8ED51082723082DF24B5607.html#rule_Expr_35256B60DE19B4D934C20948CE6D8BCE49F1731C"> query expression</a> , evaluates it with respect to the given <a href="../../System.Dom/doc/class_DomDocument_975632F3AA8CF3FEC1D51FB0E91F580D6EBA16C8.html">DomDocument</a> and returns the resulting <a href="../../System.XPath/doc/class_XPathObject_91D53F03F45FCACE5D10959D030939A3CBB38F3E.html">XPathObject</a> .</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a>&lt;<a href="../../System.XPath/doc/class_XPathObject_91D53F03F45FCACE5D10959D030939A3CBB38F3E.html">XPathObject</a>></td>
-    <td xml:space="preserve"><a href="../../System.XPath/doc/ns_System.XPath.html#function_Evaluate_7744D75060A34CA07FEAF119B483BB6EC1226786">Evaluate</a>(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">uchar</span>>&amp;&nbsp;xpathExpression, <a href="../../System.Dom/doc/class_DomNode_AAD27BD01107131DCBD7D66B91A6A861C7C23509.html">DomNode</a>*&nbsp;node)</td>
+    <td xml:space="preserve"><a href="../../System.XPath/doc/ns_System.XPath.html#function_Evaluate_7744D75060A34CA07FEAF119B483BB6EC1226786">Evaluate</a>(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;TEMPLATE_ARGUMENT_TYPE>&amp;&nbsp;xpathExpression, <a href="../../System.Dom/doc/class_DomNode_AAD27BD01107131DCBD7D66B91A6A861C7C23509.html">DomNode</a>*&nbsp;node)</td>
     <td xml:space="preserve">Compiles the given XPath <a href="grammar_XPathExpressionGrammar_D814D198200E8CD6C8ED51082723082DF24B5607.html#rule_Expr_35256B60DE19B4D934C20948CE6D8BCE49F1731C"> query expression</a> , evaluates it with respect to the given <a href="../../System.Dom/doc/class_DomNode_AAD27BD01107131DCBD7D66B91A6A861C7C23509.html">DomNode</a> and returns the resulting <a href="../../System.XPath/doc/class_XPathObject_91D53F03F45FCACE5D10959D030939A3CBB38F3E.html">XPathObject</a> .</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../System.Dom/doc/enumerated_type_Axis_8D4FE5B83262A122798FD80A5636BA4533BD15EB.html">Axis</a></td>
-    <td xml:space="preserve"><a href="../../System.XPath/doc/ns_System.XPath.html#function_GetAxis_FAF9CA1A975345D0065CB4AC484EA5D57D621254">GetAxis</a>(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">uchar</span>>&amp;&nbsp;axisName)</td>
+    <td xml:space="preserve"><a href="../../System.XPath/doc/ns_System.XPath.html#function_GetAxis_FAF9CA1A975345D0065CB4AC484EA5D57D621254">GetAxis</a>(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;TEMPLATE_ARGUMENT_TYPE>&amp;&nbsp;axisName)</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../System.XPath/doc/class_XPathFunction_4E98AF12C16CEE36444238CC7D9E37903E24A408.html">XPathFunction</a>*</td>
-    <td xml:space="preserve"><a href="../../System.XPath/doc/ns_System.XPath.html#function_GetXPathLibraryFunction_2D48D048C03624F8FA1D251D418A4ABE72180D9D">GetXPathLibraryFunction</a>(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">uchar</span>>&amp;&nbsp;functionName)</td>
+    <td xml:space="preserve"><a href="../../System.XPath/doc/ns_System.XPath.html#function_GetXPathLibraryFunction_2D48D048C03624F8FA1D251D418A4ABE72180D9D">GetXPathLibraryFunction</a>(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;TEMPLATE_ARGUMENT_TYPE>&amp;&nbsp;functionName)</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;RETURN_TYPE</td>
     <td xml:space="preserve"><a href="../../System.XPath/doc/ns_System.XPath.html#function_SetExecutionDuration_9193F8D37B059196E54282B1C6B6D04D28C8EC88">SetExecutionDuration</a>(<a href="../../System.Base/doc/class_Duration_78813FE475939D533DB7A63066BE3D8FEB436151.html">Duration</a>&nbsp;executionDuration)</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;RETURN_TYPE</td>
     <td xml:space="preserve"><a href="../../System.XPath/doc/ns_System.XPath.html#function_SetQueryDom_65414D52C7CA20B0E09E74874ED91D1960B0E64F">SetQueryDom</a>(<a href="../../System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a>&lt;<a href="../../System.Dom/doc/class_DomNode_AAD27BD01107131DCBD7D66B91A6A861C7C23509.html">DomNode</a>>&amp;&amp;&nbsp;queryDom)</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;RETURN_TYPE</td>
     <td xml:space="preserve"><a href="../../System.XPath/doc/ns_System.XPath.html#function_SetQueryDuration_45B8CBD3E42A6777F912720EC2C381F649991541">SetQueryDuration</a>(<a href="../../System.Base/doc/class_Duration_78813FE475939D533DB7A63066BE3D8FEB436151.html">Duration</a>&nbsp;queryDuration)</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">uchar</span>></td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;TEMPLATE_ARGUMENT_TYPE></td>
     <td xml:space="preserve"><a href="../../System.XPath/doc/ns_System.XPath.html#function_StringValue_CA5B9D94D1D3F30404D0145C8213D07440CA21C2">StringValue</a>(<a href="../../System.Dom/doc/class_DomNode_AAD27BD01107131DCBD7D66B91A6A861C7C23509.html">DomNode</a>*&nbsp;node)</td>
    </tr>
   </table>
@@ -440,21 +440,21 @@
   <br/>
   <hr/>
   <h3 id="function_DebugParsing_127992BF29D2037C02619D446B8763B482EB975A" xml:space="preserve">DebugParsing&nbsp;Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;DebugParsing()</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;RETURN_TYPE&nbsp;DebugParsing()</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.XPath/file/XPathDebug.cm.html#71">71</a>&nbsp;of&nbsp;<a href="../../System.XPath/file/XPathDebug.cm.html">System.XPath/XPathDebug.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_DebugQuery_49550C4D8ECCEDA4037BA09CBCE165C74644EB22" xml:space="preserve">DebugQuery&nbsp;Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;DebugQuery()</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;RETURN_TYPE&nbsp;DebugQuery()</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.XPath/file/XPathDebug.cm.html#76">76</a>&nbsp;of&nbsp;<a href="../../System.XPath/file/XPathDebug.cm.html">System.XPath/XPathDebug.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_Evaluate_BAADC9F9757ECDA2C151920B9C3805CAD33229D9" xml:space="preserve">Evaluate&nbsp;Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a>&lt;<a href="../../System.XPath/doc/class_XPathObject_91D53F03F45FCACE5D10959D030939A3CBB38F3E.html">XPathObject</a>>&nbsp;Evaluate(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">uchar</span>>&amp;&nbsp;xpathExpression, <a href="../../System.Dom/doc/class_DomDocument_975632F3AA8CF3FEC1D51FB0E91F580D6EBA16C8.html">DomDocument</a>*&nbsp;document)</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a>&lt;<a href="../../System.XPath/doc/class_XPathObject_91D53F03F45FCACE5D10959D030939A3CBB38F3E.html">XPathObject</a>>&nbsp;Evaluate(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;TEMPLATE_ARGUMENT_TYPE>&amp;&nbsp;xpathExpression, <a href="../../System.Dom/doc/class_DomDocument_975632F3AA8CF3FEC1D51FB0E91F580D6EBA16C8.html">DomDocument</a>*&nbsp;document)</h4>
   <span xml:space="preserve"><p class="description" xml:space="preserve">Compiles the given XPath <a href="grammar_XPathExpressionGrammar_D814D198200E8CD6C8ED51082723082DF24B5607.html#rule_Expr_35256B60DE19B4D934C20948CE6D8BCE49F1731C"> query expression</a> , evaluates it with respect to the given <a href="../../System.Dom/doc/class_DomDocument_975632F3AA8CF3FEC1D51FB0E91F580D6EBA16C8.html">DomDocument</a> and returns the resulting <a href="../../System.XPath/doc/class_XPathObject_91D53F03F45FCACE5D10959D030939A3CBB38F3E.html">XPathObject</a> .</p><span xml:space="preserve"><p class="description" xml:space="preserve">The concrete type of the result depends on the supplied XPath expression. If the expression is a <a href="grammar_XPathExpressionGrammar_D814D198200E8CD6C8ED51082723082DF24B5607.html#rule_PathExpr_119171CB9F132FA051BB69B3AF4916B1C4410851"> path expression</a> the result will be a <a href="../../System.XPath/doc/class_XPathNodeSet_70D9F2F055A2EAFCF3988BC033AE454E204F643A.html">XPathNodeSet</a> . If the expression is a Boolean expression, for example an <a href="grammar_XPathExpressionGrammar_D814D198200E8CD6C8ED51082723082DF24B5607.html#rule_OrExpr_7DB3F0405E0E1FE54A04A420B05B0AAD7F692390"> or expression</a> , the result will be a <a href="../../System.XPath/doc/class_XPathBoolean_62EBEB870905B1B981080A7A18EBBBD98ADD5C4A.html">XPathBoolean</a> , and so on. The result of a <a href="grammar_XPathExpressionGrammar_D814D198200E8CD6C8ED51082723082DF24B5607.html#rule_FunctionCall_7F14EFF296F2A74BFB4E5605F6E7A0AFE65608B8"> function call</a> has a type depending on the function called. The functions implemented are documented under the <a href="../../System.XPath/doc/class_XPathFunctionLibrary_5044787DDFDAF4AF5701F92F8775A709B4496547.html">XPathFunctionLibrary</a> .</p><p class="description" xml:space="preserve">If the query string is not syntactically valid <a href="grammar_XPathExpressionGrammar_D814D198200E8CD6C8ED51082723082DF24B5607.html#rule_Expr_35256B60DE19B4D934C20948CE6D8BCE49F1731C"> XPath expression</a> , the function throws an <a href="../../System.Text.Parsing/doc/class_ExpectationFailure_EBDBB0FC1DDED5BE7E15008622BB34AFCA7E9A8C.html">ExpectationFailure</a> exception. If an error such as type violation is detected when evaluating the query expression, the function throws an <a href="../../System.XPath/doc/class_XPathException_5F5973D81A22230252D5069223C1877CBFBA755A.html">XPathException</a> exception.</p></span></span>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.XPath/file/XPathEvaluate.cm.html#58">58</a>&nbsp;of&nbsp;<a href="../../System.XPath/file/XPathEvaluate.cm.html">System.XPath/XPathEvaluate.cm</a></span>
@@ -462,7 +462,7 @@
   <br/>
   <hr/>
   <h3 id="function_Evaluate_7744D75060A34CA07FEAF119B483BB6EC1226786" xml:space="preserve">Evaluate&nbsp;Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a>&lt;<a href="../../System.XPath/doc/class_XPathObject_91D53F03F45FCACE5D10959D030939A3CBB38F3E.html">XPathObject</a>>&nbsp;Evaluate(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">uchar</span>>&amp;&nbsp;xpathExpression, <a href="../../System.Dom/doc/class_DomNode_AAD27BD01107131DCBD7D66B91A6A861C7C23509.html">DomNode</a>*&nbsp;node)</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a>&lt;<a href="../../System.XPath/doc/class_XPathObject_91D53F03F45FCACE5D10959D030939A3CBB38F3E.html">XPathObject</a>>&nbsp;Evaluate(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;TEMPLATE_ARGUMENT_TYPE>&amp;&nbsp;xpathExpression, <a href="../../System.Dom/doc/class_DomNode_AAD27BD01107131DCBD7D66B91A6A861C7C23509.html">DomNode</a>*&nbsp;node)</h4>
   <span xml:space="preserve"><p class="description" xml:space="preserve">Compiles the given XPath <a href="grammar_XPathExpressionGrammar_D814D198200E8CD6C8ED51082723082DF24B5607.html#rule_Expr_35256B60DE19B4D934C20948CE6D8BCE49F1731C"> query expression</a> , evaluates it with respect to the given <a href="../../System.Dom/doc/class_DomNode_AAD27BD01107131DCBD7D66B91A6A861C7C23509.html">DomNode</a> and returns the resulting <a href="../../System.XPath/doc/class_XPathObject_91D53F03F45FCACE5D10959D030939A3CBB38F3E.html">XPathObject</a> .</p><span xml:space="preserve"><p class="description" xml:space="preserve">The concrete type of the result depends on the supplied XPath expression. If the expression is a <a href="grammar_XPathExpressionGrammar_D814D198200E8CD6C8ED51082723082DF24B5607.html#rule_PathExpr_119171CB9F132FA051BB69B3AF4916B1C4410851"> path expression</a> the result will be a <a href="../../System.XPath/doc/class_XPathNodeSet_70D9F2F055A2EAFCF3988BC033AE454E204F643A.html">XPathNodeSet</a> . If the expression is a Boolean expression, for example an <a href="grammar_XPathExpressionGrammar_D814D198200E8CD6C8ED51082723082DF24B5607.html#rule_OrExpr_7DB3F0405E0E1FE54A04A420B05B0AAD7F692390"> or expression</a> , the result will be a <a href="../../System.XPath/doc/class_XPathBoolean_62EBEB870905B1B981080A7A18EBBBD98ADD5C4A.html">XPathBoolean</a> . The result of a <a href="grammar_XPathExpressionGrammar_D814D198200E8CD6C8ED51082723082DF24B5607.html#rule_FunctionCall_7F14EFF296F2A74BFB4E5605F6E7A0AFE65608B8"> function call</a> has a type depending on the function called. The functions implemented are documented under the <a href="../../System.XPath/doc/class_XPathFunctionLibrary_5044787DDFDAF4AF5701F92F8775A709B4496547.html">XPathFunctionLibrary</a> .</p><p class="description" xml:space="preserve">If the query string is not syntactically valid <a href="grammar_XPathExpressionGrammar_D814D198200E8CD6C8ED51082723082DF24B5607.html#rule_Expr_35256B60DE19B4D934C20948CE6D8BCE49F1731C"> XPath expression</a> , the function throws an <a href="../../System.Text.Parsing/doc/class_ExpectationFailure_EBDBB0FC1DDED5BE7E15008622BB34AFCA7E9A8C.html">ExpectationFailure</a> exception. If an error such as type violation is detected when evaluating the query expression, the function throws an <a href="../../System.XPath/doc/class_XPathException_5F5973D81A22230252D5069223C1877CBFBA755A.html">XPathException</a> exception.</p></span></span>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.XPath/file/XPathEvaluate.cm.html#45">45</a>&nbsp;of&nbsp;<a href="../../System.XPath/file/XPathEvaluate.cm.html">System.XPath/XPathEvaluate.cm</a></span>
@@ -470,42 +470,42 @@
   <br/>
   <hr/>
   <h3 id="function_GetAxis_FAF9CA1A975345D0065CB4AC484EA5D57D621254" xml:space="preserve">GetAxis&nbsp;Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../System.Dom/doc/enumerated_type_Axis_8D4FE5B83262A122798FD80A5636BA4533BD15EB.html">Axis</a>&nbsp;GetAxis(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">uchar</span>>&amp;&nbsp;axisName)</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../System.Dom/doc/enumerated_type_Axis_8D4FE5B83262A122798FD80A5636BA4533BD15EB.html">Axis</a>&nbsp;GetAxis(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;TEMPLATE_ARGUMENT_TYPE>&amp;&nbsp;axisName)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.XPath/file/XPathExpr.cm.html#1432">1432</a>&nbsp;of&nbsp;<a href="../../System.XPath/file/XPathExpr.cm.html">System.XPath/XPathExpr.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_GetXPathLibraryFunction_2D48D048C03624F8FA1D251D418A4ABE72180D9D" xml:space="preserve">GetXPathLibraryFunction&nbsp;Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../System.XPath/doc/class_XPathFunction_4E98AF12C16CEE36444238CC7D9E37903E24A408.html">XPathFunction</a>*&nbsp;GetXPathLibraryFunction(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">uchar</span>>&amp;&nbsp;functionName)</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../System.XPath/doc/class_XPathFunction_4E98AF12C16CEE36444238CC7D9E37903E24A408.html">XPathFunction</a>*&nbsp;GetXPathLibraryFunction(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;TEMPLATE_ARGUMENT_TYPE>&amp;&nbsp;functionName)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.XPath/file/XPathFunction.cm.html#36">36</a>&nbsp;of&nbsp;<a href="../../System.XPath/file/XPathFunction.cm.html">System.XPath/XPathFunction.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_SetExecutionDuration_9193F8D37B059196E54282B1C6B6D04D28C8EC88" xml:space="preserve">SetExecutionDuration&nbsp;Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;SetExecutionDuration(<a href="../../System.Base/doc/class_Duration_78813FE475939D533DB7A63066BE3D8FEB436151.html">Duration</a>&nbsp;executionDuration)</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;RETURN_TYPE&nbsp;SetExecutionDuration(<a href="../../System.Base/doc/class_Duration_78813FE475939D533DB7A63066BE3D8FEB436151.html">Duration</a>&nbsp;executionDuration)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.XPath/file/XPathDebug.cm.html#91">91</a>&nbsp;of&nbsp;<a href="../../System.XPath/file/XPathDebug.cm.html">System.XPath/XPathDebug.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_SetQueryDom_65414D52C7CA20B0E09E74874ED91D1960B0E64F" xml:space="preserve">SetQueryDom&nbsp;Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;SetQueryDom(<a href="../../System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a>&lt;<a href="../../System.Dom/doc/class_DomNode_AAD27BD01107131DCBD7D66B91A6A861C7C23509.html">DomNode</a>>&amp;&amp;&nbsp;queryDom)</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;RETURN_TYPE&nbsp;SetQueryDom(<a href="../../System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a>&lt;<a href="../../System.Dom/doc/class_DomNode_AAD27BD01107131DCBD7D66B91A6A861C7C23509.html">DomNode</a>>&amp;&amp;&nbsp;queryDom)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.XPath/file/XPathDebug.cm.html#81">81</a>&nbsp;of&nbsp;<a href="../../System.XPath/file/XPathDebug.cm.html">System.XPath/XPathDebug.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_SetQueryDuration_45B8CBD3E42A6777F912720EC2C381F649991541" xml:space="preserve">SetQueryDuration&nbsp;Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;SetQueryDuration(<a href="../../System.Base/doc/class_Duration_78813FE475939D533DB7A63066BE3D8FEB436151.html">Duration</a>&nbsp;queryDuration)</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;RETURN_TYPE&nbsp;SetQueryDuration(<a href="../../System.Base/doc/class_Duration_78813FE475939D533DB7A63066BE3D8FEB436151.html">Duration</a>&nbsp;queryDuration)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.XPath/file/XPathDebug.cm.html#86">86</a>&nbsp;of&nbsp;<a href="../../System.XPath/file/XPathDebug.cm.html">System.XPath/XPathDebug.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_StringValue_CA5B9D94D1D3F30404D0145C8213D07440CA21C2" xml:space="preserve">StringValue&nbsp;Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">uchar</span>>&nbsp;StringValue(<a href="../../System.Dom/doc/class_DomNode_AAD27BD01107131DCBD7D66B91A6A861C7C23509.html">DomNode</a>*&nbsp;node)</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;TEMPLATE_ARGUMENT_TYPE>&nbsp;StringValue(<a href="../../System.Dom/doc/class_DomNode_AAD27BD01107131DCBD7D66B91A6A861C7C23509.html">DomNode</a>*&nbsp;node)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.XPath/file/XPathFunction.cm.html#216">216</a>&nbsp;of&nbsp;<a href="../../System.XPath/file/XPathFunction.cm.html">System.XPath/XPathFunction.cm</a></span>
   <br/>

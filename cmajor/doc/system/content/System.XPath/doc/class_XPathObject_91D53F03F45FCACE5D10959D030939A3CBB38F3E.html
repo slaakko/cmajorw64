@@ -23,7 +23,7 @@
   <h2>Member Functions</h2>
   <table>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span></td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">nothrow</span>&nbsp;RETURN_TYPE</td>
     <td xml:space="preserve"><a href="../../System.XPath/doc/class_XPathObject_91D53F03F45FCACE5D10959D030939A3CBB38F3E.html#member_function_ToBool_XPathObject_3B76C7108647E808227733F50DDB8769645C5DF2">ToBool</a>()&nbsp;<span class="kw">const</span></td>
    </tr>
    <tr>
@@ -31,11 +31,11 @@
     <td xml:space="preserve"><a href="../../System.XPath/doc/class_XPathObject_91D53F03F45FCACE5D10959D030939A3CBB38F3E.html#member_function_ToDom_XPathObject_DC0C1BB26C5018C80710BAF5C3375004C1C7D2CF">ToDom</a>()&nbsp;<span class="kw">const</span></td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">double</span></td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;RETURN_TYPE</td>
     <td xml:space="preserve"><a href="../../System.XPath/doc/class_XPathObject_91D53F03F45FCACE5D10959D030939A3CBB38F3E.html#member_function_ToDouble_XPathObject_C89CCF06A7F5A75A1846535C05EDB6D219F91F4D">ToDouble</a>(<a href="../../System.XPath/doc/class_XPathContext_54EB2271A3739C07EC41BC345CC60F436CFAB6BB.html">XPathContext</a>&amp;&nbsp;context)&nbsp;<span class="kw">const</span></td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">uchar</span>></td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;TEMPLATE_ARGUMENT_TYPE></td>
     <td xml:space="preserve"><a href="../../System.XPath/doc/class_XPathObject_91D53F03F45FCACE5D10959D030939A3CBB38F3E.html#member_function_ToString_XPathObject_1D8739621FD95FBA72E8A20F112B56866B563838">ToString</a>()&nbsp;<span class="kw">const</span></td>
    </tr>
   </table>
@@ -49,7 +49,7 @@
   <hr/>
   <h2>Member Function Details</h2>
   <h3 id="member_function_ToBool_XPathObject_3B76C7108647E808227733F50DDB8769645C5DF2" xml:space="preserve">ToBool&nbsp;Member Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;ToBool()</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">nothrow</span>&nbsp;RETURN_TYPE&nbsp;ToBool()</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.XPath/file/XPathObject.cm.html#15">15</a>&nbsp;of&nbsp;<a href="../../System.XPath/file/XPathObject.cm.html">System.XPath/XPathObject.cm</a></span>
   <br/>
@@ -63,14 +63,14 @@
   <br/>
   <hr/>
   <h3 id="member_function_ToDouble_XPathObject_C89CCF06A7F5A75A1846535C05EDB6D219F91F4D" xml:space="preserve">ToDouble&nbsp;Member Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">double</span>&nbsp;ToDouble(<a href="../../System.XPath/doc/class_XPathContext_54EB2271A3739C07EC41BC345CC60F436CFAB6BB.html">XPathContext</a>&amp;&nbsp;context)</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;RETURN_TYPE&nbsp;ToDouble(<a href="../../System.XPath/doc/class_XPathContext_54EB2271A3739C07EC41BC345CC60F436CFAB6BB.html">XPathContext</a>&amp;&nbsp;context)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.XPath/file/XPathObject.cm.html#16">16</a>&nbsp;of&nbsp;<a href="../../System.XPath/file/XPathObject.cm.html">System.XPath/XPathObject.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_ToString_XPathObject_1D8739621FD95FBA72E8A20F112B56866B563838" xml:space="preserve">ToString&nbsp;Member Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">uchar</span>>&nbsp;ToString()</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;TEMPLATE_ARGUMENT_TYPE>&nbsp;ToString()</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.XPath/file/XPathObject.cm.html#17">17</a>&nbsp;of&nbsp;<a href="../../System.XPath/file/XPathObject.cm.html">System.XPath/XPathObject.cm</a></span>
   <br/>

@@ -273,8 +273,8 @@ function drawInheritanceDiagram() {
         { name: "System.Text.Parsing.BinaryParser", id: "diagram_node_2", level: 2, subject: true, hasDerivedNodes: true, link: "../../System.Text.Parsing/doc/class_BinaryParser_19E488A784487BB055BADC530295F1AA7A5F0BCA.html" },
         { name: "System.Text.Parsing.AlternativeParser", id: "diagram_node_3", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing/doc/class_AlternativeParser_8DD9857AEB00E695967B3B1B3B8C707141C6AD93.html" },
         { name: "System.Text.Parsing.DifferenceParser", id: "diagram_node_4", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing/doc/class_DifferenceParser_6B333D97634B9028F109391E5F702C41F874DE5F.html" },
-        { name: "System.Text.Parsing.ExclusiveOrParser", id: "diagram_node_6", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing/doc/class_ExclusiveOrParser_024EB6E22761BAB373A51265E66943EC916618FE.html" },
-        { name: "System.Text.Parsing.IntersectionParser", id: "diagram_node_5", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing/doc/class_IntersectionParser_C3227AB2B63C00FCB285B109438BD7DE0BBB4E94.html" },
+        { name: "System.Text.Parsing.ExclusiveOrParser", id: "diagram_node_5", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing/doc/class_ExclusiveOrParser_024EB6E22761BAB373A51265E66943EC916618FE.html" },
+        { name: "System.Text.Parsing.IntersectionParser", id: "diagram_node_6", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing/doc/class_IntersectionParser_C3227AB2B63C00FCB285B109438BD7DE0BBB4E94.html" },
         { name: "System.Text.Parsing.SequenceParser", id: "diagram_node_7", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing/doc/class_SequenceParser_AEF4FE3271FA60C88397ECB05526C1D6A4FA3E01.html" }];
     drawDiagram(diagramNodes);
 }
