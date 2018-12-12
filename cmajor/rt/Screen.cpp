@@ -7,21 +7,69 @@
 #include <memory>
 #include <unordered_map>
 #include <fstream>
+bool runningOnWsl = false;
+int ksup = 0;
+int ksdn = 0;
+int clft = 0;
+int crgt = 0;
+int cup = 0;
+int cdn = 0;
+int cpgup = 0;
+int cpgdn = 0;
+int chome = 0;
+int cend = 0;
 #ifdef _WIN32
 #include <cmajor/system/ext/pdcurs36/curses.h>
+void SetKeys()
+{
+    ksup = KEY_SUP;
+    ksdn = KEY_SDOWN;
+    clft = CTL_LEFT;
+    crgt = CTL_RIGHT;
+    cup = CTL_UP;
+    cdn = CTL_DOWN;
+    cpgup = CTL_PGUP;
+    cpgdn = CTL_PGDN;
+    chome = CTL_HOME;
+    cend = CTL_END;
+}
 #else
 #include <ncurses.h>
-// extension on Windows Subsystem for Linux:
-#define KEY_SUP 337
-#define KEY_SDOWN 336
-#define CTL_LEFT 545
-#define CTL_RIGHT 560
-#define CTL_UP 566
-#define CTL_DOWN 525
-#define CTL_PGUP 555
-#define CTL_PGDN 550
-#define CTL_HOME 535
-#define CTL_END 530
+#include <cmajor/rt/Environment.hpp>
+void SetKeys()
+{
+    std::string osInfo = RtGetOsInfo();
+    if (osInfo.find("Microsoft") != std::string::npos)
+    {
+        runningOnWsl = true;
+    }
+    if (runningOnWsl) // running on Windows Subsystem for Linux
+    {
+        ksup = 337;
+        ksdn = 336;
+        clft = 545;
+        crgt = 560;
+        cup = 566;
+        cdn = 525;
+        cpgup = 555;
+        cpgdn = 550;
+        chome = 535;
+        cend = 530;
+    }
+    else // running on native Linux
+    {
+        ksup = 337;
+        ksdn = 336;
+        clft = 544;
+        crgt = 559;
+        cup = 565;
+        cdn = 524;
+        cpgup = 554;
+        cpgdn = 549;
+        chome = 262;
+        cend = 360;
+    }
+}
 #endif
 
 namespace cmajor { namespace rt {
@@ -30,6 +78,7 @@ std::unordered_map<int, int> keyMap;
 
 void InitScreen()
 {
+    SetKeys();
     keyMap['\r'] = keyEnter;
     keyMap['\n'] = keyEnter;
     keyMap[KEY_DOWN] = keyDown;
@@ -62,16 +111,16 @@ void InitScreen()
     keyMap[KEY_SLEFT] = keyShiftLeft;
     keyMap[KEY_SRIGHT] = keyShiftRight;
     keyMap[KEY_RESIZE] = keyResize;
-    keyMap[KEY_SUP] = keyShiftUp;
-    keyMap[KEY_SDOWN] = keyShiftDown;
-    keyMap[CTL_UP] = keyControlUp;
-    keyMap[CTL_DOWN] = keyControlDown;
-    keyMap[CTL_LEFT] = keyControlLeft;
-    keyMap[CTL_RIGHT] = keyControlRight;
-    keyMap[CTL_PGUP] = keyControlPgUp;
-    keyMap[CTL_PGDN] = keyControlPgDown;
-    keyMap[CTL_HOME] = keyControlHome;
-    keyMap[CTL_END] = keyControlEnd;
+    keyMap[ksup] = keyShiftUp;
+    keyMap[ksdn] = keyShiftDown;
+    keyMap[cup] = keyControlUp;
+    keyMap[cdn] = keyControlDown;
+    keyMap[clft] = keyControlLeft;
+    keyMap[crgt] = keyControlRight;
+    keyMap[cpgup] = keyControlPgUp;
+    keyMap[cpgdn] = keyControlPgDown;
+    keyMap[chome] = keyControlHome;
+    keyMap[cend] = keyControlEnd;
 }
 
 void DoneScreen()
@@ -183,15 +232,26 @@ extern "C" RT_API void RtAddStr(const char* str)
     addstr(str);
 }
 
-extern "C" RT_API int RtGetCh()
+extern "C" RT_API int RtGetRawCh()
+{
+    return getch();
+}
+
+extern "C" RT_API int RtTranslateCh(int ch)
 {
     using cmajor::rt::keyMap;
-    int ch = getch();
     auto it = keyMap.find(ch);
     if (it != keyMap.cend())
     {
         ch = it->second;
     }
+    return ch;
+}
+
+extern "C" RT_API int RtGetCh()
+{
+    int ch = RtGetRawCh();
+    ch = RtTranslateCh(ch);
     return ch;
 }
 
@@ -213,4 +273,9 @@ extern "C" RT_API void RtAttrOff(int attrs)
 extern "C" RT_API void RtAttrSet(int attrs)
 {
     attrset(attrs);
+}
+
+extern "C" RT_API bool RtRunningOnWsl()
+{
+    return runningOnWsl;
 }

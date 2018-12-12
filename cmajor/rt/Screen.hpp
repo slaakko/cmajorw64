@@ -26,11 +26,14 @@ extern "C" RT_API void RtGetYX(int* row, int* col);
 extern "C" RT_API void RtMove(int row, int col);
 extern "C" RT_API void RtAddCh(int ch);
 extern "C" RT_API void RtAddStr(const char* str);
-extern "C" RT_API int RtGetCh();
+extern "C" RT_API int RtGetCh(); // key codes translated to System.Runtime/Keys.cm
+extern "C" RT_API int RtGetRawCh(); // key code from PDCurses/ncurses library (not translated)
+extern "C" RT_API int RtTranslateCh(int ch); // translate a raw key code
 extern "C" RT_API void RtGetNStr(char* str, int size);
 extern "C" RT_API void RtAttrOn(int attrs);
 extern "C" RT_API void RtAttrOff(int attrs);
 extern "C" RT_API void RtAttrSet(int attrs);
+extern "C" RT_API bool RtRunningOnWsl();
 
 // Key codes returned by RtGetCh function:
 
