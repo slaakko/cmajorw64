@@ -8,4 +8,4 @@ project <keys/keys.cmp>;
 project <rex/rex.cmp>;
 project <sted/sted.cmp>;
 project <xpq/xpq.cmp>;
-activeProject Calculator;
+activeProject Args;

@@ -492,6 +492,19 @@ int main(int argc, const char** argv)
                     }
                     std::cerr << compileResult->ToString() << std::endl;
                 }
+                else if (GetGlobalFlag(GlobalFlags::msbuild))
+                {
+                    cmajor::dom::Document compileResultDoc;
+                    std::unique_ptr<cmajor::dom::Element> compileResultElement(new cmajor::dom::Element(U"compileResult"));
+                    std::unique_ptr<cmajor::dom::Element> successElement(new cmajor::dom::Element(U"success"));
+                    std::unique_ptr<cmajor::dom::Text> trueValue(new cmajor::dom::Text(U"true"));
+                    successElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(trueValue.release()));
+                    compileResultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(successElement.release()));
+                    compileResultDoc.AppendChild(std::unique_ptr<cmajor::dom::Node>(compileResultElement.release()));
+                    CodeFormatter formatter(std::cerr);
+                    formatter.SetIndentSize(1);
+                    compileResultDoc.Write(formatter);
+                }
             }
             else if (GetGlobalFlag(GlobalFlags::ide))
             {

@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/rt/Screen.hpp>
+#include <cmajor/rt/Environment.hpp>
 #include <memory>
 #include <unordered_map>
 #include <fstream>
@@ -35,14 +36,8 @@ void SetKeys()
 }
 #else
 #include <ncurses.h>
-#include <cmajor/rt/Environment.hpp>
 void SetKeys()
 {
-    std::string osInfo = RtGetOsInfo();
-    if (osInfo.find("Microsoft") != std::string::npos)
-    {
-        runningOnWsl = true;
-    }
     if (runningOnWsl) // running on Windows Subsystem for Linux
     {
         ksup = 337;
@@ -78,6 +73,11 @@ std::unordered_map<int, int> keyMap;
 
 void InitScreen()
 {
+    std::string osInfo = RtGetOsInfo();
+    if (osInfo.find("Microsoft") != std::string::npos)
+    {
+        runningOnWsl = true;
+    }
     SetKeys();
     keyMap['\r'] = keyEnter;
     keyMap['\n'] = keyEnter;

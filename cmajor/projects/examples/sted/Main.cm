@@ -165,7 +165,10 @@ class Editor
     }
     private void Print()
     {
-        RtClear();
+        if (RtRunningOnWsl()) 
+        {
+            RtClear(); // on Windows Subsystem for Linux screen update does not work without this...
+        }        
         for (int r = 0; r < screen.textRows; ++r)
         {
             int lineNumber = r + rowOffset;

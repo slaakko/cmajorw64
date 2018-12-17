@@ -10,7 +10,7 @@ int main()
     try
     {
         int ch = RtGetRawCh();
-        while (ch != cast<int>('\n') && ch != cast<int>('\r'))
+        while (ch != keyEscape)
         {
             string s = "raw: " + ToString(ch) + ", translated: " + ToString(RtTranslateCh(ch)) + "\n";
             RtAddStr(s.Chars());
