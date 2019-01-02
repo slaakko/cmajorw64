@@ -1,0 +1,240 @@
+using System;
+using System.Collections;
+using Span = System.Text.Parsing.Span;
+
+namespace cmsx.assembly
+{
+    public const ulong notDefined = cast<ulong>(-1);
+
+    public enum Segment : byte
+    {
+        text = 0u, data = 1u, pool = 2u, stack = 3u
+    }
+
+    public class Value
+    {
+        public enum Kind
+        {
+            register, pure, undefined
+        }
+        public nothrow Value(Kind kind_, ulong value_) : kind(kind_), value(value_)
+        {
+        }
+        public Kind kind;
+        public ulong value;
+    }
+
+    public void Error(const string& message, const Span& span)
+    {
+        System.Text.Parsing.ThrowException(message, span);
+    }
+
+    public class Assembler : Visitor
+    {
+        public nothrow Assembler() : currentSegment(Segment.text), at(cmsx.machine.textSegmentBaseAddress), atCodeSegment(notDefined), atDataSegment(notDefined)
+        {
+        }
+        public void Assemble(List<UniquePtr<Instruction>>& instructions)
+        {
+            long n = instructions.Count();
+            for (long i = 0; i < n; ++i)
+            {
+                Instruction* inst = instructions[i].Get();
+                inst->Accept(*this);
+            }
+
+        }
+        public override void Visit(Instruction& inst)
+        {
+            instruction = &inst;
+            inst.opCode->Accept(*this);
+            AlignAt();
+            if (!inst.label.IsNull())
+            {
+                if (opc != IS && opc != GREG)
+                {
+                    inst.label->Accept(*this);
+                    if (value.kind != Value.Kind.undefined)
+                    {
+                        Error("symbol '" + ToUtf8(name) + "' already defined", span);
+                    }
+                    symbolTable[name] = Value(Value.Kind.pure, at);
+                }
+            }
+            ProcessOp();
+        }
+        public override void Visit(OpCode& opCode)
+        {
+            string opCodeName = ToUtf8(opCode.name);
+            opc = cmsx.machine.GetOpCode(opCodeName);
+            if (opc == -1)
+            {
+                opc = PseudoOpMap.Instance().GetCode(opCodeName);
+            }
+            if (opc == -1)
+            {
+                Error("unknown opcode '" + opCodeName + "'", opCode.span);
+            }
+        }
+        public override void Visit(LocalLabel& ll)
+        {
+            // todo
+        }
+        public override void Visit(Symbol& symbol)
+        {
+            span = symbol.span;
+            name = symbol.name;
+            Map<ustring, Value>.ConstIterator i = symbolTable.CFind(name);
+            if (i != symbolTable.CEnd())
+            {
+                value = i->second;
+            }
+            else
+            {
+                value = Value(Value.Kind.undefined, notDefined);
+            }
+        }
+        public override void Visit(DecimalConstant& dc) 
+        {
+            value = Value(Value.Kind.pure, dc.value);
+        }
+        public override void Visit(HexConstant& hc)
+        {
+            value = Value(Value.Kind.pure, hc.value);
+        }
+        public override void Visit(CharacterConstant& cc)
+        {
+            value = Value(Value.Kind.undefined, notDefined);
+            string s = ToString(cc.value);
+            for (char c : s)
+            {
+                
+            }
+        }
+        public override void Visit(At&)
+        {
+            value = Value(Value.Kind.pure, at);
+        }
+        public override void Visit(StringConstant& sc)
+        {
+            value = Value(Value.Kind.undefined, notDefined);
+            string s = ToUtf8(sc.value);
+            for (char c : s)
+            {
+                
+            }
+        }
+        public override void Visit(LocalOperand& operand)
+        {
+            // todo
+        }
+        public override void Visit(UnaryExpression& expr)
+        {
+            switch (expr.op)
+            {
+                case Operator.unaryPlus:
+                {
+                    break;
+                }
+                case Operator.unaryMinus:
+                {
+                    if (value.kind == Value.Kind.pure)
+                    {
+                        value.value = cast<ulong>(-value.value);
+                    }
+                    else
+                    {
+                        Error("unary minus needs pure operand", expr.span);
+                    }
+                    break;
+                }
+                case Operator.complement:
+                {
+                    if (value.kind == Value.Kind.pure)
+                    {
+                        value.value = ~value.value;
+                    }
+                    else
+                    {
+                        Error("complement needs pure operand", expr.span);
+                    }
+                    break;
+                }
+                case Operator.register:
+                {
+                    if (value.value >= 0u && value.value <= 255u && value.kind == Value.Kind.pure)
+                    {
+                        value.kind = Value.Kind.register;
+                    }
+                    else
+                    {
+                        Error("invalid registerize operand", expr.span);
+                    }
+                    break;
+                }
+                case Operator.serial:
+                {
+                    // todo
+                    break;
+                }
+            }
+        }
+        private void AlignAt()
+        {
+            ulong alignment = 1u;
+            if (opc == WYDE)
+            {
+                alignment = 2u;
+            }
+            else if (opc == TETRA || opc < 256)
+            {
+                alignment = 4u;
+            }
+            else if (opc == OCTA)
+            {
+                alignment = 8u;
+            }
+            ulong a = at & (alignment - 1u);
+            if (a != 0u)
+            {
+                at = at + alignment - a;
+            }
+        }
+        private void ProcessOp()
+        {
+            switch (opc)
+            {
+                case IS:
+                {
+                    ProcessIs();
+                    break;
+                }
+            }
+        }
+        private void ProcessIs()
+        {
+            if (instruction->operandList->operands.Count() != 1)
+            {
+                Error("IS takes one operand", instruction->span);
+            }
+            Node* expr = instruction->operandList->operands[0].Get();
+            value = Value(Value.Kind.undefined, notDefined);
+            expr->Accept(*this);
+            if (value.kind == Value.Kind.undefined)
+            {
+                Error("invalid IS expression value", instruction->span);
+            }
+
+        }
+        private Segment currentSegment;
+        private int opc;
+        private Instruction* instruction;
+        private Value value;
+        private Span span;
+        private ustring name;
+        private ulong at;
+        private ulong atCodeSegment;
+        private ulong atDataSegment;
+        private Map<ustring, Value> symbolTable;
+    }
+}

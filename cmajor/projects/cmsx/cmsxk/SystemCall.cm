@@ -1,0 +1,42 @@
+using System;
+using cmsx.machine;
+
+namespace cmsx.kernel
+{
+    public const byte exitSystemCall = 0u;
+    public const byte numSystemCalls = 1u;
+
+    public delegate void TrapHandler(Machine& machine, byte trapX, byte trapY, byte trapZ, ulong trapP);
+
+    public inline nothrow ulong MakeSystemCallPtrAddress(int systemCall)
+    {
+        return trapTableBaseAddress + cast<ulong>(systemCall) * 8u;
+    }
+
+    public nothrow void Exit(Machine& machine, byte x, byte y, byte z, ulong p)
+    {
+        if (x != 0u || y != 0u || z != 0u)
+        {
+            if (!Machine.GetFlag(Machine.Flags.quiet))
+            {
+                Console.Error() << "invalid halt parameters: " << ToString(x) << ", " << ToString(y) << ", " << ToString(z) << endl();
+            }
+            RtExit(1);
+        }
+        Process* process = ProcessTable.Instance().GetRunning();
+        if (process != null)
+        {
+            ushort exitCode = MakeProcessExitCode(0u, cast<byte>(p));
+            ExitProcess(process, exitCode);
+            Schedule();
+        }
+        else
+        {
+            if (!Machine.GetFlag(Machine.Flags.quiet))
+            {
+                Console.Error() << "exit called for a process that is not running!" << endl();
+            }
+            RtExit(1);
+        }
+    }
+}

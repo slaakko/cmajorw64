@@ -1,0 +1,382 @@
+using System;
+using System.Collections;
+using cmsx.machine;
+
+namespace cmsx.kernel
+{
+    public const int numProcessSlots = 1024;
+    public const int noPID = -1;
+    public const int idlePID = 0x7FFFFFFF;
+
+    public class Process 
+    {
+        public enum State : byte
+        {
+            free = 0u, created = 1u, readyToRun = 2u, running = 3u, asleep = 5u, zombie = 6u
+        }
+        public nothrow Process() : pid(noPID), state(State.free), parent(null), firstChild(null), nextSibling(null),
+            nextFree(null), nextReadyToRun(null), prevReadyToRun(null), memoryTable(), sp(0u), exitCode(0u)
+        {
+        }
+        public int pid;
+        public State state;
+        public Process* parent;
+        public Process* firstChild;
+        public Process* nextSibling;
+        public Process* nextFree;
+        public Process* nextReadyToRun;
+        public Process* prevReadyToRun;
+        public MemoryTable memoryTable;
+        public ulong sp;
+        public ushort exitCode;
+    }
+
+    public class ProcessTable
+    {
+        static ProcessTable() : instance(new ProcessTable())
+        {
+        }
+        public static nothrow ProcessTable& Instance()
+        {
+            return *instance;
+        }
+        private ProcessTable() : nextPID(0), free(null), running(null), ready(null), nextFreeProcessSlot(0)
+        {
+        }
+        public void Init()
+        {
+        }
+        public nothrow Process* CreateProcess()
+        {
+            Process* process = null;
+            if (free != null)
+            {
+                process = free;
+                free = free->nextFree;
+            }
+            else if (nextFreeProcessSlot < numProcessSlots)
+            {
+                process = &processSlots[nextFreeProcessSlot++];
+            }
+            else
+            {
+                return null;
+            }
+            process->pid = nextPID++;
+            process->state = Process.State.created;
+            process->parent = null;
+            process->firstChild = null;
+            process->nextSibling = null;
+            process->nextFree = null;
+            process->nextReadyToRun = null;
+            process->prevReadyToRun = null;
+            InitializeProcessMemory(process);
+            AddProcessToProcessMap(process);
+            return process;
+        }
+        public nothrow void FreeProcess(Process* process)
+        {
+            processMap.Remove(process->pid);
+            *process = Process();
+            process->nextFree = free;
+            free = process;
+        }
+        public nothrow Process* GetProcess(int pid) const
+        {
+            HashMap<int, Process*>.ConstIterator it = processMap.CFind(pid);
+            if (it != processMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        public inline nothrow Process* GetRunning() const
+        {
+            return running;
+        }
+        public inline nothrow void SetRunning(Process* running_)
+        {
+            running = running_;
+        }
+        public inline nothrow Process* GetReady() const
+        {
+            return ready;
+        }
+        public inline nothrow void SetReady(Process* ready_)
+        {
+            ready = ready_;
+        }
+        public inline nothrow Process* GetIdle() const
+        {
+            return &idleProcess;
+        }
+        public nothrow void AddProcessToProcessMap(Process* process)
+        {
+            processMap[process->pid] = process;
+        }
+        private static UniquePtr<ProcessTable> instance;
+        private Process[numProcessSlots] processSlots;
+        private Process idleProcess;
+        private int nextPID;
+        private Process* free;
+        private int nextFreeProcessSlot;
+        private HashMap<int, Process*> processMap;
+        private Process* running;
+        private Process* ready;
+    }
+
+    public nothrow Process* CreateProcess(ProcessTable& processTable)
+    {
+        return processTable.CreateProcess();
+    }
+
+    public nothrow void FreeProcess(ProcessTable& processTable, Process* process)
+    {
+        processTable.FreeProcess(process);
+    }
+
+    public nothrow Process* GetProcess(ProcessTable& processTable, int pid)
+    {
+        return processTable.GetProcess(pid);
+    }
+
+    public nothrow Process* GetRunningProcess(ProcessTable& processTable)
+    {
+        return processTable.GetRunning();
+    }
+
+    public nothrow void AddProcessToList(Process** head, Process* process)
+    {
+        #assert(head != null);
+        if (*head == null)
+        {
+            process->prevReadyToRun = process;
+            process->nextReadyToRun = process;
+            *head = process;
+        }
+        else
+        {
+            Process* h = *head;
+            h->prevReadyToRun->nextReadyToRun = process;
+            process->prevReadyToRun = h->prevReadyToRun;
+            h->prevReadyToRun = process;
+            process->nextReadyToRun = h;
+        }
+    }
+
+    public nothrow Process* RemoveProcessFromList(Process** head)
+    {
+        #assert(head != null);
+        Process* process = *head;
+        if (process != null)
+        {
+            if (process->nextReadyToRun == process)
+            {
+                *head = null;
+            }
+            else
+            {
+                Process* h = *head;
+                Process* next = h->nextReadyToRun;
+                h->nextReadyToRun->prevReadyToRun = h->prevReadyToRun;
+                h->prevReadyToRun->nextReadyToRun = h->nextReadyToRun;
+                h->nextReadyToRun = h;
+                h->prevReadyToRun = h;
+                *head = next;
+            }
+        }
+        return process;
+    }
+
+    public nothrow void SetProcessReadyToRun(ProcessTable& processTable, Process* process)
+    {
+        Process* ready = processTable.GetReady();
+        process->state = Process.State.readyToRun;
+        AddProcessToList(&ready, process);
+        processTable.SetReady(ready);
+    }
+
+    public nothrow void LinkReadyProcessesToRunningList(ProcessTable& processTable)
+    {
+        Process* ready = processTable.GetReady();
+        Process* running = processTable.GetRunning();
+        Process* process = RemoveProcessFromList(&ready);
+        while (process != null)
+        {
+            AddProcessToList(&running, process);
+            process = RemoveProcessFromList(&ready);
+        }
+        processTable.SetReady(ready);
+        processTable.SetRunning(running);
+    }
+
+    public nothrow inline ushort MakeProcessExitCode(byte signalNumber, byte userExitCode)
+    {
+        return (cast<ushort>(signalNumber) << 8u) | cast<ushort>(userExitCode);
+    }
+
+    public nothrow inline void UnpackProcessExitCode(ushort exitCode, byte& signalNumber, byte& userExitCode)
+    {
+        signalNumber = cast<byte>(exitCode >> 8u);
+        userExitCode = cast<byte>(exitCode);
+    }
+
+    public nothrow void ExitProcess(Process* process, ushort exitCode)
+    {
+        #assert(process->pid != idlePID);
+        FreeProcessMemory(Machine.Instance().GetMemory(), process);
+        process->exitCode = exitCode;
+        process->state = Process.State.zombie;
+    }
+
+    public nothrow void InitializeProcessMemory(Process* process)
+    {
+        DefaultInitializeMemoryTable(process->memoryTable);
+        AllocateMemory(Machine.Instance().GetMemory(), process->memoryTable);
+        ulong sp = stackSegmentBaseAddress + process->memoryTable.segmentDescriptors[stackSegmentIndex]->startAddress;
+        Machine& machine = Machine.Instance();
+        Registers& regs = machine.GetRegisters();
+        ulong prevPC = regs.GetPC();
+        ulong prevFP = regs.GetFP();
+        ulong prevRL = regs.GetSpecial(Registers.rL);
+        ulong prevRG = regs.GetSpecial(Registers.rG);
+        ulong pc = textSegmentBaseAddress + process->memoryTable.segmentDescriptors[textSegmentIndex]->startAddress;
+        regs.SetPC(pc);
+        regs.SetFP(0u);
+        regs.SetSpecial(Registers.rL, 0u);
+        regs.SetSpecial(Registers.rG, 255u);
+        process->sp = machine.GetProcessor().SaveContext(process->memoryTable.virtualTranslationRegisterValue, sp);
+        regs.SetPC(prevPC);
+        regs.SetFP(prevFP);
+        regs.SetSpecial(Registers.rL, prevRL);
+        regs.SetSpecial(Registers.rG, prevRG);
+    }
+
+    public nothrow void FreeProcessMemory(Memory& mem, Process* process)
+    {
+        FreeMemory(mem, process->memoryTable);
+    }
+
+    public nothrow void InitializeIdleProcess(ProcessTable& processTable, Process* idleProcess)
+    {
+        idleProcess->pid = idlePID;
+        idleProcess->state = Process.State.readyToRun;
+        idleProcess->parent = null;
+        idleProcess->firstChild = null;
+        idleProcess->nextSibling = null;
+        idleProcess->nextFree = null;
+        idleProcess->nextReadyToRun = idleProcess;
+        idleProcess->prevReadyToRun = idleProcess;
+        InitializeProcessMemory(idleProcess);
+        Machine& machine = Machine.Instance();
+        Registers& regs = machine.GetRegisters();
+        Memory& mem = machine.GetMemory();
+        MemoryTable& memoryTable = idleProcess->memoryTable;
+        ulong prevRV = regs.GetSpecial(Registers.rV);
+        regs.SetSpecial(Registers.rV, memoryTable.virtualTranslationRegisterValue);
+        ulong addr = memoryTable.segmentDescriptors[textSegmentIndex]->startAddress;
+        mem.WriteByte(addr, SWYM, Protection.execute);
+        ++addr;
+        mem.WriteByte(addr, 0u, Protection.execute);
+        ++addr;
+        mem.WriteByte(addr, 0u, Protection.execute);
+        ++addr;
+        mem.WriteByte(addr, 0u, Protection.execute);
+        ++addr;
+        mem.WriteByte(addr, JMPB, Protection.execute);
+        ++addr;
+        mem.WriteByte(addr, 0xFFu, Protection.execute);
+        ++addr;
+        mem.WriteByte(addr, 0xFFu, Protection.execute);
+        ++addr;
+        mem.WriteByte(addr, 0xFFu, Protection.execute);
+        regs.SetSpecial(Registers.rV, prevRV);
+        processTable.AddProcessToProcessMap(idleProcess);
+    }
+
+    public void CreateInitProcess(ProcessTable& processTable)
+    {
+        Process* idleProcess = processTable.GetIdle();
+        InitializeIdleProcess(processTable, idleProcess);
+        Process* initProcess = CreateProcess(processTable);
+        if (initProcess == null)
+        {
+            throw Exception("could not create init process");
+        }
+        Machine& machine = Machine.Instance();
+        Registers& regs = machine.GetRegisters();
+        Memory& mem = machine.GetMemory();
+        MemoryTable& memoryTable = initProcess->memoryTable;
+        ulong prevRV = regs.GetSpecial(Registers.rV);
+        regs.SetSpecial(Registers.rV, memoryTable.virtualTranslationRegisterValue);
+        ulong addr = memoryTable.segmentDescriptors[textSegmentIndex]->startAddress;
+        mem.WriteByte(addr, TRAP, Protection.execute);
+        ++addr;
+        mem.WriteByte(addr, 0u, Protection.execute);
+        ++addr;
+        mem.WriteByte(addr, 0u, Protection.execute);
+        ++addr;
+        mem.WriteByte(addr, 0u, Protection.execute);
+        ++addr;
+        regs.SetSpecial(Registers.rV, prevRV);
+        SetProcessReadyToRun(processTable, initProcess);
+    }
+
+    public nothrow void Schedule()
+    {
+        Machine& machine = Machine.Instance();
+        Processor& processor = machine.GetProcessor();
+        ProcessTable& processTable = ProcessTable.Instance();
+        Process* running  = processTable.GetRunning();
+        Process* prevRunning = running;
+        Process*  idle = processTable.GetIdle();
+        if (running == idle)
+        {
+            running->sp = processor.SaveContext(running->memoryTable.virtualTranslationRegisterValue, running->sp);
+            running = null;
+            processTable.SetRunning(running);
+        }
+        LinkReadyProcessesToRunningList(processTable);
+        running  = processTable.GetRunning();
+        if (running == null)
+        {
+            running = idle;
+        }
+        else
+        {
+            running = running->nextReadyToRun;
+            if (running->state != Process.State.readyToRun && running->state != Process.State.running)
+            {
+                running = idle;
+            }
+        }
+        if (prevRunning != running)
+        {
+            if (prevRunning != null)
+            {
+                if (prevRunning->state != Process.State.zombie)
+                {
+                    prevRunning->sp = processor.SaveContext(prevRunning->memoryTable.virtualTranslationRegisterValue, prevRunning->sp);
+                }
+                if (prevRunning->state == Process.State.running)
+                {
+                    prevRunning->state = Process.State.readyToRun;
+                }
+                else
+                {
+                    RemoveProcessFromList(&prevRunning);
+                }
+            }
+            processor.UnsaveContext(running->memoryTable.virtualTranslationRegisterValue, running->sp);
+        }
+        else
+        {
+            processor.GetRegisters().SetSpecial(Registers.rV, running->memoryTable.virtualTranslationRegisterValue);
+        }
+        processTable.SetRunning(running);
+        running->state = Process.State.running;
+    }
+}

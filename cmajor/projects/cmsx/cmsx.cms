@@ -1,0 +1,7 @@
+solution cmsx;
+project <cmsx.cmp>;
+project <cmsxa/cmsxa.cmp>;
+project <cmsxas/cmsxas.cmp>;
+project <cmsxk/cmsxk.cmp>;
+project <cmsxm/cmsxm.cmp>;
+project <cmsxu/cmsxu.cmp>;

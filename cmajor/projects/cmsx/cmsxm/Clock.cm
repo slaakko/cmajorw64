@@ -1,0 +1,65 @@
+using System;
+using System.Threading;
+
+namespace cmsx.machine
+{
+    public class ClockDriver
+    {
+        public ClockDriver(Clock& clock_) : clock(clock_)
+        {
+            clock.Start();
+        }
+        public ~ClockDriver()
+        {
+            clock.Stop();
+        }
+        private Clock& clock;
+    }
+
+    public class Clock
+    {
+        public const long tick = 50; // 50 ms
+
+        public Clock(Machine& machine_) : machine(machine_)
+        {
+        }
+        public void Start()
+        {
+            ThreadStartMethod tickMethod = Tick;
+            thread = Thread.StartMethod(tickMethod);
+        }
+        public void Stop()
+        {
+            stopping = true;
+            stop.NotifyOne();
+            thread.Join();
+        }
+        private void Tick()
+        {
+            try
+            {
+                while (!stopping)
+                {
+                    LockGuard<RecursiveMutex> lock(mtx);
+                    ConditionVariableStatus status = stop.WaitFor(mtx, Duration.FromMilliseconds(tick));
+                    if (status == ConditionVariableStatus.timeout)
+                    {
+                        ulong rq = machine.GetRegisters().GetSpecial(Registers.rQ);
+                        rq = rq | CLOCK_BIT;
+                        machine.GetRegisters().SetSpecial(Registers.rQ, rq);
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                Console.Error() << "clock: " << ex.ToString() << endl();
+                RtExit(1);
+            }
+        }
+        private Machine& machine; 
+        private RecursiveMutex mtx;
+        private ConditionVariable stop;
+        private Thread thread;
+        private bool stopping;
+    }
+}

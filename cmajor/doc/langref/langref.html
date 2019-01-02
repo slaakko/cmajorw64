@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -156,6 +156,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;12.1 <a href="#interfaces-syntax">Syntax</a><br />
         13 <a href="#delegates">Delegates</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;13.1 <a href="#delegates-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;13.2 <a href="#delegate-conversions">Conversions</a><br />
         14 <a href="#class-delegates">Class Delegates</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;14.1 <a href="#class-delegates-syntax">Syntax</a><br />
         15 <a href="#concepts">Concepts</a><br />
@@ -2766,6 +2767,13 @@
         The default value of a generic pointer type object is <span class="kw">null</span>.
     </p>
 
+    <p>
+        To support systems programming, a <strong>void*</strong> value can be explicitly converted to a <strong>ulong</strong> value,
+        and a <strong>ulong</strong> value can be explicitly converted to a <strong>void*</strong> value.
+        Also a <strong>void*</strong> value can be explicitly converted to any <a href="#delegates">delegate type</a> value,
+        and any delegate type value can be explicitly converted to a <strong>void*</strong> value.
+    </p>
+
     <h3 id="reference-type">6.6 Reference Types</h3>
 
     <p>
@@ -4350,6 +4358,13 @@
         A nonmember function or a static member function can be bound to a delegate.
         An object of a delegate type contains a pointer to a function.
         For an example of a delegate, see <a href="../code/cmdoc/content/Delegate/file/delegate.cm.html">delegate.cm</a>.
+    </p>
+
+    <h3 id="delegate-conversions">13.2 Conversions</h3>
+
+    <p>
+        To support systems programming, a delegate type value can be explicitly converted to a <strong>void*</strong> value, 
+        and a <strong>void*</strong> value can be explicitly converted to a delegate type value.
     </p>
 
     <h2 id="class-delegates">14 Class Delegates</h2>

@@ -1,0 +1,9 @@
+project cmsxk;
+target=library;
+reference <../cmsxm/cmsxm.cmp>;
+source <Boot.cm>;
+source <InterruptHandler.cm>;
+source <Memory.cm>;
+source <Process.cm>;
+source <Segment.cm>;
+source <SystemCall.cm>;

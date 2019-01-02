@@ -1,0 +1,4 @@
+project cmsxas;
+target=library;
+reference <../cmsxa/cmsxa.cmp>;
+source <Main.cm>;

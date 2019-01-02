@@ -118,6 +118,7 @@ using namespace cmajor::symbols;
 using namespace cmajor::parsing;
 using namespace cmajor::build;
 
+#if(0)
 void AddWarningsTo(cmajor::dom::Element* diagnosticsElement, Module* module)
 {
     if (!module->WarningCollection().Warnings().empty())
@@ -161,6 +162,7 @@ void AddWarningsTo(cmajor::dom::Element* diagnosticsElement, Module* module)
         }
     }
 }
+#endif
 
 int main(int argc, const char** argv)
 {
@@ -466,21 +468,26 @@ int main(int argc, const char** argv)
             {
                 if (!GetGlobalFlag(GlobalFlags::quiet) && !GetGlobalFlag(GlobalFlags::ide) && !GetGlobalFlag(GlobalFlags::msbuild))
                 {
+#if(0)
                     for (const Warning& warning : rootModule->WarningCollection().Warnings())
                     {
                         std::string what = Expand(rootModule.get(), warning.Message(), warning.Defined(), warning.References(), "Warning");
                         std::cerr << what << std::endl;
                     }
+#endif
                 }
                 if (GetGlobalFlag(GlobalFlags::ide))
                 {
+#if(0)
                     for (const Warning& warning : rootModule->WarningCollection().Warnings())
                     {
                         std::string what = Expand(rootModule.get(), warning.Message(), warning.Defined(), warning.References(), "Warning");
                         std::cout << what << std::endl;
                     }
+#endif
                     std::unique_ptr<JsonObject> compileResult(new JsonObject());
                     compileResult->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(true)));
+#if(0)
                     if (!rootModule->WarningCollection().Warnings().empty())
                     {
                         JsonArray* warningsArray = new JsonArray();
@@ -490,6 +497,7 @@ int main(int argc, const char** argv)
                         }
                         compileResult->AddField(U"warnings", std::unique_ptr<JsonValue>(warningsArray));
                     }
+#endif
                     std::cerr << compileResult->ToString() << std::endl;
                 }
                 else if (GetGlobalFlag(GlobalFlags::msbuild))
@@ -547,11 +555,13 @@ int main(int argc, const char** argv)
             std::cerr << ex.what() << std::endl;
             if (rootModule)
             {
+#if(0)
                 for (const Warning& warning : rootModule->WarningCollection().Warnings())
                 {
                     std::string what = Expand(rootModule.get(), warning.Message(), warning.Defined(), warning.References(), "Warning");
                     std::cerr << what << std::endl;
                 }
+#endif
             }
         }
         if (GetGlobalFlag(GlobalFlags::ide))
@@ -559,11 +569,13 @@ int main(int argc, const char** argv)
             std::cout << ex.what() << std::endl;
             if (rootModule)
             {
+#if(0)
                 for (const Warning& warning : rootModule->WarningCollection().Warnings())
                 {
                     std::string what = Expand(rootModule.get(), warning.Message(), warning.Defined(), warning.References(), "Warning");
                     std::cout << what << std::endl;
                 }
+#endif
             }
             std::unique_ptr<JsonObject> compileResult(new JsonObject());
             compileResult->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(false)));
@@ -580,6 +592,7 @@ int main(int argc, const char** argv)
             }
             json->AddField(U"references", std::move(refs));
             compileResult->AddField(U"diagnostics", std::move(json));
+#if(0)
             if (rootModule && !rootModule->WarningCollection().Warnings().empty())
             {
                 JsonArray* warningsArray = new JsonArray();
@@ -589,6 +602,7 @@ int main(int argc, const char** argv)
                 }
                 compileResult->AddField(U"warnings", std::unique_ptr<JsonValue>(warningsArray));
             }
+#endif
             std::cerr << compileResult->ToString() << std::endl;
         }
         else if (GetGlobalFlag(GlobalFlags::msbuild))
@@ -596,11 +610,13 @@ int main(int argc, const char** argv)
             std::cout << ex.what() << std::endl;
             if (rootModule)
             {
+#if(0)
                 for (const Warning& warning : rootModule->WarningCollection().Warnings())
                 {
                     std::string what = Expand(rootModule.get(), warning.Message(), warning.Defined(), warning.References(), "Warning");
                     std::cout << what << std::endl;
                 }
+#endif
             }
             cmajor::dom::Document compileResultDoc;
             std::unique_ptr<cmajor::dom::Element> compileResultElement(new cmajor::dom::Element(U"compileResult"));
@@ -628,7 +644,9 @@ int main(int argc, const char** argv)
                 diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(spanElement.release()));
             }
             diagnosticsElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(diagnosticElement.release()));
+#if(0)
             AddWarningsTo(diagnosticsElement.get(), rootModule.get());
+#endif
             compileResultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(diagnosticsElement.release()));
             compileResultDoc.AppendChild(std::unique_ptr<cmajor::dom::Node>(compileResultElement.release()));
             CodeFormatter formatter(std::cerr);
@@ -642,23 +660,28 @@ int main(int argc, const char** argv)
         if (!GetGlobalFlag(GlobalFlags::quiet) && !GetGlobalFlag(GlobalFlags::ide) && !GetGlobalFlag(GlobalFlags::msbuild))
         {
             std::cerr << ex.What() << std::endl;
+#if(0)
             for (const Warning& warning : ex.GetModule()->WarningCollection().Warnings())
             {
                 std::string what = Expand(ex.GetModule(), warning.Message(), warning.Defined(), warning.References(), "Warning");
                 std::cerr << what << std::endl;
             }
+#endif
         }
         if (GetGlobalFlag(GlobalFlags::ide))
         {
             std::cout << ex.What() << std::endl;
+#if(0)
             for (const Warning& warning : ex.GetModule()->WarningCollection().Warnings())
             {
                 std::string what = Expand(ex.GetModule(), warning.Message(), warning.Defined(), warning.References(), "Warning");
                 std::cout << what << std::endl;
             }
+#endif
             std::unique_ptr<JsonObject> compileResult(new JsonObject());
             compileResult->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(false)));
             compileResult->AddField(U"diagnostics", std::move(ex.ToJson()));
+#if(0)
             if (!ex.GetModule()->WarningCollection().Warnings().empty())
             {
                 JsonArray* warningsArray = new JsonArray();
@@ -668,16 +691,19 @@ int main(int argc, const char** argv)
                 }
                 compileResult->AddField(U"warnings", std::unique_ptr<JsonValue>(warningsArray));
             }
+#endif
             std::cerr << compileResult->ToString() << std::endl;
         }
         else if (GetGlobalFlag(GlobalFlags::msbuild))
         {
             std::cout << ex.What() << std::endl;
+#if(0)
             for (const Warning& warning : ex.GetModule()->WarningCollection().Warnings())
             {
                 std::string what = Expand(ex.GetModule(), warning.Message(), warning.Defined(), warning.References(), "Warning");
                 std::cout << what << std::endl;
             }
+#endif
             cmajor::dom::Document compileResultDoc;
             std::unique_ptr<cmajor::dom::Element> compileResultElement(new cmajor::dom::Element(U"compileResult"));
             std::unique_ptr<cmajor::dom::Element> successElement(new cmajor::dom::Element(U"success"));
@@ -686,7 +712,9 @@ int main(int argc, const char** argv)
             compileResultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(successElement.release()));
             std::unique_ptr<cmajor::dom::Element> diagnosticsElement(new cmajor::dom::Element(U"diagnostics"));
             ex.AddToDiagnosticsElement(diagnosticsElement.get());
+#if(0)
             AddWarningsTo(diagnosticsElement.get(), ex.GetModule());
+#endif
             compileResultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(diagnosticsElement.release()));
             compileResultDoc.AppendChild(std::unique_ptr<cmajor::dom::Node>(compileResultElement.release()));
             CodeFormatter formatter(std::cerr);
@@ -702,11 +730,13 @@ int main(int argc, const char** argv)
             std::cerr << ex.what() << std::endl;
             if (rootModule)
             {
+#if(0)
                 for (const Warning& warning : rootModule->WarningCollection().Warnings())
                 {
                     std::string what = Expand(rootModule.get(), warning.Message(), warning.Defined(), warning.References(), "Warning");
                     std::cerr << what << std::endl;
                 }
+#endif
             }
         }
         if (GetGlobalFlag(GlobalFlags::ide))
@@ -714,11 +744,13 @@ int main(int argc, const char** argv)
             std::cout << ex.what() << std::endl;
             if (rootModule)
             {
+#if(0)
                 for (const Warning& warning : rootModule->WarningCollection().Warnings())
                 {
                     std::string what = Expand(rootModule.get(), warning.Message(), warning.Defined(), warning.References(), "Warning");
                     std::cout << what << std::endl;
                 }
+#endif
             }
             std::unique_ptr<JsonObject> compileResult(new JsonObject());
             compileResult->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(false)));
@@ -728,6 +760,7 @@ int main(int argc, const char** argv)
             diagnostics->AddField(U"project", std::unique_ptr<JsonValue>(new JsonString(U"")));
             diagnostics->AddField(U"message", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(ex.what()))));
             compileResult->AddField(U"diagnostics", std::move(diagnostics));
+#if(0)
             if (rootModule && !rootModule->WarningCollection().Warnings().empty())
             {
                 JsonArray* warningsArray = new JsonArray();
@@ -737,6 +770,7 @@ int main(int argc, const char** argv)
                 }
                 compileResult->AddField(U"warnings", std::unique_ptr<JsonValue>(warningsArray));
             }
+#endif
             std::cerr << compileResult->ToString() << std::endl;
         }
         else if (GetGlobalFlag(GlobalFlags::msbuild))
@@ -744,11 +778,13 @@ int main(int argc, const char** argv)
             std::cout << ex.what() << std::endl;
             if (rootModule)
             {
+#if(0)
                 for (const Warning& warning : rootModule->WarningCollection().Warnings())
                 {
                     std::string what = Expand(rootModule.get(), warning.Message(), warning.Defined(), warning.References(), "Warning");
                     std::cout << what << std::endl;
                 }
+#endif
             }
             cmajor::dom::Document compileResultDoc;
             std::unique_ptr<cmajor::dom::Element> compileResultElement(new cmajor::dom::Element(U"compileResult"));
@@ -771,7 +807,9 @@ int main(int argc, const char** argv)
             diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(subcategoryElement.release()));
             diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(messageElement.release()));
             diagnosticsElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(diagnosticElement.release()));
+#if(0)
             AddWarningsTo(diagnosticsElement.get(), rootModule.get());
+#endif
             compileResultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(diagnosticsElement.release()));
             compileResultDoc.AppendChild(std::unique_ptr<cmajor::dom::Node>(compileResultElement.release()));
             CodeFormatter formatter(std::cerr);

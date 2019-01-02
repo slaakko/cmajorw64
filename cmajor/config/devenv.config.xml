@@ -5,7 +5,7 @@
     <infoDelaySecs>10</infoDelaySecs>
     <formSizeX>1834</formSizeX>
     <formSizeY>982</formSizeY>
-    <formTop>12</formTop>
+    <formTop>0</formTop>
     <formLeft>0</formLeft>
     <textVisX>182</textVisX>
     <textVisY>182</textVisY>
@@ -28,19 +28,19 @@
     <maxRecentProjects>10</maxRecentProjects>
     <recentProjects>
         <recentProject>
-            <path>D:\work\cmajorw64\cmajor\projects\examples\examples.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
             <path>D:\work\cmajorw64\cmajor\system\System.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
-            <path>D:\work\cmajorw64\cmajor\projects\koe\koe.cms</path>
+            <path>D:\work\cmajorw64\cmajor\projects\tools\cmparsergen\cmparsergen.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
-            <path>D:\work\cmajorw64\cmajor\projects\tools\cmparsergen\cmparsergen.cms</path>
+            <path>D:\work\cmajorw64\cmajor\projects\examples\examples.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>D:\work\cmajorw64\cmajor\projects\koe\koe.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>

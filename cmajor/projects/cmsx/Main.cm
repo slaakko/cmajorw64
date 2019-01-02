@@ -1,0 +1,114 @@
+using System;
+using System.Threading;
+using cmsx.machine;
+using cmsx.kernel;
+
+void Init(Machine& machine)
+{
+    MemoryTable& kernelMemoryTable = KernelMemory.Instance().GetTable();
+    machine.SetKernelRootPageAddress(kernelMemoryTable.rootPageAddress);
+    AllocateMemory(machine.GetMemory(), kernelMemoryTable);
+    Registers& regs = machine.GetRegisters();
+    SetProcessorToKernelMode(regs);
+    regs.SetSpecial(Registers.rV, MakeVirtualTranslationRegisterValue(kernelMemoryTable.rootPageAddress, kernelMemoryTable.addressSpaceNumber));
+    BootProc boot = Boot;
+    ulong bootProcValue = cast<ulong>(cast<void*>(boot));
+    machine.GetMemory().WriteULong(bootProcAddress, bootProcValue, Protection.write);
+    ProcessTable.Instance().Init();
+}
+
+void Run(Machine& machine)
+{
+    machine.Run();
+}
+
+void Terminate(Machine& machine)
+{
+    Registers& regs = machine.GetRegisters();
+    SetProcessorToKernelMode(regs);
+    regs.SetSpecial(Registers.rV, MakeVirtualTranslationRegisterValue(machine.GetKernelRootPageAddress(), kernelAddressSpaceNumber));
+    MemoryTable& kernelMemoryTable = KernelMemory.Instance().GetTable();
+    FreeMemory(machine.GetMemory(), kernelMemoryTable);
+}
+
+void MachineThreadFunction(void* machineParam)
+{
+    try
+    {
+        Machine* machine = cast<Machine*>(machineParam);
+        if (machine != null)
+        {
+            Init(*machine);
+            Run(*machine);
+            Terminate(*machine);
+        }
+    }
+    catch (const Exception& ex)
+    {
+        System.Console.Error() << ex.ToString() << endl();
+        RtExit(1);
+    }
+}
+
+class MachineDriver
+{
+    public MachineDriver(Machine& machine_) : machine(machine_), machineThread(Thread.StartFunction(MachineThreadFunction, &machine))
+    {
+    }
+    public ~MachineDriver()
+    {
+        machine.Exit();
+        machineThread.Join();
+    }
+    private Machine& machine;
+    private Thread machineThread;
+}
+
+void Run()
+{
+    Machine& machine = Machine.Instance();
+    MachineDriver machineDriver(machine);
+    string line = Console.ReadLine();
+    while (!Console.In().EndOfStream())
+    {
+        if (line == "logout" || line == "exit")
+        {
+            break;
+        }
+        line = Console.ReadLine();
+    }
+}
+
+int main(int argc, const char** argv)
+{
+    Debug.Start();
+    try
+    {
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("-"))
+            {
+                if (arg == "--verbose" || arg == "-v")
+                {
+                    Machine.SetFlag(Machine.Flags.verbose);
+                }
+                else if (arg == "--quiet" || arg == "-q")
+                {
+                    Machine.SetFlag(Machine.Flags.quiet);
+                }
+                else if (arg == "--debug" || arg == "-d")
+                {
+                    Machine.SetFlag(Machine.Flags.debug);
+                }
+            }
+        }
+        Run();
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+        return 1;
+    }
+    return 0;
+}

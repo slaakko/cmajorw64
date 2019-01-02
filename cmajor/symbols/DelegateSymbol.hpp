@@ -149,6 +149,39 @@ private:
     FunctionSymbol* function;
 };
 
+class DelegateToVoidPtrConversion : public FunctionSymbol
+{
+public:
+    DelegateToVoidPtrConversion(TypeSymbol* delegateType_, TypeSymbol* voidPtrType_);
+    ConversionType GetConversionType() const override { return ConversionType::explicit_; }
+    uint8_t ConversionDistance() const override { return 255; }
+    TypeSymbol* ConversionSourceType() const { return delegateType; }
+    TypeSymbol* ConversionTargetType() const { return voidPtrType; }
+    bool IsBasicTypeOperation() const override { return true; }
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    const char* ClassName() const override { return "DelegateToVoidPtrConversion"; }
+private:
+    TypeSymbol* delegateType;
+    TypeSymbol* voidPtrType;
+};
+
+class VoidPtrToDelegateConversion : public FunctionSymbol
+{
+public:
+    VoidPtrToDelegateConversion(TypeSymbol* voidPtrType_, TypeSymbol* delegateType_, TypeSymbol* ulongType_);
+    ConversionType GetConversionType() const override { return ConversionType::explicit_; }
+    uint8_t ConversionDistance() const override { return 255; }
+    TypeSymbol* ConversionSourceType() const { return delegateType; }
+    TypeSymbol* ConversionTargetType() const { return voidPtrType; }
+    bool IsBasicTypeOperation() const override { return true; }
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    const char* ClassName() const override { return "VoidPtrToDelegateConversion"; }
+private:
+    TypeSymbol* voidPtrType;
+    TypeSymbol* delegateType;
+    TypeSymbol* ulongType;
+};
+
 class ClassDelegateTypeSymbol : public TypeSymbol
 {
 public:

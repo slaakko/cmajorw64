@@ -614,6 +614,37 @@ void FunctionToDelegateConversion::Check()
     }
 }
 
+DelegateToVoidPtrConversion::DelegateToVoidPtrConversion(TypeSymbol* delegateType_, TypeSymbol* voidPtrType_) :
+    FunctionSymbol(Span(), U"dlg2voidptr"), delegateType(delegateType_), voidPtrType(voidPtrType_)
+{
+    SetConversion();
+    SetGroupName(U"@conversion");
+    SetAccess(SymbolAccess::public_);
+}
+
+void DelegateToVoidPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+{
+    emitter.SetCurrentDebugLocation(span);
+    llvm::Value* value = emitter.Stack().Pop();
+    emitter.Stack().Push(emitter.Builder().CreateBitCast(value, voidPtrType->IrType(emitter)));
+}
+
+VoidPtrToDelegateConversion::VoidPtrToDelegateConversion(TypeSymbol* voidPtrType_, TypeSymbol* delegateType_, TypeSymbol* ulongType_) :
+    FunctionSymbol(Span(), U"voidptr2dlg"), voidPtrType(voidPtrType_), delegateType(delegateType_), ulongType(ulongType_)
+{
+    SetConversion();
+    SetGroupName(U"@conversion");
+    SetAccess(SymbolAccess::public_);
+}
+
+void VoidPtrToDelegateConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+{
+    emitter.SetCurrentDebugLocation(span);
+    llvm::Value* value = emitter.Stack().Pop();
+    llvm::Value* ulongValue = emitter.Builder().CreatePtrToInt(value, ulongType->IrType(emitter));
+    emitter.Stack().Push(emitter.Builder().CreateIntToPtr(ulongValue, delegateType->IrType(emitter)));
+}
+
 ClassDelegateTypeSymbol::ClassDelegateTypeSymbol(const Span& span_, const std::u32string& name_) : 
     TypeSymbol(SymbolType::classDelegateTypeSymbol, span_, name_), returnType(nullptr), parameters(), delegateType(nullptr), objectDelegatePairType(nullptr), 
     copyConstructor(nullptr)
