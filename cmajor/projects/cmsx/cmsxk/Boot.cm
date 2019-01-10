@@ -15,6 +15,12 @@ namespace cmsx.kernel
         {
             mem.WriteULong(MakeInterruptHandlerPtrAddress(i), 0u, Protection.write);
         }
+        InterruptHandler softwareInterruptHandler = SoftwareInterruptHandler;
+        ulong softwareInterruptHandlerAddress = cast<ulong>(cast<void*>(softwareInterruptHandler));
+        mem.WriteULong(MakeInterruptHandlerPtrAddress(irqSoftware), softwareInterruptHandlerAddress, Protection.write);
+        InterruptHandler intervalInterruptHandler = IntervalInterruptHandler;
+        ulong intervalInterruptHandlerAddress = cast<ulong>(cast<void*>(intervalInterruptHandler));
+        mem.WriteULong(MakeInterruptHandlerPtrAddress(irqInterval), intervalInterruptHandlerAddress, Protection.write);
         InterruptHandler clockHandler = ClockHandler;
         ulong clockHandlerAddress = cast<ulong>(cast<void*>(clockHandler));
         mem.WriteULong(MakeInterruptHandlerPtrAddress(irqClock), clockHandlerAddress, Protection.write);
@@ -27,9 +33,6 @@ namespace cmsx.kernel
         InterruptHandler securityViolationHandler = SecurityViolationHandler;
         ulong securityViolationHandlerAddress = cast<ulong>(cast<void*>(securityViolationHandler));
         mem.WriteULong(MakeInterruptHandlerPtrAddress(irqS), securityViolationHandlerAddress, Protection.write);
-        InterruptHandler softwareInterruptHandler = SoftwareInterruptHandler;
-        ulong softwareInterruptHandlerAddress = cast<ulong>(cast<void*>(softwareInterruptHandler));
-        mem.WriteULong(MakeInterruptHandlerPtrAddress(irqSoftware), softwareInterruptHandlerAddress, Protection.write);
         machine.GetRegisters().SetSpecial(Registers.rTT, interruptVectorBaseAddress);
         machine.GetRegisters().SetSpecial(Registers.rT, trapTableBaseAddress);
     }
@@ -44,6 +47,12 @@ namespace cmsx.kernel
         TrapHandler exitSystemCallHandler = Exit;
         ulong exitSystemCallAddress = cast<ulong>(cast<void*>(exitSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(exitSystemCall), exitSystemCallAddress, Protection.write);
+        TrapHandler waitSystemCallHandler = Wait;
+        ulong waitSystemCallAddress = cast<ulong>(cast<void*>(waitSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(waitSystemCall), waitSystemCallAddress, Protection.write);
+        TrapHandler forkSystemCallHandler = Fork;
+        ulong forkSystemCallAddress = cast<ulong>(cast<void*>(forkSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(forkSystemCall), forkSystemCallAddress, Protection.write);
     }
 
     public void Boot(Machine& machine)
@@ -56,8 +65,10 @@ namespace cmsx.kernel
         DisableAllInterrupts(regs);
         InitializeInterruptVector(machine);
         InitializeSystemCalls(machine);
-        CreateInitProcess(ProcessTable.Instance());
-        Schedule();
+        Kernel& kernel = Kernel.Instance();
+        ProcessTable& processTable = kernel.GetProcessTable();
+        CreateInitAndIdleProcessess(machine, processTable);
+        Schedule(machine, processTable);
         SetProcessorToUserMode(regs);
         EnableAllInterrupts(regs);
         if (Machine.GetFlag(Machine.Flags.verbose))

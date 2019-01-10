@@ -1,0 +1,116 @@
+using System;
+
+namespace cmsx.object
+{
+    public enum LinkCode : byte
+    {
+        forwardLongJump = 0u, forwardShortJump = 1u, absoluteRegisterValue = 2u, farJump = 3u, farOcta = 4u
+    }
+
+    public const int maxLinkCodeStrLength = 17;
+
+    public string LinkCodeStr(LinkCode linkCode)
+    {
+        switch (linkCode)
+        {
+            case LinkCode.forwardLongJump: return  "LINKFWDLONGJUMP";
+            case LinkCode.forwardShortJump: return "LINKFWDSHORTJMP";
+            case LinkCode.absoluteRegisterValue: return "LINKABSOLUTEREG";
+            case LinkCode.farJump: return "LINKFARJUMP";
+            case LinkCode.farOcta: return "LINKFAROCTA";
+        }
+        return "";
+    }
+
+    public void LinkInternal(ObjectFile& objectFile)
+    {
+        LinkSection newLinkSection;
+        SymbolTable& symbolTable = objectFile.GetSymbolTable();
+        Section* linkSection = objectFile.linkSection;
+        #assert(linkSection != null);
+        Section* codeSection = objectFile.codeSection;
+        #assert(codeSection != null);
+        linkSection->pos = 0u;
+        int x = linkSection->GetByte();
+        while (x != -1)
+        {
+            LinkCode linkCode = cast<LinkCode>(cast<byte>(x));
+            switch (linkCode)
+            {
+                case LinkCode.forwardLongJump:
+                {
+                    uint symbolIndex = linkSection->GetUInt();
+                    ulong fromAddress = linkSection->GetULong();
+                    Symbol* symbol = symbolTable.GetSymbol(cast<int>(symbolIndex));
+                    #assert(symbol != null);
+                    #assert(symbol->segment == Segment.text);
+                    #assert(symbol->linkage == Linkage.internal_);
+                    #assert(symbol->value.kind == Value.Kind.pure);
+                    ulong toAddress = symbol->value.value;
+                    #assert(toAddress >= fromAddress);
+                    ulong offset = (toAddress - fromAddress) >> 2u;
+                    if (offset >= cast<ulong>(MaxValue<ushort>()) << 8u)
+                    {
+                        throw Exception("error linking: forward long jump too far");
+                    }
+                    codeSection->EmitLongOffset(fromAddress, cast<uint>(offset));
+                    break;
+                }
+                case LinkCode.forwardShortJump:
+                {
+                    uint symbolIndex = linkSection->GetUInt();
+                    ulong fromAddress = linkSection->GetULong();
+                    Symbol* symbol = symbolTable.GetSymbol(cast<int>(symbolIndex));
+                    #assert(symbol != null);
+                    #assert(symbol->segment == Segment.text);
+                    #assert(symbol->linkage == Linkage.internal_);
+                    #assert(symbol->value.kind == Value.Kind.pure);
+                    ulong toAddress = symbol->value.value;
+                    #assert(toAddress >= fromAddress);
+                    ulong offset = (toAddress - fromAddress) >> 2u;
+                    if (offset >= cast<ulong>(MaxValue<ushort>()))
+                    {
+                        throw Exception("error linking: forward short jump too far");
+                    }
+                    codeSection->EmitShortOffset(fromAddress, cast<ushort>(offset));
+                    break;
+                }
+                case LinkCode.absoluteRegisterValue:
+                {
+                    uint index = linkSection->GetUInt();
+                    ulong address = linkSection->GetULong();
+                    int reg = linkSection->GetByte();
+                    if (reg == - 1)
+                    {
+                        throw Exception("unexpected end of file " + objectFile.FileName());
+                    }
+                    newLinkSection.EmitByte(LinkCode.absoluteRegisterValue);
+                    newLinkSection.EmitUInt(cast<uint>(index));
+                    newLinkSection.EmitULong(address);
+                    newLinkSection.EmitByte(cast<byte>(reg));
+                    break;
+                }
+                case LinkCode.farJump:
+                {
+                    uint index = linkSection->GetUInt();
+                    ulong address = linkSection->GetULong();
+                    newLinkSection.EmitByte(LinkCode.farJump);
+                    newLinkSection.EmitUInt(cast<uint>(index));
+                    newLinkSection.EmitULong(address);
+                    break;
+                }
+                case LinkCode.farOcta:
+                {
+                    uint index = linkSection->GetUInt();
+                    ulong address = linkSection->GetULong();
+                    newLinkSection.EmitByte(LinkCode.farOcta);
+                    newLinkSection.EmitUInt(cast<uint>(index));
+                    newLinkSection.EmitULong(address);
+                    break;
+                }
+            }
+            x = linkSection->GetByte();
+        }
+        Swap(linkSection->data, newLinkSection.data);
+    }
+}

@@ -15,6 +15,10 @@ Project("{A8A06387-5A08-470D-8F9C-CD5ECF2DDB09}") = "cmsxk", "cmsxk\cmsxk.cmproj
 EndProject
 Project("{A8A06387-5A08-470D-8F9C-CD5ECF2DDB09}") = "cmsxu", "cmsxu\cmsxu.cmproj", "{09657CFF-72C3-4C7B-A3EA-222EE4EBC858}"
 EndProject
+Project("{A8A06387-5A08-470D-8F9C-CD5ECF2DDB09}") = "cmsxo", "cmsxo\cmsxo.cmproj", "{4E86B5E2-D558-4C75-9929-EB819B55BFD6}"
+EndProject
+Project("{A8A06387-5A08-470D-8F9C-CD5ECF2DDB09}") = "cmsxdump", "cmsxdump\cmsxdump.cmproj", "{A5CE21A7-7F2F-4E4F-AC3B-0C21F66A55DD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +49,14 @@ Global
 		{09657CFF-72C3-4C7B-A3EA-222EE4EBC858}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09657CFF-72C3-4C7B-A3EA-222EE4EBC858}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{09657CFF-72C3-4C7B-A3EA-222EE4EBC858}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4E86B5E2-D558-4C75-9929-EB819B55BFD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E86B5E2-D558-4C75-9929-EB819B55BFD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E86B5E2-D558-4C75-9929-EB819B55BFD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E86B5E2-D558-4C75-9929-EB819B55BFD6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5CE21A7-7F2F-4E4F-AC3B-0C21F66A55DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5CE21A7-7F2F-4E4F-AC3B-0C21F66A55DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5CE21A7-7F2F-4E4F-AC3B-0C21F66A55DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5CE21A7-7F2F-4E4F-AC3B-0C21F66A55DD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="Globals">
     <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-    <ProjectGuid>e0925858-448a-4b3d-83df-560ee0908f71</ProjectGuid>
+    <ProjectGuid>4e86b5e2-d558-4c75-9929-eb819b55bfd6</ProjectGuid>
   </PropertyGroup>
   <PropertyGroup>
     <TargetType>library</TargetType>
@@ -10,18 +10,11 @@
   <Import Project="$(CustomProjectExtensionsPath)Cmajor.props" />
   <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets" />
   <ItemGroup>
-    <CmCompile Include="Assembler.cm" />
-    <CmCompile Include="Assembly.cm" />
-    <CmCompile Include="AssemblyParser.cm" />
-    <CmCompile Include="AssemblyInstruction.cm" />
-    <CmCompile Include="Visitor.cm" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="AssemblyParser.parser" />
-    <None Include="AssemblyParser.pp" />
+    <CmCompile Include="Link.cm" />
+    <CmCompile Include="Format.cm" />
+    <CmCompile Include="Symbol.cm" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\cmsxm\cmsxm.cmproj" />
-    <ProjectReference Include="..\cmsxo\cmsxo.cmproj" />
   </ItemGroup>
 </Project>

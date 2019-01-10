@@ -300,6 +300,21 @@ namespace cmsx.machine
         {
             FreePage(rootPageAddress);
         }
+        public nothrow void SharePage(ulong pageAddress)
+        {
+            HashMap<ulong, PageFrame*>.ConstIterator it = pageFrameMap.CFind(pageAddress);
+            if (it != pageFrameMap.CEnd())
+            {
+                PageFrame* pageFrame = it->second;
+                #assert(pageFrame->useCount > 0u);
+                pageFrame->useCount = pageFrame->useCount + 1u;
+            }
+            else
+            {
+                Console.Error() << "page frame for page address " << ToHexString(pageAddress) + " not found" << endl();
+                RtExit(1);
+            }
+        }
         public nothrow void CopyPage(ulong fromAddress, ulong toAddress)
         {
             OsCopyMemoryPage(fromAddress, toAddress, pageSize);
@@ -310,13 +325,14 @@ namespace cmsx.machine
             ulong pageAddress = 0u;
             ushort offset = 0u;
             ushort addressSpaceNumber = 0u;
-            Protection protection = Protection.notPresent;
-            return GetPageTableEntry(virtualAddress, segmentIndex, pageAddress, offset, addressSpaceNumber, protection);
+            Protection pageProtection = Protection.notPresent;
+            ulong pteAddress = 0u;
+            return GetPageTableEntry(virtualAddress, segmentIndex, pageAddress, offset, addressSpaceNumber, pageProtection, pteAddress);
         }
-        public nothrow ulong GetPageTableEntry(ulong virtualAddress, byte& segmentIndex, ulong& pageAddress, ushort& offset, ushort& addressSpaceNumber, Protection& protection)
+        public nothrow ulong GetPageTableEntry(ulong virtualAddress, byte& segmentIndex, ulong& pageAddress, ushort& offset, ushort& addressSpaceNumber, Protection& pageProtection, ulong& pteAddress)
         {
             ulong pte = 0u;
-            protection = Protection.notPresent;
+            pageProtection = Protection.notPresent;
             segmentIndex = GetSegmentIndex(virtualAddress);
             ushort segmentOffset = MakeSegmentOffset(segmentIndex);
             ushort pageTableAddressSpaceNumber = 0u;
@@ -334,11 +350,11 @@ namespace cmsx.machine
             offset = cast<ushort>(virtualAddress & pageOffsetMask);
             if (pageNum >= firstRootPageEntryNumber && pageNum <= lastDirectRootPageEntryNumber)
             {
-                ulong pteAddress = rootPageAddress + 8u * pageNum;
+                pteAddress = rootPageAddress + 8u * pageNum;
                 pte = ReadMemoryULong(pteAddress);
                 ushort pteAddressSpaceNumber = 0u;
-                UnpackPageTableEntry(pte, pageAddress, pteAddressSpaceNumber, protection);
-                if (protection == Protection.notPresent || addressSpaceNumber != pteAddressSpaceNumber)
+                UnpackPageTableEntry(pte, pageAddress, pteAddressSpaceNumber, pageProtection);
+                if (pageProtection == Protection.notPresent || addressSpaceNumber != pteAddressSpaceNumber)
                 {
                     return 0u;
                 }
@@ -362,11 +378,11 @@ namespace cmsx.machine
                     {
                         return 0u;
                     }
-                    ulong pteAddress = singleIndirectPageAddress + 8u * digit0;
+                    pteAddress = singleIndirectPageAddress + 8u * digit0;
                     pte = ReadMemoryULong(pteAddress);
                     ushort pteAddressSpaceNumber = 0u;
-                    UnpackPageTableEntry(pte, pageAddress, pteAddressSpaceNumber, protection);
-                    if (protection == Protection.notPresent || addressSpaceNumber != pteAddressSpaceNumber)
+                    UnpackPageTableEntry(pte, pageAddress, pteAddressSpaceNumber, pageProtection);
+                    if (pageProtection == Protection.notPresent || addressSpaceNumber != pteAddressSpaceNumber)
                     {
                         return 0u;
                     }
@@ -393,11 +409,11 @@ namespace cmsx.machine
                     {
                         return 0u;
                     }
-                    ulong pteAddress = singleIndirectPageAddress + 8u * digit0;
+                    pteAddress = singleIndirectPageAddress + 8u * digit0;
                     pte = ReadMemoryULong(pteAddress);
                     ushort pteAddressSpaceNumber = 0u;
-                    UnpackPageTableEntry(pte, pageAddress, pteAddressSpaceNumber, protection);
-                    if (protection == Protection.notPresent || addressSpaceNumber != pteAddressSpaceNumber)
+                    UnpackPageTableEntry(pte, pageAddress, pteAddressSpaceNumber, pageProtection);
+                    if (pageProtection == Protection.notPresent || addressSpaceNumber != pteAddressSpaceNumber)
                     {
                         return 0u;
                     }
@@ -434,11 +450,11 @@ namespace cmsx.machine
                     {
                         return 0u;
                     }
-                    ulong pteAddress = singleIndirectPageAddress + 8u * digit0;
+                    pteAddress = singleIndirectPageAddress + 8u * digit0;
                     pte = ReadMemoryULong(pteAddress);
                     ushort pteAddressSpaceNumber = 0u;
-                    UnpackPageTableEntry(pte, pageAddress, pteAddressSpaceNumber, protection);
-                    if (protection == Protection.notPresent || addressSpaceNumber != pteAddressSpaceNumber)
+                    UnpackPageTableEntry(pte, pageAddress, pteAddressSpaceNumber, pageProtection);
+                    if (pageProtection == Protection.notPresent || addressSpaceNumber != pteAddressSpaceNumber)
                     {
                         return 0u;
                     }
@@ -446,7 +462,7 @@ namespace cmsx.machine
             }
             return pte;
         }
-        public nothrow ulong TranslateAddress(ulong virtualAddress, Protection protection)
+        public nothrow ulong TranslateAddress(ulong virtualAddress, Protection access)
         {
             if (CheckSecurityViolation(virtualAddress))
             {
@@ -457,18 +473,28 @@ namespace cmsx.machine
             ushort offset = 0u;
             ushort addressSpaceNumber = 0u;
             Protection pageProtection = Protection.notPresent;
-            ulong pte = GetPageTableEntry(virtualAddress, segmentIndex, pageAddress, offset, addressSpaceNumber, pageProtection);
-            if (pte == 0u || (pageProtection & protection) != protection)
+            ulong pteAddress = 0u;
+            ulong pte = GetPageTableEntry(virtualAddress, segmentIndex, pageAddress, offset, addressSpaceNumber, pageProtection, pteAddress);
+            if (pte != 0u && pageProtection == Protection.copyOnWrite && (access & Protection.write) != 0u)
             {
-                PageFault(virtualAddress, pageProtection, protection);
+                ulong newPageAddress = AllocatePage();
+                CopyPage(pageAddress, newPageAddress);
+                FreePage(pageAddress);
+                pageAddress = newPageAddress;
+                pte = MakePageTableEntry(pageAddress, addressSpaceNumber, cast<Protection>(Protection.read | Protection.write));
+                WriteMemoryULong(pteAddress, pte);
+            }
+            else if (pte == 0u || (pageProtection & access) != access)
+            {
+                PageFault(virtualAddress, pageProtection, access);
                 return invalidAddress;
             }
             ulong physicalAddress = pageAddress + offset;
             return physicalAddress;
         }
-        public nothrow byte ReadByte(ulong virtualAddress, Protection protection)
+        public nothrow byte ReadByte(ulong virtualAddress, Protection access)
         {
-            ulong address = TranslateAddress(virtualAddress, protection);
+            ulong address = TranslateAddress(virtualAddress, access);
             if (address != invalidAddress)
             {
                 return ReadMemoryByte(address);
@@ -478,17 +504,17 @@ namespace cmsx.machine
                 return 0u;
             }
         }
-        public nothrow void WriteByte(ulong virtualAddress, byte b, Protection protection)
+        public nothrow void WriteByte(ulong virtualAddress, byte b, Protection access)
         {
-            ulong address = TranslateAddress(virtualAddress, protection);
+            ulong address = TranslateAddress(virtualAddress, access);
             if (address != invalidAddress)
             {
                 WriteMemoryByte(address, b);
             }
         }
-        public nothrow ushort ReadUShort(ulong virtualAddress, Protection protection)
+        public nothrow ushort ReadUShort(ulong virtualAddress, Protection access)
         {
-            ulong address = TranslateAddress(virtualAddress, protection);
+            ulong address = TranslateAddress(virtualAddress, access);
             if (address != invalidAddress)
             {
                 return ReadMemoryUShort(address);
@@ -498,17 +524,17 @@ namespace cmsx.machine
                 return 0u;
             }
         }
-        public nothrow void WriteUShort(ulong virtualAddress, ushort u, Protection protection)
+        public nothrow void WriteUShort(ulong virtualAddress, ushort u, Protection access)
         {
-            ulong address = TranslateAddress(virtualAddress, protection);
+            ulong address = TranslateAddress(virtualAddress, access);
             if (address != invalidAddress)
             {
                 WriteMemoryUShort(address, u);
             }
         }
-        public nothrow uint ReadUInt(ulong virtualAddress, Protection protection)
+        public nothrow uint ReadUInt(ulong virtualAddress, Protection access)
         {
-            ulong address = TranslateAddress(virtualAddress, protection);
+            ulong address = TranslateAddress(virtualAddress, access);
             if (address != invalidAddress)
             {
                 return ReadMemoryUInt(address);
@@ -518,17 +544,17 @@ namespace cmsx.machine
                 return 0u;
             }
         }
-        public nothrow void WriteUInt(ulong virtualAddress, uint u, Protection protection)
+        public nothrow void WriteUInt(ulong virtualAddress, uint u, Protection access)
         {
-            ulong address = TranslateAddress(virtualAddress, protection);
+            ulong address = TranslateAddress(virtualAddress, access);
             if (address != invalidAddress)
             {
                 WriteMemoryUInt(address, u);
             }
         }
-        public nothrow ulong ReadULong(ulong virtualAddress, Protection protection)
+        public nothrow ulong ReadULong(ulong virtualAddress, Protection access)
         {
-            ulong address = TranslateAddress(virtualAddress, protection);
+            ulong address = TranslateAddress(virtualAddress, access);
             if (address != invalidAddress)
             {
                 return ReadMemoryULong(address);
@@ -538,17 +564,17 @@ namespace cmsx.machine
                 return 0u;
             }
         }
-        public nothrow void WriteULong(ulong virtualAddress, ulong u, Protection protection)
+        public nothrow void WriteULong(ulong virtualAddress, ulong u, Protection access)
         {
-            ulong address = TranslateAddress(virtualAddress, protection);
+            ulong address = TranslateAddress(virtualAddress, access);
             if (address != invalidAddress)
             {
                 WriteMemoryULong(address, u);
             }
         }
-        private nothrow void PageFault(ulong virtualAddress, Protection pageProtection, Protection protection)
+        private nothrow void PageFault(ulong virtualAddress, Protection pageProtection, Protection access)
         {
-            SetPageFault(machine.GetRegisters(), virtualAddress, pageProtection, protection);
+            InvokePageFault(machine.GetRegisters(), virtualAddress, pageProtection, access);
         }
         private nothrow bool CheckSecurityViolation(ulong virtualAddress)
         {

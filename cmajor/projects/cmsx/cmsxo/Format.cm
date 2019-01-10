@@ -1,0 +1,834 @@
+using System;
+using System.IO;
+using System.Collections;
+using cmsx.machine;
+
+namespace cmsx.object
+{
+    public const char objectFileVersion_1 = '1';
+    public const char libraryFileVersion_1 = '1';
+    public const char executableFileVersion_1 = '1';
+
+    public const char currentObjectFileVersion = objectFileVersion_1;
+    public const char currentLibraryFileVersion = libraryFileVersion_1;
+    public const char currentExecutableFileVersion = executableFileVersion_1;
+
+    public string ObjectFileVersionStr()
+    {
+        return string(currentObjectFileVersion);
+    }
+
+    public string LibraryFileVersionStr()
+    {
+        return string(currentLibraryFileVersion);
+    }
+
+    public string ExecutableFileVersionStr()
+    {
+        return string(currentExecutableFileVersion);
+    }
+
+    public string ReadHeaderName(const string& fileName, System.IO.BinaryReader& reader, int length)
+    {
+        string result;
+        for (int i = 0; i < length; ++i)
+        {
+            int x = reader.ReadByteOrEnd();
+            if (x == -1)
+            {
+                throw Exception("unexpected end of file " + fileName);
+            }
+            result.Append(cast<char>(x));
+        }
+        return result;
+    }
+
+    public void WriteHeaderName(System.IO.BinaryWriter& writer, const string& headerName)
+    {
+        for (char c : headerName)
+        {
+            writer.Write(c);
+        }
+    }
+
+    public ulong ReadULong(const string& fileName, System.IO.BinaryReader& reader)
+    {
+        List<byte> b;
+        for (int i = 0; i < 8; ++i)
+        {
+            int x = reader.ReadByteOrEnd();
+            if (x == -1)
+            {
+                throw Exception("unexpected end of file " + fileName);
+            }
+            b.Add(cast<byte>(x));
+        }
+        ulong x = (cast<ulong>(b[0]) << 56u) | (cast<ulong>(b[1]) << 48u) | (cast<ulong>(b[2]) << 40u) | (cast<ulong>(b[3]) << 32u) | (cast<ulong>(b[4]) << 24u) | (cast<ulong>(b[5]) << 16u) |
+            (cast<ulong>(b[6]) << 8u) | cast<ulong>(b[7]);
+        return x;
+    }
+
+    public void WriteULong(System.IO.BinaryWriter& writer, ulong x)
+    {
+        byte x0 = cast<byte>(x);
+        x = x >> 8u;
+        byte x1 = cast<byte>(x);
+        x = x >> 8u;
+        byte x2 = cast<byte>(x);
+        x = x >> 8u;
+        byte x3 = cast<byte>(x);
+        x = x >> 8u;
+        byte x4 = cast<byte>(x);
+        x = x >> 8u;
+        byte x5 = cast<byte>(x);
+        x = x >> 8u;
+        byte x6 = cast<byte>(x);
+        x = x >> 8u;
+        byte x7 = cast<byte>(x);
+        x = x >> 8u;
+        writer.Write(x7);
+        writer.Write(x6);
+        writer.Write(x5);
+        writer.Write(x4);
+        writer.Write(x3);
+        writer.Write(x2);
+        writer.Write(x1);
+        writer.Write(x0);
+    }
+
+    public UniquePtr<File> ReadFile(const string& fileName)
+    {
+        UniquePtr<File> file;
+        System.IO.BinaryReader reader = System.IO.File.OpenBinary(fileName);        
+        string fileHeaderName = ReadHeaderName(fileName, reader, 8);
+        string headerBaseName = fileHeaderName.Substring(0, fileHeaderName.Length() - 1);
+        string fileVersion = fileHeaderName.Substring(fileHeaderName.Length() - 1, 1);
+        if (headerBaseName == "CMSXOBJ")
+        {
+            if (fileVersion == ObjectFileVersionStr())
+            {
+                file.Reset(new ObjectFile(fileName, false));
+            }
+            else
+            {
+                throw Exception("invalid file " + fileName + " " + headerBaseName + " version " + fileVersion + " read, version " + ObjectFileVersionStr() + " expected");
+            }
+        }
+        else if (headerBaseName == "CMSXLIB")
+        {
+            if (fileVersion == LibraryFileVersionStr())
+            {
+                file.Reset(new LibraryFile(fileName, false));
+            }
+            else
+            {
+                throw Exception("invalid file " + fileName + " " + headerBaseName + " version " + fileVersion + " read, version " + LibraryFileVersionStr() + " expected");
+            }
+        }
+        else if (headerBaseName == "CMSXEXE")
+        {
+            if (fileVersion == ExecutableFileVersionStr())
+            {
+                file.Reset(new ExecutableFile(fileName, false));
+            }
+            else
+            {
+                throw Exception("invalid file " + fileName + " " + headerBaseName + " version " + fileVersion + " read, version " + ExecutableFileVersionStr() + " expected");
+            }
+        }
+        else
+        {
+            throw Exception("invalid file " + fileName + " header '" + headerBaseName + "' not CMSXOBJ, CMSXLIB or CMSXEXE");
+        }
+        file->Read(reader);
+        return file;
+    }
+
+    public class FileFormatter : Formatter
+    {
+        public nothrow FileFormatter(File& file_) : file(file_)
+        {
+        }
+        public override string FormatRegisterNumber(byte x)
+        {
+            Symbol* registerSymbol = file.GetSymbolTable().GetRegisterSymbol(x);
+            if (registerSymbol != null)
+            {
+                return registerSymbol->name;
+            }
+            else
+            {
+                return base->FormatRegisterNumber(x);
+            }
+        }
+        public override string GetLabel(ulong address)
+        {
+            Symbol* symbol = file.GetSymbolTable().GetSymbolByAddress(address);
+            if (symbol != null)
+            {
+                return symbol->name;
+            }
+            else
+            {
+                return string();
+            }
+        }
+        private File& file;
+    }
+
+    public class File
+    {
+        public nothrow File(const string& fileName_, Section* headerSection_) : fileName(fileName_), headerSection(headerSection_)
+        {
+        }
+        public default virtual ~File();
+        public virtual void Finalize()
+        {
+            for (const UniquePtr<Section>& section : sections)
+            {
+                section->Finalize();
+            }
+        }
+        public virtual void AddSection(Section* section)
+        {
+            section->file = this;
+            sections.Add(UniquePtr<Section>(section));
+        }
+        public Section* CreateSection(const string& sectionName)
+        {
+            if (sectionName == "CODE")
+            {
+                return new CodeSection();
+            }
+            else if (sectionName == "DATA")
+            {
+                return new DataSection();
+            }
+            else if (sectionName == "SYMB")
+            {
+                return new SymbolSection();
+            }
+            else if (sectionName == "LINK")
+            {
+                return new LinkSection();
+            }
+            else
+            {
+                throw Exception("unknown section '" + sectionName + " in file " + fileName);
+            }
+        }
+        public void Write()
+        {
+            System.IO.BinaryWriter writer = System.IO.File.CreateBinary(fileName);
+            WriteHeaderName(writer, headerSection->name);
+            ulong numSections = cast<ulong>(sections.Count());
+            WriteULong(writer, numSections);
+            for (const UniquePtr<Section>& section : sections)
+            {
+                WriteHeaderName(writer, section->name);
+                section->Write(writer);
+            }
+        }
+        public void Read(System.IO.BinaryReader& reader)
+        {
+            ulong numSections = ReadULong(fileName, reader);
+            for (ulong i = 0u; i < numSections; ++i)
+            {
+                string sectionName = ReadHeaderName(fileName, reader, 4);
+                Section* section = CreateSection(sectionName);
+                AddSection(section);
+                section->Read(reader);
+            }
+        }
+        public virtual void AddSymbolsToAddressMap()
+        {
+        }
+        public virtual void Dump(StreamWriter& writer)
+        {
+            for (const UniquePtr<Section>& section : sections)
+            {
+                section->Dump(writer);
+            }
+        }
+        public nothrow SymbolTable& GetSymbolTable()
+        {
+            return symbolTable;
+        }
+        public nothrow const string& FileName() const
+        {
+            return fileName;
+        }
+        private string fileName;
+        private UniquePtr<Section> headerSection;
+        private List<UniquePtr<Section>> sections;
+        private SymbolTable symbolTable;
+    }
+
+    public class ObjectFile : File
+    {
+        public ObjectFile(const string& fileName_, bool createSections_) : base(fileName_, new ObjectFileHeaderSection())
+        {
+            if (createSections_)
+            {
+                AddSection(new CodeSection());
+                AddSection(new DataSection());
+                AddSection(new SymbolSection());
+                AddSection(new LinkSection());
+            }
+        }
+        public ObjectFile(const string& fileName_) : this(fileName_, true)
+        {
+        }
+        public override void AddSection(Section* section)
+        {
+            base->AddSection(section);
+            if (section is CodeSection*)
+            {
+                codeSection = section;
+            }
+            else if (section is DataSection*)
+            {
+                dataSection = section;
+            }
+            else if (section is SymbolSection*)
+            {
+                symbolSection = section;
+            }
+            else if (section is LinkSection*)
+            {
+                linkSection = section;
+            }
+        }
+        public override void AddSymbolsToAddressMap()
+        {
+            symbolSection->AddSymbolsToAddressMap();
+        }
+        public Section* codeSection;
+        public Section* dataSection;
+        public Section* symbolSection;
+        public Section* linkSection;
+    }
+
+    public class LibraryFile : File
+    {
+        public LibraryFile(const string& fileName_, bool createSections_) : base(fileName_, new LibraryFileHeaderSection())
+        {
+        }
+        public LibraryFile(const string& fileName_) : this(fileName_, true)
+        {
+        }
+    }
+
+    public class ExecutableFile : File
+    {
+        public ExecutableFile(const string& fileName_, bool createSections_) : base(fileName_, new ExecutableFileHeaderSection())
+        {
+        }
+        public ExecutableFile(const string& fileName_) : this(fileName_, true)
+        {
+        }
+    }
+
+    public abstract class Section
+    {
+        public nothrow Section(const string& name_) : file(null), name(name_), pos(0), baseAddress(0u), length(0u)
+        {
+        }
+        public default virtual ~Section();
+        public virtual void Finalize()
+        {
+        }
+        public virtual void AddSymbolsToAddressMap()
+        {
+        }
+        public nothrow ulong Address() const
+        {
+            return cast<ulong>(pos);
+        }
+        public nothrow ulong BaseAddress() const
+        {
+            return baseAddress;
+        }
+        public nothrow void SetBaseAddress(ulong baseAddress_)
+        {
+            baseAddress = baseAddress_;
+        }
+        public nothrow ulong Length() const
+        {
+            return length;
+        }
+        public void Write(System.IO.BinaryWriter& writer)
+        {
+            length = cast<ulong>(data.Count());
+            WriteULong(writer, length);
+            for (byte b : data)
+            {
+                writer.Write(b);
+            }
+        }
+        public virtual void Read(System.IO.BinaryReader& reader)
+        {
+            length = ReadULong(file->FileName(), reader);
+            for (ulong i = 0u; i < length; ++i)
+            {
+                int x = reader.ReadByteOrEnd();
+                if (x == -1)
+                {
+                    throw Exception("unexpected end of file " + file->FileName() + " " + name + " section");
+                }
+                data.Add(cast<byte>(x));
+            }
+        }
+        public virtual void Dump(StreamWriter& writer)
+        {
+            writer.WriteLine(name + " section");
+            writer.WriteLine("length: #" + ToHexString(length));
+        }
+        public nothrow int GetByte()
+        {
+            if (pos < data.Count())
+            {
+                return data[pos++];
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        public void EmitByte(byte b)
+        {
+            if (pos == data.Count())
+            {
+                data.Add(b);
+                ++pos;
+            }
+            else if (pos < data.Count())
+            {
+                data[pos++] = b;
+            }
+            else
+            {
+                throw Exception("invalid pos for file " + file->FileName() + " " + name + " section: " + ToString(pos));
+            }
+        }
+        public void EmitByte(ulong address, byte b)
+        {
+            long prevPos = pos;
+            pos = cast<long>(address);
+            EmitByte(b);
+            pos = prevPos;
+        }
+        public nothrow void EmitLongOffset(ulong address, uint longOffset)
+        {
+            long prevPos = pos;
+            pos = cast<long>(address + 1u);
+            EmitLongOffset(longOffset);
+            pos = prevPos;
+        }
+        public nothrow void EmitShortOffset(ulong address, ushort shortOffset)
+        {
+            long prevPos = pos;
+            pos = cast<long>(address + 2u);
+            EmitShortOffset(shortOffset);
+            pos = prevPos;
+        }
+        public nothrow void EmitULong(ulong address, ulong x)
+        {
+            long prevPos = pos;
+            pos = cast<long>(address);
+            EmitULong(x);
+            pos = prevPos;
+        }
+        public string GetString()
+        {
+            string result;
+            int x = GetByte();
+            while (x != -1 && x != 0)
+            {
+                result.Append(cast<char>(x));
+                x = GetByte();
+            }
+            if (x == -1)
+            {
+                throw Exception("unexpected end of " + name + " section of file " + file->FileName());
+            }
+            return result;
+        }
+        public void EmitString(const string& s)
+        {
+            for (char c : s)
+            {
+                EmitByte(cast<byte>(c));
+            }
+            EmitByte(0u);
+        }
+        public void EmitShortOffset(ushort offset)
+        {
+            byte b0 = cast<byte>(offset);
+            offset = offset >> 8u;
+            byte b1 = cast<byte>(offset);
+            offset = offset >> 8u;
+            #assert(offset == 0u);
+            EmitByte(b1);
+            EmitByte(b0);
+        }
+        public void EmitLongOffset(uint offset)
+        {
+            byte b0 = cast<byte>(offset);
+            offset = offset >> 8u;
+            byte b1 = cast<byte>(offset);
+            offset = offset >> 8u;
+            byte b2 = cast<byte>(offset);
+            offset = offset >> 8u;
+            EmitByte(b2);
+            EmitByte(b1);
+            EmitByte(b0);
+        }
+        public uint GetUInt()
+        {
+            List<byte> b;
+            for (int i = 0; i < 4; ++i)
+            {
+                int x = GetByte();
+                if (x == -1)
+                {
+                    throw Exception("unexpected end of " + name + " section of file " + file->FileName());
+                }
+                b.Add(cast<byte>(x));
+            }
+            uint u = (cast<uint>(b[0]) << 24u) | (cast<uint>(b[1]) << 16u) | (cast<uint>(b[2]) << 8u) | cast<uint>(b[3]);
+            return u;
+        }
+        public void EmitUInt(uint x)
+        {
+            byte b0 = cast<byte>(x);
+            x = x >> 8u;
+            byte b1 = cast<byte>(x);
+            x = x >> 8u;
+            byte b2 = cast<byte>(x);
+            x = x >> 8u;
+            byte b3 = cast<byte>(x);
+            x = x >> 8u;
+            #assert(x == 0u);
+            EmitByte(b3);
+            EmitByte(b2);
+            EmitByte(b1);
+            EmitByte(b0);
+        }
+        public ulong GetULong()
+        {
+            List<byte> b;
+            for (int i = 0; i < 8; ++i)
+            {
+                int x = GetByte();
+                if (x == -1)
+                {
+                    throw Exception("unexpected end of " + name + " section of file " + file->FileName());
+                }
+                b.Add(cast<byte>(x));
+            }
+            ulong u = (cast<ulong>(b[0]) << 56u) | (cast<ulong>(b[1]) << 48u) | (cast<ulong>(b[2]) << 40u) | (cast<ulong>(b[3]) << 32u) | (cast<ulong>(b[4]) << 24u) | (cast<ulong>(b[5]) << 16u) |
+                (cast<ulong>(b[6]) << 8u) | cast<ulong>(b[7]);
+            return u;
+        }
+        public void EmitULong(ulong x)
+        {
+            byte b0 = cast<byte>(x);
+            x = x >> 8u;
+            byte b1 = cast<byte>(x);
+            x = x >> 8u;
+            byte b2 = cast<byte>(x);
+            x = x >> 8u;
+            byte b3 = cast<byte>(x);
+            x = x >> 8u;
+            byte b4 = cast<byte>(x);
+            x = x >> 8u;
+            byte b5 = cast<byte>(x);
+            x = x >> 8u;
+            byte b6 = cast<byte>(x);
+            x = x >> 8u;
+            byte b7 = cast<byte>(x);
+            x = x >> 8u;
+            #assert(x == 0u);
+            EmitByte(b7);
+            EmitByte(b6);
+            EmitByte(b5);
+            EmitByte(b4);
+            EmitByte(b3);
+            EmitByte(b2);
+            EmitByte(b1);
+            EmitByte(b0);
+        }
+        public File* file;
+        public string name;
+        public List<byte> data;
+        public long pos;
+        public ulong baseAddress;
+        public ulong length;
+    }
+
+    public class ObjectFileHeaderSection : Section
+    {
+        public nothrow ObjectFileHeaderSection() : base("CMSXOBJ" + ObjectFileVersionStr())
+        {
+        }
+    }
+
+    public class LibraryFileHeaderSection : Section
+    {
+        public nothrow LibraryFileHeaderSection() : base("CMSXLIB" + LibraryFileVersionStr())
+        {
+        }
+    }
+
+    public class ExecutableFileHeaderSection : Section
+    {
+        public nothrow ExecutableFileHeaderSection() : base("CMSXEXE" + ExecutableFileVersionStr())
+        {
+        }
+    }
+
+    public class CodeSection : Section
+    {
+        public nothrow CodeSection() : base("CODE")
+        {
+        }
+        public override void Dump(StreamWriter& writer)
+        {
+            if (file == null)
+            {
+                throw Exception("file is null");
+            }
+            FileFormatter formatter(*file);
+            base->Dump(writer);
+            pos = 0u;
+            ulong address = 0u;
+            int opc = GetByte();
+            while (opc != -1)
+            {
+                byte opCode = cast<byte>(opc);
+                int x = GetByte();
+                int y = GetByte();
+                int z = GetByte();
+                if (x != -1 && y != -1 && z != -1)
+                {
+                    byte xx = cast<byte>(x);
+                    byte yy = cast<byte>(y);
+                    byte zz = cast<byte>(z);
+                    string instructionLine = FormatInstruction(BaseAddress() + address, opCode, xx, yy, zz, formatter);
+                    writer.WriteLine(instructionLine);
+                }
+                else
+                {
+                    throw Exception("unexpected end of data of file " + file->FileName());
+                }
+                address = address + 4u;
+                opc = GetByte();
+            }
+        }
+    }
+
+    public class DataSection : Section
+    {
+        public nothrow DataSection() : base("DATA")
+        {
+            SetBaseAddress(cmsx.machine.dataSegmentBaseAddress);
+        }
+    }
+
+    public class SymbolSection : Section
+    {
+        public nothrow SymbolSection() : base("SYMB")
+        {
+        }
+        public override void Finalize()
+        {
+            EmitSymbols();
+        }
+        public Segment GetSegment()
+        {
+            int segment = GetByte();
+            if (segment == -1)
+            {
+                throw Exception("unexpected end of " + name + " section of file " + file->FileName());
+            }
+            return cast<Segment>(cast<byte>(segment));
+        }
+        public Linkage GetLinkage()
+        {
+            int linkage = GetByte();
+            if (linkage == -1)
+            {
+                throw Exception("unexpected end of " + name + " section of file " + file->FileName());
+            }
+            return cast<Linkage>(cast<byte>(linkage));
+        }
+        public Value.Kind GetValueKind()
+        {
+            int kind = GetByte();
+            if (kind == -1)
+            {
+                throw Exception("unexpected end of " + name + " section of file " + file->FileName());
+            }
+            return cast<Value.Kind>(cast<byte>(kind));
+        }
+        public Value GetValue()
+        {
+            Value.Kind kind = GetValueKind();
+            ulong v = GetULong();
+            Value value(kind, v, null);
+            return value;
+        }
+        public override void Read(System.IO.BinaryReader& reader)
+        {
+            base->Read(reader);
+            pos = 0u;
+            ulong numSymbols = GetULong();
+            for (ulong i = 0u; i < numSymbols; ++i)
+            {
+                uint symbolIndex = GetUInt();
+                string symbolName = GetString();
+                Segment segment = GetSegment();
+                Linkage linkage = GetLinkage();
+                Value value = GetValue();
+                Symbol* symbol = new Symbol();
+                symbol->index = cast<int>(symbolIndex);
+                symbol->name = symbolName;
+                symbol->segment = segment;
+                symbol->linkage = linkage;
+                symbol->value = value;
+                symbol->absoluteAddress = 0u;
+                file->GetSymbolTable().AddSymbol(symbol, false);
+            }
+        }
+        public void EmitSymbols()
+        {
+            if (file == null)
+            {
+                throw Exception("file is null");
+            }
+            SymbolTable& symbolTable = file->GetSymbolTable();
+            EmitULong(cast<ulong>(symbolTable.Symbols().Count()));
+            for (const UniquePtr<Symbol>& symbol : symbolTable.Symbols())
+            {
+                EmitSymbol(symbol.Get());
+            }
+        }
+        public void EmitSymbol(Symbol* symbol)
+        {
+            EmitUInt(cast<uint>(symbol->index));
+            EmitString(symbol->name);
+            EmitByte(symbol->segment);
+            EmitByte(symbol->linkage);
+            EmitValue(symbol->value);
+        }
+        public void EmitValue(const Value& value)
+        {
+            EmitByte(value.kind);
+            EmitULong(value.value);
+        }
+        public override void AddSymbolsToAddressMap()
+        {
+            SymbolTable& symbolTable = file->GetSymbolTable();
+            for (const UniquePtr<Symbol>& symbol : symbolTable.Symbols())
+            {
+                symbolTable.AddSymbolToAddressMap(symbol.Get());
+            }
+        }
+        public override void Dump(StreamWriter& writer)
+        {
+            base->Dump(writer);
+            SymbolTable& symbolTable = file->GetSymbolTable();
+            for (const UniquePtr<Symbol>& symbol : symbolTable.Symbols())
+            {
+                string symbolLine;
+                string absoluteAddress;
+                if (symbol->value.kind == Value.Kind.pure)
+                {
+                    absoluteAddress = "#" + ToHexString(symbol->absoluteAddress);
+                }
+                symbolLine.Append(Format(absoluteAddress, 17));
+                symbolLine.Append(" ").Append(Format(ToString(symbol->index), 11));
+                symbolLine.Append(" ").Append(Format(symbol->name, 32));
+                symbolLine.Append(" ").Append(Format(SegmentStr(symbol->segment), 7));
+                symbolLine.Append(" ").Append(Format(LinkageStr(symbol->linkage), 8)); 
+                symbolLine.Append(" ").Append(ValueStr(symbol->value));
+                writer.WriteLine(symbolLine);
+            }
+        }
+    }
+
+    public class LinkSection : Section
+    {
+        public nothrow LinkSection() : base("LINK")
+        {
+        }
+        public override void Dump(StreamWriter& writer)
+        {
+            if (file == null)
+            {
+                throw Exception("file is null");
+            }
+            FileFormatter formatter(*file);
+            base->Dump(writer);
+            pos = 0u;
+            int x = GetByte();
+            while (x != -1)
+            {
+                LinkCode linkCode = cast<LinkCode>(cast<byte>(x));
+                string linkLine = Format(LinkCodeStr(linkCode), maxLinkCodeStrLength);
+                switch (linkCode)
+                {
+                    case LinkCode.forwardLongJump:
+                    {
+                        uint index = GetUInt();
+                        linkLine.Append(" ").Append(Format(ToString(index), 11));
+                        ulong address = GetULong();
+                        linkLine.Append(" #").Append(ToHexString(address));
+                        break;
+                    }
+                    case LinkCode.forwardShortJump:
+                    {
+                        uint index = GetUInt();
+                        linkLine.Append(" ").Append(Format(ToString(index), 11));
+                        ulong address = GetULong();
+                        linkLine.Append(" #").Append(ToHexString(address));
+                        break;
+                    }
+                    case LinkCode.absoluteRegisterValue:
+                    {
+                        uint index = GetUInt();
+                        linkLine.Append(" ").Append(Format(ToString(index), 11));
+                        ulong address = GetULong();
+                        linkLine.Append(" #").Append(ToHexString(address));
+                        int reg = GetByte();
+                        if (reg == - 1)
+                        {
+                            throw Exception("unexpected end of file " + file->FileName());
+                        }
+                        linkLine.Append(" ").Append(formatter.FormatRegisterNumber(cast<byte>(reg)));
+                        break;
+                    }
+                    case LinkCode.farJump:
+                    {
+                        uint index = GetUInt();
+                        linkLine.Append(" ").Append(Format(ToString(index), 11));
+                        ulong address = GetULong();
+                        linkLine.Append(" #").Append(ToHexString(address));
+                        break;
+                    }
+                    case LinkCode.farOcta:
+                    {
+                        uint index = GetUInt();
+                        linkLine.Append(" ").Append(Format(ToString(index), 11));
+                        ulong address = GetULong();
+                        linkLine.Append(" #").Append(ToHexString(address));
+                        break;
+                    }
+                }
+                writer.WriteLine(linkLine);
+                x = GetByte();
+            }
+        }
+    }
+}

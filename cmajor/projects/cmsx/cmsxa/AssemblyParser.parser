@@ -29,8 +29,8 @@ namespace cmsx.assembly
             |   StringConstant{ value = StringConstant; }
             ;
 
-        Symbol : Symbol*
-            ::= token((idstart | ':' | '_') (idcont | ':' | '_' )*){ value = new Symbol(span, ustring(matchBegin, matchEnd)); }
+        Symbol : SymbolNode*
+            ::= token((idstart | ':' | '_') (idcont | ':' | '_' )*){ value = new SymbolNode(span, ToUtf8(ustring(matchBegin, matchEnd))); }
             ;
 
         LocalOperand(var uchar d) : LocalOperand*
@@ -105,7 +105,7 @@ namespace cmsx.assembly
             ;
 
         OpCode : OpCode*
-            ::= token((letter | digit)+){ value = new OpCode(span, ustring(matchBegin, matchEnd)); }
+            ::= token((letter | digit)+){ value = new OpCode(span, ToUtf8(ustring(matchBegin, matchEnd))); }
             ;
 
         Operands : OperandList*
@@ -124,7 +124,7 @@ namespace cmsx.assembly
             ;
 
         Comment
-            ::= S? (anychar - (idstart | ':' | '_' | digit | ';' | NL)) (anychar - NL)*
+            ::= S? (anychar - (idstart | ':' | '_' | digit | ';' | '.' | NL)) (anychar - NL)*
             ;
 
         CommentLine
@@ -136,8 +136,8 @@ namespace cmsx.assembly
             ;
 
         ModeLine(List<UniquePtr<Instruction>>* instructionList)
-            ::= token(S? '.' [cC][oO][dD][eE]){ instructionList->Add(UniquePtr<Instruction>(new Instruction(span, null, new OpCode(span, u".CODE"), null))); } S? NL
-            |   token(S? '.' [dD][aA][tT][aA]){ instructionList->Add(UniquePtr<Instruction>(new Instruction(span, null, new OpCode(span, u".DATA"), null))); } S? NL
+            ::= token(S? '.' [cC][oO][dD][eE]){ instructionList->Add(UniquePtr<Instruction>(new Instruction(span, null, new OpCode(span, ".CODE"), null))); } S? NL
+            |   token(S? '.' [dD][aA][tT][aA]){ instructionList->Add(UniquePtr<Instruction>(new Instruction(span, null, new OpCode(span, ".DATA"), null))); } S? NL
             ;
 
         AssemblyLine(List<UniquePtr<Instruction>>* instructionList)

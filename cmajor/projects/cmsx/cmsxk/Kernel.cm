@@ -1,0 +1,47 @@
+using System;
+
+using System;
+using cmsx.machine;
+
+namespace cmsx.kernel
+{
+    public Machine& GetMachine()
+    {
+        return Machine.Instance();
+    }
+
+    public class Kernel
+    {
+        static Kernel() : instance(new Kernel())
+        {
+        }
+        public static nothrow Kernel& Instance()
+        {
+            return *instance;
+        }
+        private nothrow Kernel() : machine(GetMachine()), processTable(GetProcessTable())
+        {
+        }
+        public void Init()
+        {
+            DefaultInitializeMemoryTable(machine, memoryTable);
+            memoryTable.addressSpaceNumber = kernelAddressSpaceNumber;
+        }
+        public inline nothrow Machine& GetMachine()
+        {
+            return machine;
+        }
+        public inline nothrow ProcessTable& GetProcessTable()
+        {
+            return processTable;
+        }
+        public inline nothrow MemoryTable& GetMemoryTable()
+        {
+            return memoryTable;
+        }
+        private static UniquePtr<Kernel> instance;
+        private Machine& machine;
+        private ProcessTable& processTable;
+        private MemoryTable memoryTable;
+    }
+}

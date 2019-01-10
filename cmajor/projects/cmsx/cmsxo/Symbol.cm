@@ -1,0 +1,174 @@
+using System;
+using System.Collections;
+
+namespace cmsx.object
+{
+    public const ulong undefinedValue = cast<ulong>(-1);
+
+    public enum Segment : byte
+    {
+        text = 0u, data = 1u, pool = 2u, stack = 3u, unknown = 255u
+    }
+
+    public string SegmentStr(Segment segment)
+    {
+        switch (segment)
+        {
+            case Segment.text: return "text";
+            case Segment.data: return "data";
+            case Segment.pool: return "pool";
+            case Segment.stack: return "stack";
+        }
+        return "-";
+    }
+
+    public enum Linkage : byte 
+    {
+        internal_ = 0u, external = 1u
+    }
+
+    public string LinkageStr(Linkage linkage)
+    {
+        switch (linkage)
+        {
+            case Linkage.internal_: return "internal";
+            case Linkage.external: return "external";
+        }
+        return "";
+    }
+
+    public char ValueKindChar(Value.Kind kind)
+    {
+        switch (kind)
+        {
+            case Value.Kind.register: return 'R';
+            case Value.Kind.pure: return 'P';
+            case Value.Kind.undefined: return 'U';
+        }
+        return '-';
+    }
+
+    public class Value
+    {
+        public enum Kind : byte
+        {
+            register, pure, undefined
+        }
+        public nothrow Value(Kind kind_, ulong value_, Symbol* symbol_) : kind(kind_), value(value_), symbol(symbol_)
+        {
+        }
+        public Kind kind;
+        public ulong value;
+        public Symbol* symbol;
+    }
+
+    public string ValueStr(const Value& value)
+    {
+        string result = string(ValueKindChar(value.kind)) + " #" + ToHexString(value.value) + " ";
+        if (value.kind == Value.Kind.register)
+        {
+            result.Append("$" + ToString(value.value));
+        }
+        else
+        {
+            result.Append(ToString(value.value));
+        }
+        return result;
+    }
+
+    public class Symbol
+    {
+        public int index;
+        public string name;
+        public Segment segment;
+        public Linkage linkage;
+        public Value value;
+        public ulong absoluteAddress;
+    }
+
+    public class SymbolTable
+    {
+        suppress SymbolTable(const SymbolTable&);
+        suppress void operator=(const SymbolTable&);
+        suppress SymbolTable(SymbolTable&&);
+        suppress void operator=(SymbolTable&&);
+        public nothrow const List<UniquePtr<Symbol>>& Symbols() const
+        {
+            return symbols;
+        }
+        public Symbol* GetSymbol(int index) const
+        {
+            return symbols[index].Get();
+        }
+        public Symbol* GetSymbol(const string& name) const
+        {
+            Map<string, Symbol*>.ConstIterator it = table.CFind(name);
+            if (it != table.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        public Symbol* GetSymbolByAddress(ulong absoluteAddress) const
+        {
+            Map<ulong, Symbol*>.ConstIterator it = addressMap.CFind(absoluteAddress);
+            if (it != addressMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        public Symbol* GetRegisterSymbol(byte registerNumber) const
+        {
+            Map<byte, Symbol*>.ConstIterator it = registerMap.CFind(registerNumber);
+            if (it != registerMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        public void AddSymbol(Symbol* symbol, bool setIndex)
+        {
+            if (setIndex)
+            {
+                symbol->index = cast<int>(symbols.Count());
+            }
+            symbols.Add(UniquePtr<Symbol>(symbol));
+            table[symbol->name] = symbol;
+            if (symbol->value.kind == Value.Kind.register)
+            {
+                registerMap[cast<byte>(symbol->value.value)] = symbol;
+            }
+        }
+        public void AddSymbol(Symbol* symbol)
+        {
+            AddSymbol(symbol, true);
+        }
+        public void AddSymbolToAddressMap(Symbol* symbol)
+        {
+            if (symbol->value.kind == Value.Kind.pure)
+            {
+                ulong segmentBaseAddress = cmsx.machine.textSegmentBaseAddress;
+                if (symbol->segment == Segment.data)
+                {
+                    segmentBaseAddress = cmsx.machine.dataSegmentBaseAddress;
+                }
+                symbol->absoluteAddress = segmentBaseAddress + symbol->value.value;
+                addressMap[symbol->absoluteAddress] = symbol;
+            }
+        }
+        private List<UniquePtr<Symbol>> symbols;
+        private Map<string, Symbol*> table;
+        private Map<ulong, Symbol*> addressMap;
+        private Map<byte, Symbol*> registerMap;
+    }
+}

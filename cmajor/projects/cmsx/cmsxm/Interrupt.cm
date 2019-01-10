@@ -4,7 +4,11 @@ namespace cmsx.machine
 {
     public const byte irqMax = 64u;
 
-    public const byte irqClock = 0u;
+    public const byte irqSoftware = 0u;
+    public const ulong SOFTWARE_INTERRUPT_BIT = cast<ulong>(1u) << irqSoftware;
+    public const byte irqInterval = 1u;
+    public const ulong INTERVAL_INTERRUPT_BIT = cast<ulong>(1u) << irqInterval;
+    public const byte irqClock = 2u;
     public const ulong CLOCK_BIT = cast<ulong>(1u) << irqClock;
 
     public const byte irqR = 32u; // read page fault
@@ -25,9 +29,6 @@ namespace cmsx.machine
     public const ulong P_BIT = cast<ulong>(1u) << irqP;
 
     public const ulong MACHINE_INTERRUPT_BITS = R_BIT | W_BIT | X_BIT | N_BIT | K_BIT | COW_BIT | S_BIT | P_BIT;
-
-    public const byte irqSoftware = 63u;
-    public const ulong SOFTWARE_INTERRUPT_BIT = cast<ulong>(1u) << irqSoftware;
 
     public const ulong ALL_INTERRUPT_BITS = 0xFFFFFFFFFFFFFFFFu;
 
@@ -70,9 +71,9 @@ namespace cmsx.machine
         regs.SetSpecial(Registers.rQ, regs.GetSpecial(Registers.rQ) | S_BIT);
     }
 
-    public nothrow void SetPageFault(Registers& regs, ulong virtualAddress, Protection pageProtection, Protection protection)
+    public nothrow void InvokePageFault(Registers& regs, ulong virtualAddress, Protection pageProtection, Protection access)
     {
-        regs.SetSpecial(Registers.rYY, PackProtection(pageProtection, protection));
+        regs.SetSpecial(Registers.rYY, PackProtection(pageProtection, access));
         regs.SetSpecial(Registers.rZZ, virtualAddress);
         ulong rq = regs.GetSpecial(Registers.rQ);
         if (pageProtection == Protection.copyOnWrite)
@@ -81,15 +82,15 @@ namespace cmsx.machine
         }
         else
         {
-            if ((protection & Protection.execute) != 0u)
+            if ((access & Protection.execute) != 0u)
             {
                 rq = rq | X_BIT; 
             }
-            else if ((protection & Protection.write) != 0u)
+            else if ((access & Protection.write) != 0u)
             {
                 rq = rq | W_BIT; 
             }
-            else if ((protection & Protection.read) != 0u)
+            else if ((access & Protection.read) != 0u)
             {
                 rq = rq | R_BIT; 
             }
@@ -106,6 +107,8 @@ namespace cmsx.machine
     {
         switch (irq)
         {
+            case irqSoftware: return "software";
+            case irqInterval: return "interval";
             case irqClock: return "clock";
             case irqR: return "read page fault";
             case irqW: return "write page fault";
@@ -115,7 +118,6 @@ namespace cmsx.machine
             case irqK: return "kernel instruction";
             case irqS: return "security violation";
             case irqP: return "negative address";
-            case irqSoftware: return "software";
         }
         return "unknown";
     }

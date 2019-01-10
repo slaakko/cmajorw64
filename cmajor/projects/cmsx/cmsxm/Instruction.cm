@@ -2,6 +2,71 @@ using System;
 
 namespace cmsx.machine
 {
+    public class Formatter
+    {
+        public default virtual ~Formatter();
+        public virtual string FormatRegisterNumber(byte x)
+        {
+            return "$" + ToString(x);
+        }
+        public virtual string GetLabel(ulong address) 
+        {
+            return string();
+        }
+        public virtual string FormatTrap(byte y)
+        {
+            return ToString(y);
+        }
+        public virtual string FormatShortOffset(ulong address, byte y, byte z, bool forward)
+        {
+            ulong to = address;
+            ulong offset = (cast<ulong>(y) << 8u) | cast<ulong>(z);
+            if (forward)
+            {
+                to = to + (offset << 2u);
+            }
+            else
+            {
+                to = to - (offset << 2u);
+            }
+            string label = GetLabel(to);
+            if (label.IsEmpty())
+            {
+                return "#" + ToHexString(y) + ToHexString(z);
+            }
+            else
+            {
+                return label;
+            }
+        }
+        public virtual string FormatLongOffset(ulong address, byte x, byte y, byte z, bool forward)
+        {
+            ulong to = address;
+            ulong offset = (cast<ulong>(x) << 16u) | (cast<ulong>(y) << 8u) | cast<ulong>(z);
+            if (forward)
+            {
+                to = to + (offset << 2u);
+            }
+            else
+            {
+                to = to - (offset << 2u);
+            }
+            string label = GetLabel(to);
+            if (label.IsEmpty())
+            {
+                return "#" + ToHexString(x) + ToHexString(y) + ToHexString(z);
+            }
+            else
+            {
+                return label;
+            }
+        }
+        public virtual string FormatYZWyde(byte y, byte z)
+        {
+            return "#" + ToHexString(y) + ToHexString(z);
+        }
+    }
+
     public class Instruction
     {
         public nothrow Instruction(byte opCode_) : opCode(opCode_)
@@ -11,6 +76,75 @@ namespace cmsx.machine
         public virtual void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
         {
             throw Exception("instruction " + GetOpCodeName(opCode) + " not implemented");
+        }
+        public virtual string FormatParams(ulong address, byte x, byte y, byte z, Formatter& formatter)
+        {
+            string result;
+            result.Append(formatter.FormatRegisterNumber(x));
+            result.Append(',');
+            if (IsJumpInst() && !IsGoInst())
+            {
+                result.Append(formatter.FormatShortOffset(address, y, z, IsForwardInst()));
+            }
+            else if (IsWydeImmediateInst())
+            {
+                result.Append(formatter.FormatYZWyde(y, z));
+            }
+            else
+            {
+                result.Append(formatter.FormatRegisterNumber(y));
+                result.Append(',');
+                if (IsZReg())
+                {
+                    result.Append(formatter.FormatRegisterNumber(z));
+                }
+                else
+                {
+                    result.Append(ToString(z));
+                }
+            }
+            return result;
+        }
+        public virtual string Format(ulong address, byte x, byte y, byte z, Formatter& formatter)
+        {
+            string result = "#" + ToHexString(address);
+            result.Append(' ');
+            result.Append(ToHexString(opCode));
+            result.Append(' ');
+            result.Append(ToHexString(x));
+            result.Append(' ');
+            result.Append(ToHexString(y));
+            result.Append(' ');
+            result.Append(ToHexString(z));
+            result.Append(' ');
+            string label = formatter.GetLabel(address);
+            result.Append(Format(label, 32));
+            result.Append(' ');
+            int n = OpCodeMap.Instance().MaxOpCodeNameLength();
+            result.Append(Format(OpCodeMap.Instance().GetName(opCode), n));
+            result.Append(' ');
+            result.Append(FormatParams(address, x, y, z, formatter));
+            return result;
+        }
+        public nothrow virtual bool IsJumpInst() const
+        {
+            return false;
+        }
+        public nothrow virtual bool IsGoInst() const
+        {
+            return false;
+        }
+        public nothrow virtual bool IsForwardInst() const
+        {
+            return true;
+        }
+        public nothrow virtual bool IsZReg() const
+        {
+            return true;
+        }
+        public nothrow virtual bool IsWydeImmediateInst() const
+        {
+            return false;
         }
         public byte opCode;
     }
@@ -26,6 +160,15 @@ namespace cmsx.machine
             regs.SetSpecial(Registers.rX, trap);
             regs.SetSpecial(Registers.rQ, regs.GetSpecial(Registers.rQ) | SOFTWARE_INTERRUPT_BIT);
         }
+        public override string FormatParams(ulong address, byte x, byte y, byte z, Formatter& formatter)
+        {
+            string result = ToString(x);
+            result.Append(',');
+            result.Append(formatter.FormatTrap(y));
+            result.Append(',');
+            result.Append(ToString(z));
+            return result;
+        }
     }
 
     public class Swym : Instruction
@@ -35,6 +178,10 @@ namespace cmsx.machine
         }
         public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
         {
+        }
+        public override string FormatParams(ulong address, byte x, byte y, byte z, Formatter& formatter)
+        {
+            return string();
         }
     }
 
@@ -68,6 +215,10 @@ namespace cmsx.machine
             ulong xx = SignExtend(b);
             regs.Set(x, xx);
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Ldw : Instruction
@@ -99,6 +250,10 @@ namespace cmsx.machine
             ushort w = mem.ReadUShort(a, Protection.read);
             ulong xx = SignExtend(w);
             regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -132,6 +287,10 @@ namespace cmsx.machine
             ulong xx = SignExtend(u);
             regs.Set(x, xx);
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Ldo : Instruction
@@ -161,6 +320,10 @@ namespace cmsx.machine
             ulong a = yy + zz;
             ulong xx = mem.ReadULong(a, Protection.read);
             regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -194,6 +357,10 @@ namespace cmsx.machine
             ulong xx = b;
             regs.Set(x, xx);
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Ldwu : Instruction
@@ -225,6 +392,10 @@ namespace cmsx.machine
             ushort w = mem.ReadUShort(a, Protection.read);
             ulong xx = w;
             regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -258,6 +429,10 @@ namespace cmsx.machine
             ulong xx = u;
             regs.Set(x, xx);
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Ldou : Instruction
@@ -287,6 +462,10 @@ namespace cmsx.machine
             ulong a = yy + zz;
             ulong xx = mem.ReadULong(a, Protection.read);
             regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -320,6 +499,10 @@ namespace cmsx.machine
             ulong xx = cast<ulong>(u) << 32u;
             regs.Set(x, xx);
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Stb : Instruction
@@ -349,6 +532,10 @@ namespace cmsx.machine
             ulong a = yy + zz;
             byte b = cast<byte>(regs.Get(x) & 0xFFu);
             mem.WriteByte(a, b, Protection.write);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -380,6 +567,10 @@ namespace cmsx.machine
             ushort u = cast<ushort>(regs.Get(x) & 0xFFFFu);
             mem.WriteUShort(a, u, Protection.write);
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Stt : Instruction
@@ -409,6 +600,10 @@ namespace cmsx.machine
             ulong a = yy + zz;
             uint u = cast<uint>(regs.Get(x) & 0xFFFFFFFFu);
             mem.WriteUInt(a, u, Protection.write);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -440,6 +635,10 @@ namespace cmsx.machine
             ulong u = regs.Get(x);
             mem.WriteULong(a, u, Protection.write);
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Stbu : Instruction
@@ -469,6 +668,10 @@ namespace cmsx.machine
             ulong a = yy + zz;
             byte b = cast<byte>(regs.Get(x) & 0xFFu);
             mem.WriteByte(a, b, Protection.write);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -500,6 +703,10 @@ namespace cmsx.machine
             ushort u = cast<ushort>(regs.Get(x) & 0xFFFFu);
             mem.WriteUShort(a, u, Protection.write);
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Sttu : Instruction
@@ -529,6 +736,10 @@ namespace cmsx.machine
             ulong a = yy + zz;
             uint u = cast<uint>(regs.Get(x) & 0xFFFFFFFFu);
             mem.WriteUInt(a, u, Protection.write);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -560,6 +771,10 @@ namespace cmsx.machine
             ulong u = regs.Get(x);
             mem.WriteULong(a, u, Protection.write);
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Stht : Instruction
@@ -589,6 +804,10 @@ namespace cmsx.machine
             ulong a = yy + zz;
             uint u = cast<uint>(regs.Get(x) >> 32u);
             mem.WriteUInt(a, u, Protection.write);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -620,6 +839,10 @@ namespace cmsx.machine
             ulong u = x;
             mem.WriteULong(a, u, Protection.write);
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Add : Instruction
@@ -647,6 +870,10 @@ namespace cmsx.machine
             long zz = z;
             long xx = yy + zz;
             regs.Set(x, cast<ulong>(xx));
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -676,6 +903,10 @@ namespace cmsx.machine
             long xx = yy - zz;
             regs.Set(x, cast<ulong>(xx));
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Mul : Instruction
@@ -703,6 +934,10 @@ namespace cmsx.machine
             long zz = z;
             long xx = yy * zz;
             regs.Set(x, cast<ulong>(xx));
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -746,6 +981,10 @@ namespace cmsx.machine
             regs.Set(x, cast<ulong>(xx));
             regs.SetSpecial(Registers.rR, cast<ulong>(rr));
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Addu : Instruction
@@ -774,6 +1013,10 @@ namespace cmsx.machine
             ulong xx = yy + zz;
             regs.Set(x, xx);
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Subu : Instruction
@@ -801,6 +1044,10 @@ namespace cmsx.machine
             ulong zz = z;
             ulong xx = yy - zz;
             regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -831,6 +1078,10 @@ namespace cmsx.machine
             ulong zz = z;
             ulong xx = yy * zz;
             regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -876,6 +1127,10 @@ namespace cmsx.machine
             regs.Set(x, xx);
             regs.SetSpecial(Registers.rR, rr);
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class I2Addu : Instruction
@@ -903,6 +1158,10 @@ namespace cmsx.machine
             ulong zz = z;
             ulong xx = (yy << 1u) + zz;
             regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -932,6 +1191,10 @@ namespace cmsx.machine
             ulong xx = (yy << 2u) + zz;
             regs.Set(x, xx);
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class I8Addu : Instruction
@@ -960,6 +1223,10 @@ namespace cmsx.machine
             ulong xx = (yy << 3u) + zz;
             regs.Set(x, xx);
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class I16Addu : Instruction
@@ -987,6 +1254,10 @@ namespace cmsx.machine
             ulong zz = z;
             ulong xx = (yy << 4u) + zz;
             regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -1018,6 +1289,10 @@ namespace cmsx.machine
             long xx = yy - zz;
             regs.Set(x, cast<ulong>(xx));
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Negu : Instruction
@@ -1045,6 +1320,10 @@ namespace cmsx.machine
             ulong zz = z;
             ulong xx = yy - zz;
             regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -1076,6 +1355,10 @@ namespace cmsx.machine
             long xx = yy << zz;
             regs.Set(x, cast<ulong>(xx));
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Slu : Instruction
@@ -1103,6 +1386,10 @@ namespace cmsx.machine
             ulong zz = z;
             ulong xx = yy << zz;
             regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -1132,6 +1419,10 @@ namespace cmsx.machine
             long xx = yy >> zz;
             regs.Set(x, cast<ulong>(xx));
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Sru : Instruction
@@ -1159,6 +1450,10 @@ namespace cmsx.machine
             ulong zz = z;
             ulong xx = yy >> zz;
             regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -1192,6 +1487,10 @@ namespace cmsx.machine
             long xx = gr - ls;
             regs.Set(x, cast<ulong>(xx));
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Cmpu : Instruction
@@ -1223,6 +1522,10 @@ namespace cmsx.machine
             long ls = cast<long>(yy < zz);
             long xx = gr - ls;
             regs.Set(x, cast<ulong>(xx));
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -1258,6 +1561,10 @@ namespace cmsx.machine
                 regs.Set(x, xx);
             }
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Csz : Instruction
@@ -1291,6 +1598,10 @@ namespace cmsx.machine
                 ulong xx = zz;
                 regs.Set(x, xx);
             }
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -1326,6 +1637,10 @@ namespace cmsx.machine
                 regs.Set(x, xx);
             }
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Csod : Instruction
@@ -1359,6 +1674,10 @@ namespace cmsx.machine
                 ulong xx = zz;
                 regs.Set(x, xx);
             }
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -1394,6 +1713,10 @@ namespace cmsx.machine
                 regs.Set(x, xx);
             }
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Csnz : Instruction
@@ -1427,6 +1750,10 @@ namespace cmsx.machine
                 ulong xx = zz;
                 regs.Set(x, xx);
             }
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -1462,6 +1789,10 @@ namespace cmsx.machine
                 regs.Set(x, xx);
             }
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Csev : Instruction
@@ -1495,6 +1826,10 @@ namespace cmsx.machine
                 ulong xx = zz;
                 regs.Set(x, xx);
             }
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -1540,6 +1875,10 @@ namespace cmsx.machine
                 regs.Set(x, xx);
             }
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Zsz : Instruction
@@ -1583,6 +1922,10 @@ namespace cmsx.machine
                 ulong xx = 0u;
                 regs.Set(x, xx);
             }
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -1628,6 +1971,10 @@ namespace cmsx.machine
                 regs.Set(x, xx);
             }
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Zsod : Instruction
@@ -1671,6 +2018,10 @@ namespace cmsx.machine
                 ulong xx = 0u;
                 regs.Set(x, xx);
             }
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -1716,6 +2067,10 @@ namespace cmsx.machine
                 regs.Set(x, xx);
             }
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Zsnz : Instruction
@@ -1759,6 +2114,10 @@ namespace cmsx.machine
                 ulong xx = 0u;
                 regs.Set(x, xx);
             }
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -1804,6 +2163,10 @@ namespace cmsx.machine
                 regs.Set(x, xx);
             }
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Zsev : Instruction
@@ -1848,6 +2211,10 @@ namespace cmsx.machine
                 regs.Set(x, xx);
             }
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class And : Instruction
@@ -1875,6 +2242,10 @@ namespace cmsx.machine
             ulong zz = z;
             ulong xx = yy & zz;
             regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -1904,6 +2275,10 @@ namespace cmsx.machine
             ulong xx = yy | zz;
             regs.Set(x, xx);
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Xor : Instruction
@@ -1931,6 +2306,10 @@ namespace cmsx.machine
             ulong zz = z;
             ulong xx = yy ^ zz;
             regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -1960,6 +2339,10 @@ namespace cmsx.machine
             ulong xx = yy & ~zz;
             regs.Set(x, xx);
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Orn : Instruction
@@ -1987,6 +2370,10 @@ namespace cmsx.machine
             ulong zz = z;
             ulong xx = yy | ~zz;
             regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -2016,6 +2403,10 @@ namespace cmsx.machine
             ulong xx = ~(yy & zz);
             regs.Set(x, xx);
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Nor : Instruction
@@ -2044,6 +2435,10 @@ namespace cmsx.machine
             ulong xx = ~(yy | zz);
             regs.Set(x, xx);
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Nxor : Instruction
@@ -2071,6 +2466,10 @@ namespace cmsx.machine
             ulong zz = z;
             ulong xx = ~(yy ^ zz);
             regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -2102,6 +2501,10 @@ namespace cmsx.machine
             ulong xx = (yy & mm) | (zz & ~mm);
             regs.Set(x, xx);
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Sadd : Instruction
@@ -2129,6 +2532,10 @@ namespace cmsx.machine
             ulong zz = z;
             ulong xx = BitCount(yy & ~zz);
             regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -2176,6 +2583,10 @@ namespace cmsx.machine
             }
             regs.Set(x, xx);
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Wdif : Instruction
@@ -2221,6 +2632,10 @@ namespace cmsx.machine
                 zz = zz >> 16u;
             }
             regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -2268,6 +2683,10 @@ namespace cmsx.machine
             }
             regs.Set(x, xx);
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Odif : Instruction
@@ -2295,6 +2714,10 @@ namespace cmsx.machine
             ulong zz = regs.Get(z);
             ulong xx = SaturatingSubtraction(yy, zz);
             regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -2457,6 +2880,10 @@ namespace cmsx.machine
             ulong xx = *cast<ulong*>(cast<void*>(&xd));
             regs.Set(x, xx);
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Flotu : Instruction
@@ -2485,6 +2912,10 @@ namespace cmsx.machine
             ulong xx = *cast<ulong*>(cast<void*>(&xd));
             regs.Set(x, xx);
         }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
     }
 
     public class Seth : Instruction
@@ -2497,6 +2928,10 @@ namespace cmsx.machine
             ushort yz = (cast<ushort>(y) << 8u) | cast<ushort>(z);
             ulong xx = cast<ulong>(yz) << 48u;
             regs.Set(x, xx);
+        }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
         }
     }
 
@@ -2511,6 +2946,10 @@ namespace cmsx.machine
             ulong xx = cast<ulong>(yz) << 32u;
             regs.Set(x, xx);
         }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
+        }
     }
 
     public class Setml : Instruction
@@ -2523,6 +2962,10 @@ namespace cmsx.machine
             ushort yz = (cast<ushort>(y) << 8u) | cast<ushort>(z);
             ulong xx = cast<ulong>(yz) << 16u;
             regs.Set(x, xx);
+        }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
         }
     }
 
@@ -2537,6 +2980,10 @@ namespace cmsx.machine
             ulong xx = yz;
             regs.Set(x, xx);
         }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
+        }
     }
 
     public class Inch : Instruction
@@ -2549,6 +2996,10 @@ namespace cmsx.machine
             ushort yz = (cast<ushort>(y) << 8u) | cast<ushort>(z);
             ulong xx = regs.Get(x) + (cast<ulong>(yz) << 48u);
             regs.Set(x, xx);
+        }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
         }
     }
 
@@ -2563,6 +3014,10 @@ namespace cmsx.machine
             ulong xx = regs.Get(x) + (cast<ulong>(yz) << 32u);
             regs.Set(x, xx);
         }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
+        }
     }
 
     public class Incml : Instruction
@@ -2575,6 +3030,10 @@ namespace cmsx.machine
             ushort yz = (cast<ushort>(y) << 8u) | cast<ushort>(z);
             ulong xx = regs.Get(x) + (cast<ulong>(yz) << 16u);
             regs.Set(x, xx);
+        }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
         }
     }
 
@@ -2589,6 +3048,146 @@ namespace cmsx.machine
             ulong xx = regs.Get(x) + cast<ulong>(yz);
             regs.Set(x, xx);
         }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Orh : Instruction
+    {
+        public nothrow Orh() : base(ORH)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ushort yz = (cast<ushort>(y) << 8u) | cast<ushort>(z);
+            ulong xx = regs.Get(x) | (cast<ulong>(yz) << 48u);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Ormh : Instruction
+    {
+        public nothrow Ormh() : base(ORMH)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ushort yz = (cast<ushort>(y) << 8u) | cast<ushort>(z);
+            ulong xx = regs.Get(x) | (cast<ulong>(yz) << 32u);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Orml : Instruction
+    {
+        public nothrow Orml() : base(ORML)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ushort yz = (cast<ushort>(y) << 8u) | cast<ushort>(z);
+            ulong xx = regs.Get(x) | (cast<ulong>(yz) << 16u);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Orl : Instruction
+    {
+        public nothrow Orl() : base(ORL)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ushort yz = (cast<ushort>(y) << 8u) | cast<ushort>(z);
+            ulong xx = regs.Get(x) | cast<ulong>(yz);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Andnh : Instruction
+    {
+        public nothrow Andnh() : base(ANDNH)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ushort yz = (cast<ushort>(y) << 8u) | cast<ushort>(z);
+            ulong xx = regs.Get(x) & ~(cast<ulong>(yz) << 48u);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Andnmh : Instruction
+    {
+        public nothrow Andnmh() : base(ANDNMH)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ushort yz = (cast<ushort>(y) << 8u) | cast<ushort>(z);
+            ulong xx = regs.Get(x) & ~(cast<ulong>(yz) << 32u);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Andnml : Instruction
+    {
+        public nothrow Andnml() : base(ANDNML)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ushort yz = (cast<ushort>(y) << 8u) | cast<ushort>(z);
+            ulong xx = regs.Get(x) & ~(cast<ulong>(yz) << 16u);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Andnl : Instruction
+    {
+        public nothrow Andnl() : base(ANDNL)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ushort yz = (cast<ushort>(y) << 8u) | cast<ushort>(z);
+            ulong xx = regs.Get(x) & ~cast<ulong>(yz);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
+        }
     }
 
     public class Jmp : Instruction
@@ -2602,6 +3201,15 @@ namespace cmsx.machine
             ulong to = pc + (((cast<ulong>(x) << 16u) | (cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
             regs.SetPC(to);
         }
+        public override string FormatParams(ulong address, byte x, byte y, byte z, Formatter& formatter)
+        {
+            string result = formatter.FormatLongOffset(address, x, y, z, true);
+            return result;
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
     }
 
     public class Jmpb : Instruction
@@ -2612,9 +3220,18 @@ namespace cmsx.machine
         public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
         {
             ulong pc = regs.GetPC();
-            ulong addr = ((cast<ulong>(x) << 16u) | (cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
-            ulong to = pc - addr - 4u;
+            ulong offset = ((cast<ulong>(x) << 16u) | (cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+            ulong to = pc - offset;
             regs.SetPC(to);
+        }
+        public override string FormatParams(ulong address, byte x, byte y, byte z, Formatter& formatter)
+        {
+            string result = formatter.FormatLongOffset(address, x, y, z, false);
+            return result;
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
         }
     }
 
@@ -2633,6 +3250,14 @@ namespace cmsx.machine
             regs.SetPC(to);
             regs.Set(x, xx);
         }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsGoInst() const
+        {
+            return true;
+        }
     }
 
     public class Goi : Instruction
@@ -2649,6 +3274,18 @@ namespace cmsx.machine
             ulong xx = pc + 4u;
             regs.SetPC(to);
             regs.Set(x, xx);
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsGoInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
     }
 
@@ -2667,6 +3304,10 @@ namespace cmsx.machine
                 regs.SetPC(to);
             }
         }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
     }
 
     public class Bnb : Instruction
@@ -2680,10 +3321,18 @@ namespace cmsx.machine
             if (xx < 0)
             {
                 ulong pc = regs.GetPC();
-                ulong addr = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
-                ulong to = pc - addr - 4u;
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
                 regs.SetPC(to);
             }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
         }
     }
 
@@ -2702,6 +3351,10 @@ namespace cmsx.machine
                 regs.SetPC(to);
             }
         }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
     }
 
     public class Bzb : Instruction
@@ -2715,10 +3368,18 @@ namespace cmsx.machine
             if (xx == 0u)
             {
                 ulong pc = regs.GetPC();
-                ulong addr = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
-                ulong to = pc - addr - 4u;
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
                 regs.SetPC(to);
             }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
         }
     }
 
@@ -2737,6 +3398,10 @@ namespace cmsx.machine
                 regs.SetPC(to);
             }
         }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
     }
 
     public class Bpb : Instruction
@@ -2750,10 +3415,18 @@ namespace cmsx.machine
             if (xx > 0)
             {
                 ulong pc = regs.GetPC();
-                ulong addr = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
-                ulong to = pc - addr - 4u;
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
                 regs.SetPC(to);
             }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
         }
     }
 
@@ -2772,6 +3445,10 @@ namespace cmsx.machine
                 regs.SetPC(to);
             }
         }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
     }
 
     public class Bodb : Instruction
@@ -2785,10 +3462,18 @@ namespace cmsx.machine
             if ((xx & 1u) != 0u)
             {
                 ulong pc = regs.GetPC();
-                ulong addr = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
-                ulong to = pc - addr - 4u;
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
                 regs.SetPC(to);
             }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
         }
     }
 
@@ -2807,7 +3492,11 @@ namespace cmsx.machine
                 regs.SetPC(to);
             }
         }
-    }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+}
 
     public class Bnnb : Instruction
     {
@@ -2820,10 +3509,18 @@ namespace cmsx.machine
             if (xx >= 0)
             {
                 ulong pc = regs.GetPC();
-                ulong addr = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
-                ulong to = pc - addr - 4u;
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
                 regs.SetPC(to);
             }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
         }
     }
 
@@ -2842,6 +3539,10 @@ namespace cmsx.machine
                 regs.SetPC(to);
             }
         }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
     }
 
     public class Bnzb : Instruction
@@ -2855,10 +3556,18 @@ namespace cmsx.machine
             if (xx != 0u)
             {
                 ulong pc = regs.GetPC();
-                ulong addr = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
-                ulong to = pc - addr - 4u;
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
                 regs.SetPC(to);
             }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
         }
     }
 
@@ -2877,6 +3586,10 @@ namespace cmsx.machine
                 regs.SetPC(to);
             }
         }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
     }
 
     public class Bnpb : Instruction
@@ -2890,10 +3603,18 @@ namespace cmsx.machine
             if (xx <= 0)
             {
                 ulong pc = regs.GetPC();
-                ulong addr = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
-                ulong to = pc - addr - 4u;
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
                 regs.SetPC(to);
             }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
         }
     }
 
@@ -2912,6 +3633,10 @@ namespace cmsx.machine
                 regs.SetPC(to);
             }
         }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
     }
 
     public class Bevb : Instruction
@@ -2925,10 +3650,18 @@ namespace cmsx.machine
             if ((xx & 1u) == 0u)
             {
                 ulong pc = regs.GetPC();
-                ulong addr = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
-                ulong to = pc - addr - 4u;
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
                 regs.SetPC(to);
             }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
         }
     }
 
@@ -2947,6 +3680,10 @@ namespace cmsx.machine
                 regs.SetPC(to);
             }
         }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
     }
 
     public class Pbnb : Instruction
@@ -2960,10 +3697,18 @@ namespace cmsx.machine
             if (xx < 0)
             {
                 ulong pc = regs.GetPC();
-                ulong addr = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
-                ulong to = pc - addr - 4u;
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
                 regs.SetPC(to);
             }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
         }
     }
 
@@ -2982,7 +3727,11 @@ namespace cmsx.machine
                 regs.SetPC(to);
             }
         }
-    }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+}
 
     public class Pbzb : Instruction
     {
@@ -2995,10 +3744,18 @@ namespace cmsx.machine
             if (xx == 0u)
             {
                 ulong pc = regs.GetPC();
-                ulong addr = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
-                ulong to = pc - addr - 4u;
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
                 regs.SetPC(to);
             }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
         }
     }
 
@@ -3017,6 +3774,10 @@ namespace cmsx.machine
                 regs.SetPC(to);
             }
         }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
     }
 
     public class Pbpb : Instruction
@@ -3030,10 +3791,18 @@ namespace cmsx.machine
             if (xx > 0)
             {
                 ulong pc = regs.GetPC();
-                ulong addr = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
-                ulong to = pc - addr - 4u;
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
                 regs.SetPC(to);
             }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
         }
     }
 
@@ -3052,6 +3821,10 @@ namespace cmsx.machine
                 regs.SetPC(to);
             }
         }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
     }
 
     public class Pbodb : Instruction
@@ -3065,10 +3838,18 @@ namespace cmsx.machine
             if ((xx & 1u) != 0u)
             {
                 ulong pc = regs.GetPC();
-                ulong addr = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
-                ulong to = pc - addr - 4u;
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
                 regs.SetPC(to);
             }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
         }
     }
 
@@ -3087,6 +3868,10 @@ namespace cmsx.machine
                 regs.SetPC(to);
             }
         }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
     }
 
     public class Pbnnb : Instruction
@@ -3100,10 +3885,18 @@ namespace cmsx.machine
             if (xx >= 0)
             {
                 ulong pc = regs.GetPC();
-                ulong addr = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
-                ulong to = pc - addr - 4u;
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
                 regs.SetPC(to);
             }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
         }
     }
 
@@ -3122,7 +3915,11 @@ namespace cmsx.machine
                 regs.SetPC(to);
             }
         }
-    }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+}
 
     public class Pbnzb : Instruction
     {
@@ -3135,10 +3932,18 @@ namespace cmsx.machine
             if (xx != 0u)
             {
                 ulong pc = regs.GetPC();
-                ulong addr = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
-                ulong to = pc - addr - 4u;
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
                 regs.SetPC(to);
             }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
         }
     }
 
@@ -3157,6 +3962,10 @@ namespace cmsx.machine
                 regs.SetPC(to);
             }
         }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
     }
 
     public class Pbnpb : Instruction
@@ -3170,10 +3979,18 @@ namespace cmsx.machine
             if (xx <= 0)
             {
                 ulong pc = regs.GetPC();
-                ulong addr = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
-                ulong to = pc - addr - 4u;
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
                 regs.SetPC(to);
             }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
         }
     }
 
@@ -3192,6 +4009,10 @@ namespace cmsx.machine
                 regs.SetPC(to);
             }
         }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
     }
 
     public class Pbevb : Instruction
@@ -3205,10 +4026,18 @@ namespace cmsx.machine
             if ((xx & 1u) == 0u)
             {
                 ulong pc = regs.GetPC();
-                ulong addr = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
-                ulong to = pc - addr - 4u;
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
                 regs.SetPC(to);
             }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
         }
     }
 
@@ -3258,10 +4087,28 @@ namespace cmsx.machine
         public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
         {
             ulong pc = regs.GetPC();
-            ulong addr = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
-            ulong to = pc - addr - 4u;
+            ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+            ulong to = pc - offset;
             ulong xx = to;
             regs.Set(x, xx);
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
+        }
+    }
+
+    public string FormatInstruction(ulong address, byte opCode, byte x, byte y, byte z, Formatter& formatter)
+    {
+        Instruction* inst = Machine.Instance().GetInst(opCode);
+        if (inst != null)
+        {
+            return inst->Format(address, x, y, z, formatter);
+        }
+        else
+        {
+            string result = GetOpCodeName(opCode) + " instruction not implemented";
+            return result;
         }
     }
 }

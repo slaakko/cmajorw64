@@ -7,7 +7,7 @@ namespace cmsx.assembly
         CharacterConstant : CharacterConstant*;
         StringConstant : StringConstant*;
         Constant : Constant*;
-        Symbol : Symbol*;
+        Symbol : SymbolNode*;
         LocalOperand(var uchar d) : LocalOperand*;
         LocalLabel(var uchar d) : LocalLabel*;
         At : At*;

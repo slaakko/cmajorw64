@@ -214,6 +214,14 @@ namespace cmsx.machine
             AddInst(new Incmh());
             AddInst(new Incml());
             AddInst(new Incl());
+            AddInst(new Orh());
+            AddInst(new Ormh());
+            AddInst(new Orml());
+            AddInst(new Orl());
+            AddInst(new Andnh());
+            AddInst(new Andnmh());
+            AddInst(new Andnml());
+            AddInst(new Andnl());
             AddInst(new Jmp());
             AddInst(new Jmpb());
             AddInst(new Go());

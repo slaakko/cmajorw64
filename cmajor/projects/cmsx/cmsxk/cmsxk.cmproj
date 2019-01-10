@@ -13,6 +13,7 @@
     <CmCompile Include="Boot.cm" />
     <CmCompile Include="ConsoleInputDriver.cm" />
     <CmCompile Include="InterruptHandler.cm" />
+    <CmCompile Include="Kernel.cm" />
     <CmCompile Include="Memory.cm" />
     <CmCompile Include="Process.cm" />
     <CmCompile Include="Segment.cm" />

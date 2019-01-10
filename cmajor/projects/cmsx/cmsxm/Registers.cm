@@ -9,6 +9,15 @@ namespace cmsx.machine
     public const ulong trapZMask = 0x00000000000000FFu;
     public const byte trapZShift = 0u;
 
+    public const byte regAX = 255u;
+    public const byte regBX = 254u;
+    public const byte regCX = 253u;
+    public const byte regDX = 252u;
+    public const byte regEX = 251u;
+    public const byte regSP = 250u;
+    public const byte regFP = 249u;
+    public const byte firstGlobalReg = 249u;
+
     public class Registers
     {
 //      register                           description                          S = saved, P = put
@@ -21,7 +30,7 @@ namespace cmsx.machine
         public const byte rF = 5u;      // failure location register              P
         public const byte rG = 6u;      // global threshold register            S P
         public const byte rH = 7u;      // himult register                      S P
-        public const byte rI = 8u;      // interval counter
+        public const byte rI = 8u;      // interval counter                     S P
         public const byte rJ = 9u;      // return-jump register                 S P
         public const byte rK = 10u;     // interrupt mask register
         public const byte rL = 11u;     // local threshold register             S P
@@ -51,11 +60,37 @@ namespace cmsx.machine
         }
         public ulong Get(byte regNum)
         {
-            return localRegs[regNum];
+            ulong rg = GetSpecial(rG);
+            if (regNum >= rg)
+            {
+                return globalRegs[regNum];
+            }
+            else
+            {
+                ulong rl = GetSpecial(rL);
+                if (regNum > rl)
+                {
+                    localRegs[regNum] = 0u;
+                }
+                return localRegs[regNum];
+            }
         }
         public void Set(byte regNum, ulong value)
         {
-            localRegs[regNum] = value;
+            ulong rg = GetSpecial(rG);
+            if (regNum >= rg)
+            {
+                globalRegs[regNum] = value;
+            }
+            else
+            {
+                ulong rl = GetSpecial(rL);
+                if (regNum > rl)
+                {
+                    SetSpecial(rL, regNum);
+                }
+                localRegs[regNum] = value;
+            }
         }
         public ulong GetSpecial(byte regNum)
         {
@@ -67,16 +102,6 @@ namespace cmsx.machine
             #assert(regNum >= 0u && regNum < 32u);
             globalRegs[regNum] = value;
         }
-        public ulong GetGlobal(byte regNum)
-        {
-            #assert(regNum >= 32u);
-            return globalRegs[regNum];
-        }
-        public void SetGlobal(byte regNum, ulong value)
-        {
-            #assert(regNum >= 32u);
-            globalRegs[regNum] = value;
-        }
         public inline nothrow ulong GetPC() const
         {
             return pc;
@@ -84,22 +109,6 @@ namespace cmsx.machine
         public inline nothrow void SetPC(ulong pc_)
         {
             pc = pc_;
-        }
-        public inline nothrow ulong GetSP() const
-        {
-            return sp;
-        }
-        public inline nothrow void SetSP(ulong sp_)
-        {
-            sp = sp_;
-        }
-        public inline nothrow ulong GetFP() const
-        {
-            return fp;
-        }
-        public inline nothrow void SetFP(ulong fp_)
-        {
-            fp = fp_;
         }
         private ulong[256] localRegs;
         private ulong[256] globalRegs;

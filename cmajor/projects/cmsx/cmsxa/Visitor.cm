@@ -9,7 +9,7 @@ namespace cmsx.assembly
         public virtual void Visit(HexConstant& hc) {}
         public virtual void Visit(CharacterConstant& cc) {}
         public virtual void Visit(StringConstant& sc) {}
-        public virtual void Visit(Symbol& s) {}
+        public virtual void Visit(SymbolNode& node) {}
         public virtual void Visit(LocalOperand& lo) {}
         public virtual void Visit(LocalLabel& ll) {}
         public virtual void Visit(At& at) {}

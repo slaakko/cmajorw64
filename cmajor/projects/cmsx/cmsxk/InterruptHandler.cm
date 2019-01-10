@@ -5,7 +5,8 @@ namespace cmsx.kernel
 {
     public nothrow void ClockHandler(Machine& machine, byte irq)
     {
-        Schedule();
+        Kernel& kernel = Kernel.Instance();
+        Schedule(machine, kernel.GetProcessTable());
     }
 
     public nothrow void PageFaultHandler(Machine& machine, byte irq)
@@ -43,7 +44,11 @@ namespace cmsx.kernel
         byte trapX = cast<byte>((trapValue & trapXMask) >> trapXShift);
         byte trapY = cast<byte>((trapValue & trapYMask) >> trapYShift);
         byte trapZ = cast<byte>((trapValue & trapZMask) >> trapZShift);
-        ulong trapP = regs.GetGlobal(255u);
+        ulong trapAX = regs.Get(regAX);
+        ulong trapBX = regs.Get(regBX);
+        ulong trapCX = regs.Get(regCX);
+        ulong trapDX = regs.Get(regDX);
+        ulong trapEX = regs.Get(regEX);
         ulong trapOffset = cast<ulong>(trapY) << 3u;
         ulong trapBaseAddress = regs.GetSpecial(Registers.rT);
         ulong trapHandlerPtrAddress = trapTableBaseAddress + trapOffset;
@@ -58,6 +63,17 @@ namespace cmsx.kernel
             RtExit(1);
         }
         TrapHandler trap = cast<TrapHandler>(cast<void*>(trapHandlerAddress));
-        trap(machine, trapX, trapY, trapZ, trapP);
+        int result = trap(machine, trapX, trapY, trapZ, trapAX, trapBX, trapCX, trapDX, trapEX);
+        ulong currentRV = regs.GetSpecial(Registers.rV);
+        if (currentRV == prevRV) // if context not switched
+        {
+            ulong returnValue = SignExtend(cast<uint>(result));
+            regs.Set(255u, returnValue);
+        }
+    }
+
+    public nothrow void IntervalInterruptHandler(Machine& machine, byte irq)
+    {
+        // todo
     }
 }

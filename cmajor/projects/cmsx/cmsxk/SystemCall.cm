@@ -4,31 +4,45 @@ using cmsx.machine;
 namespace cmsx.kernel
 {
     public const byte exitSystemCall = 0u;
-    public const byte numSystemCalls = 1u;
+    public const byte waitSystemCall = 1u;
+    public const byte forkSystemCall = 2u;
+    public const byte numSystemCalls = 3u;
 
-    public delegate void TrapHandler(Machine& machine, byte trapX, byte trapY, byte trapZ, ulong trapP);
+    public delegate int TrapHandler(Machine& machine, byte trapX, byte trapY, byte trapZ, ulong trapAX, ulong trapBX, ulong trapCX, ulong trapDX, ulong trapEX);
 
     public inline nothrow ulong MakeSystemCallPtrAddress(int systemCall)
     {
         return trapTableBaseAddress + cast<ulong>(systemCall) * 8u;
     }
 
-    public nothrow void Exit(Machine& machine, byte x, byte y, byte z, ulong p)
+    public nothrow int Exit(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
     {
-        if (x != 0u || y != 0u || z != 0u)
+        if (x != 0u || y != exitSystemCall || z != 0u)
         {
             if (!Machine.GetFlag(Machine.Flags.quiet))
             {
-                Console.Error() << "invalid halt parameters: " << ToString(x) << ", " << ToString(y) << ", " << ToString(z) << endl();
+                Console.Error() << "invalid exit parameters: " << ToString(x) << ", " << ToString(y) << ", " << ToString(z) << endl();
             }
             RtExit(1);
+            return -1;
         }
-        Process* process = ProcessTable.Instance().GetRunning();
+        Kernel& kernel = Kernel.Instance();
+        ProcessTable& processTable = kernel.GetProcessTable();
+        Process* process = processTable.GetRunning();
         if (process != null)
         {
-            ushort exitCode = MakeProcessExitCode(0u, cast<byte>(p));
-            ExitProcess(process, exitCode);
-            Schedule();
+            ushort exitCode = MakeProcessExitCode(0u, cast<byte>(ax));
+            int retval = ExitProcess(machine, processTable, process, exitCode);
+            if (retval != 0)
+            {
+                if (!Machine.GetFlag(Machine.Flags.quiet))
+                {
+                    Console.Error() << "exit failed!" << endl();
+                }
+                RtExit(1);
+                return -1;
+            }
+            return 0;
         }
         else
         {
@@ -37,6 +51,71 @@ namespace cmsx.kernel
                 Console.Error() << "exit called for a process that is not running!" << endl();
             }
             RtExit(1);
+            return -1;
         }
+        return 0;
     }
+
+    public nothrow int Wait(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    {
+        if (x != 0u || y != waitSystemCall || z != 0u)
+        {
+            if (!Machine.GetFlag(Machine.Flags.quiet))
+            {
+                Console.Error() << "invalid wait parameters: " << ToString(x) << ", " << ToString(y) << ", " << ToString(z) << endl();
+            }
+            RtExit(1);
+            return -1;
+        }
+        Kernel& kernel = Kernel.Instance();
+        ProcessTable& processTable = kernel.GetProcessTable();
+        Process* process = processTable.GetRunning();
+        if (process != null)
+        {
+            int retval = WaitProcess(machine, processTable, process, ax);
+            return retval;
+        }
+        else
+        {
+            if (!Machine.GetFlag(Machine.Flags.quiet))
+            {
+                Console.Error() << "wait called for a process that is not running!" << endl();
+            }
+            RtExit(1);
+            return -1;
+        }
+        return 0;
+    }
+
+    public nothrow int Fork(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    {
+        if (x != 0u || y != forkSystemCall || z != 0u)
+        {
+            if (!Machine.GetFlag(Machine.Flags.quiet))
+            {
+                Console.Error() << "invalid fork parameters: " << ToString(x) << ", " << ToString(y) << ", " << ToString(z) << endl();
+            }
+            RtExit(1);
+            return -1;
+        }
+        Kernel& kernel = Kernel.Instance();
+        ProcessTable& processTable = kernel.GetProcessTable();
+        Process* process = processTable.GetRunning();
+        if (process != null)
+        {
+            int retval = ForkProcess(machine, processTable, process);
+            return retval;
+        }
+        else
+        {
+            if (!Machine.GetFlag(Machine.Flags.quiet))
+            {
+                Console.Error() << "fork called for a process that is not running!" << endl();
+            }
+            RtExit(1);
+            return -1;
+        }
+        return 0;
+    }
+
 }

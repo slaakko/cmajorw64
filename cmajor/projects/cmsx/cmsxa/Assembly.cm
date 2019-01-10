@@ -9,11 +9,14 @@ namespace cmsx.assembly
     public const int GREG = 257;
     public const int LOC = 258;
     public const int BYTE = 259;
-    public const int WYDE = 259;
-    public const int TETRA = 260;
-    public const int OCTA = 261;
-    public const int CODE = 262;
-    public const int DATA = 263;
+    public const int WYDE = 260;
+    public const int TETRA = 261;
+    public const int OCTA = 262;
+    public const int CODE = 263;
+    public const int DATA = 264;
+    public const int LDA = 265;
+    public const int SET = 266;
+    public const int numInsts = SET + 1;
 
     public class PseudoOpMap
     {
@@ -35,6 +38,8 @@ namespace cmsx.assembly
             codes["OCTA"] = OCTA;
             codes[".CODE"] = CODE;
             codes[".DATA"] = DATA;
+            codes["LDA"] = LDA;
+            codes["SET"] = SET;
         }
         public nothrow int GetCode(const string& name) const
         {
@@ -120,16 +125,16 @@ namespace cmsx.assembly
         public ustring value;
     }
 
-    public class Symbol : Node
+    public class SymbolNode : Node
     {
-        public nothrow Symbol(const Span& span_, const ustring& name_) : base(span_), name(name_)
+        public nothrow SymbolNode(const Span& span_, const string& name_) : base(span_), name(name_)
         {
         }
         public override void Accept(Visitor& visitor)
         {
             visitor.Visit(*this);
         }
-        public ustring name;
+        public string name;
     }
 
     public enum Direction
@@ -221,14 +226,15 @@ namespace cmsx.assembly
 
     public class OpCode : Node
     {
-        public nothrow OpCode(const Span& span_, const ustring& name_) : base(span_), name(name_)
+        public nothrow OpCode(const Span& span_, const string& name_) : base(span_), name(name_), value(-1)
         {
         }
         public override void Accept(Visitor& visitor)
         {
             visitor.Visit(*this);
         }
-        public ustring name;
+        public string name;
+        public int value;
     }
 
     public class OperandList : Node
@@ -237,6 +243,10 @@ namespace cmsx.assembly
         {
             operands.Add(UniquePtr<Node>(firstOperand_));
         }
+        suppress OperandList(const OperandList&);
+        suppress void operator=(const OperandList&);
+        suppress OperandList(OperandList&&);
+        suppress void operator=(OperandList&&);
         public void AddOperand(Node* operand)
         {
             operands.Add(UniquePtr<Node>(operand));
@@ -253,6 +263,10 @@ namespace cmsx.assembly
         public nothrow Instruction(const Span& span_, Node* label_, OpCode* opCode_, OperandList* operandList_) : base(span_), label(label_), opCode(opCode_), operandList(operandList_)
         {
         }
+        suppress Instruction(const Instruction&);
+        suppress void operator=(const Instruction&);
+        suppress Instruction(Instruction&&);
+        suppress void operator=(Instruction&&);
         public override void Accept(Visitor& visitor)
         {
             visitor.Visit(*this);
@@ -292,6 +306,14 @@ namespace cmsx.assembly
         ustring assemblyFileContent = ToUtf32(utf8Content);
         List<UniquePtr<Instruction>> instructions;
         AssemblyFileParser.Instance().Parse(index, assemblyFileContent, assemblyFilePath, &instructions);
-        int x = 0;
+        string objectFilePath = Path.ChangeExtension(assemblyFilePath, ".o");
+        Assembler assembler(objectFilePath);
+        assembler.Assemble(instructions);
+        cmsx.object.LinkInternal(assembler.objectFile);
+        if (verbose)
+        {
+            Console.Out() << "==> " << objectFilePath << endl();
+        }
+        assembler.WriteObjectFile();
     }
 }

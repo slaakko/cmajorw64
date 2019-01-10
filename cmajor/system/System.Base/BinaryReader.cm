@@ -37,6 +37,10 @@ namespace System.IO
             byte x = ReadByte();
             return cast<sbyte>(x);
         }
+        public int ReadByteOrEnd()
+        {
+            return stream->ReadByte();
+        }
         public byte ReadByte()
         {
             int x = stream->ReadByte();
@@ -202,6 +206,14 @@ namespace System.IO
         public long Tell() 
         {
             return stream->Tell();
+        }
+        public long Size()
+        {
+            long pos = Tell();
+            Seek(0, Origin.seekEnd);
+            long size = Tell();
+            Seek(pos, Origin.seekSet);
+            return size;
         }
         public nothrow const SharedPtr<ByteStream>& ContainedStream() 
         {

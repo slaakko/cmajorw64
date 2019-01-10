@@ -5,16 +5,18 @@ using cmsx.kernel;
 
 void Init(Machine& machine)
 {
-    MemoryTable& kernelMemoryTable = KernelMemory.Instance().GetTable();
+    Kernel& kernel = Kernel.Instance();
+    kernel.Init();
+    MemoryTable& kernelMemoryTable = kernel.GetMemoryTable();
     machine.SetKernelRootPageAddress(kernelMemoryTable.rootPageAddress);
-    AllocateMemory(machine.GetMemory(), kernelMemoryTable);
+    Memory& mem = machine.GetMemory();
+    AllocateMemory(mem, kernelMemoryTable);
     Registers& regs = machine.GetRegisters();
     SetProcessorToKernelMode(regs);
     regs.SetSpecial(Registers.rV, MakeVirtualTranslationRegisterValue(kernelMemoryTable.rootPageAddress, kernelMemoryTable.addressSpaceNumber));
     BootProc boot = Boot;
     ulong bootProcValue = cast<ulong>(cast<void*>(boot));
-    machine.GetMemory().WriteULong(bootProcAddress, bootProcValue, Protection.write);
-    ProcessTable.Instance().Init();
+    mem.WriteULong(bootProcAddress, bootProcValue, Protection.write);
 }
 
 void Run(Machine& machine)
@@ -24,10 +26,11 @@ void Run(Machine& machine)
 
 void Terminate(Machine& machine)
 {
+    Kernel& kernel = Kernel.Instance();
     Registers& regs = machine.GetRegisters();
     SetProcessorToKernelMode(regs);
     regs.SetSpecial(Registers.rV, MakeVirtualTranslationRegisterValue(machine.GetKernelRootPageAddress(), kernelAddressSpaceNumber));
-    MemoryTable& kernelMemoryTable = KernelMemory.Instance().GetTable();
+    MemoryTable& kernelMemoryTable = kernel.GetMemoryTable();
     FreeMemory(machine.GetMemory(), kernelMemoryTable);
 }
 

@@ -299,4 +299,15 @@ namespace System
         result.Append(u'"');
         return result;
     }
+
+    public string Format(const string& s, int width)
+    {
+        string result(' ', width);
+        int n = Min(cast<int>(s.Length()), width);
+        for (int i = 0; i < n; ++i)
+        {
+            result[i] = s[i];
+        }
+        return result;
+    }
 }
