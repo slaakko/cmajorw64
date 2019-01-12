@@ -96,9 +96,9 @@ namespace cmsx.object
         writer.Write(x0);
     }
 
-    public UniquePtr<File> ReadFile(const string& fileName)
+    public UniquePtr<BinaryFile> ReadBinaryFile(const string& fileName)
     {
-        UniquePtr<File> file;
+        UniquePtr<BinaryFile> file;
         System.IO.BinaryReader reader = System.IO.File.OpenBinary(fileName);        
         string fileHeaderName = ReadHeaderName(fileName, reader, 8);
         string headerBaseName = fileHeaderName.Substring(0, fileHeaderName.Length() - 1);
@@ -144,9 +144,9 @@ namespace cmsx.object
         return file;
     }
 
-    public class FileFormatter : Formatter
+    public class BinaryFileFormatter : Formatter
     {
-        public nothrow FileFormatter(File& file_) : file(file_)
+        public nothrow BinaryFileFormatter(BinaryFile& file_) : file(file_)
         {
         }
         public override string FormatRegisterNumber(byte x)
@@ -166,22 +166,29 @@ namespace cmsx.object
             Symbol* symbol = file.GetSymbolTable().GetSymbolByAddress(address);
             if (symbol != null)
             {
-                return symbol->name;
+                if (!symbol->localName.IsEmpty())
+                {
+                    return symbol->localName;
+                }
+                else
+                {
+                    return symbol->name;
+                }
             }
             else
             {
                 return string();
             }
         }
-        private File& file;
+        private BinaryFile& file;
     }
 
-    public class File
+    public class BinaryFile
     {
-        public nothrow File(const string& fileName_, Section* headerSection_) : fileName(fileName_), headerSection(headerSection_)
+        public nothrow BinaryFile(const string& fileName_, Section* headerSection_) : fileName(fileName_), headerSection(headerSection_)
         {
         }
-        public default virtual ~File();
+        public default virtual ~BinaryFile();
         public virtual void Finalize()
         {
             for (const UniquePtr<Section>& section : sections)
@@ -193,6 +200,14 @@ namespace cmsx.object
         {
             section->file = this;
             sections.Add(UniquePtr<Section>(section));
+        }
+        public virtual nothrow Section* GetCodeSection()  const
+        {
+            return null;
+        }
+        public virtual nothrow Section* GetDataSection() const
+        {
+            return null;
         }
         public Section* CreateSection(const string& sectionName)
         {
@@ -248,6 +263,7 @@ namespace cmsx.object
             for (const UniquePtr<Section>& section : sections)
             {
                 section->Dump(writer);
+                writer.WriteLine();
             }
         }
         public nothrow SymbolTable& GetSymbolTable()
@@ -264,7 +280,7 @@ namespace cmsx.object
         private SymbolTable symbolTable;
     }
 
-    public class ObjectFile : File
+    public class ObjectFile : BinaryFile
     {
         public ObjectFile(const string& fileName_, bool createSections_) : base(fileName_, new ObjectFileHeaderSection())
         {
@@ -299,6 +315,14 @@ namespace cmsx.object
                 linkSection = section;
             }
         }
+        public override nothrow Section* GetCodeSection()  const
+        {
+            return codeSection;
+        }
+        public override nothrow Section* GetDataSection() const
+        {
+            return dataSection;
+        }
         public override void AddSymbolsToAddressMap()
         {
             symbolSection->AddSymbolsToAddressMap();
@@ -309,7 +333,7 @@ namespace cmsx.object
         public Section* linkSection;
     }
 
-    public class LibraryFile : File
+    public class LibraryFile : BinaryFile
     {
         public LibraryFile(const string& fileName_, bool createSections_) : base(fileName_, new LibraryFileHeaderSection())
         {
@@ -317,25 +341,66 @@ namespace cmsx.object
         public LibraryFile(const string& fileName_) : this(fileName_, true)
         {
         }
+        public List<UniquePtr<ObjectFile>> objectFiles;
     }
 
-    public class ExecutableFile : File
+    public class ExecutableFile : BinaryFile
     {
         public ExecutableFile(const string& fileName_, bool createSections_) : base(fileName_, new ExecutableFileHeaderSection())
         {
+            if (createSections_)
+            {
+                AddSection(new CodeSection());
+                AddSection(new DataSection());
+                AddSection(new SymbolSection());
+            }
         }
         public ExecutableFile(const string& fileName_) : this(fileName_, true)
         {
         }
+        public override nothrow Section* GetCodeSection()  const
+        {
+            return codeSection;
+        }
+        public override nothrow Section* GetDataSection() const
+        {
+            return dataSection;
+        }
+        public override void AddSymbolsToAddressMap()
+        {
+            symbolSection->AddSymbolsToAddressMap();
+        }
+        public override void AddSection(Section* section)
+        {
+            base->AddSection(section);
+            if (section is CodeSection*)
+            {
+                codeSection = section;
+            }
+            else if (section is DataSection*)
+            {
+                dataSection = section;
+            }
+            else if (section is SymbolSection*)
+            {
+                symbolSection = section;
+            }
+        }
+        public Section* codeSection;
+        public Section* dataSection;
+        public Section* symbolSection;
     }
 
     public abstract class Section
     {
-        public nothrow Section(const string& name_) : file(null), name(name_), pos(0), baseAddress(0u), length(0u)
+        public nothrow Section(const string& name_) : file(null), name(name_), pos(0), baseAddress(0u), length(0u), copyStartPos(0u), copyLength(0u)
         {
         }
         public default virtual ~Section();
         public virtual void Finalize()
+        {
+        }
+        public virtual void AddSymbol(Symbol* symbol)
         {
         }
         public virtual void AddSymbolsToAddressMap()
@@ -357,10 +422,11 @@ namespace cmsx.object
         {
             return length;
         }
-        public void Write(System.IO.BinaryWriter& writer)
+        public virtual void Write(System.IO.BinaryWriter& writer)
         {
             length = cast<ulong>(data.Count());
             WriteULong(writer, length);
+            WriteULong(writer, baseAddress);
             for (byte b : data)
             {
                 writer.Write(b);
@@ -369,6 +435,7 @@ namespace cmsx.object
         public virtual void Read(System.IO.BinaryReader& reader)
         {
             length = ReadULong(file->FileName(), reader);
+            baseAddress = ReadULong(file->FileName(), reader);
             for (ulong i = 0u; i < length; ++i)
             {
                 int x = reader.ReadByteOrEnd();
@@ -382,7 +449,11 @@ namespace cmsx.object
         public virtual void Dump(StreamWriter& writer)
         {
             writer.WriteLine(name + " section");
-            writer.WriteLine("length: #" + ToHexString(length));
+            if ((this is CodeSection*) || (this is DataSection*))
+            {
+                writer.WriteLine(Format("base address:", 17) + " #" + ToHexString(baseAddress));
+            }
+            writer.WriteLine(Format("length:", 17) + " #" + ToHexString(length));
         }
         public nothrow int GetByte()
         {
@@ -559,12 +630,15 @@ namespace cmsx.object
             EmitByte(b1);
             EmitByte(b0);
         }
-        public File* file;
+        public BinaryFile* file;
         public string name;
         public List<byte> data;
         public long pos;
         public ulong baseAddress;
         public ulong length;
+        public ulong copyStartPos;
+        public ulong copyLength;
+        public Section* copyTargetSection;
     }
 
     public class ObjectFileHeaderSection : Section
@@ -599,7 +673,7 @@ namespace cmsx.object
             {
                 throw Exception("file is null");
             }
-            FileFormatter formatter(*file);
+            BinaryFileFormatter formatter(*file);
             base->Dump(writer);
             pos = 0u;
             ulong address = 0u;
@@ -634,6 +708,117 @@ namespace cmsx.object
         {
             SetBaseAddress(cmsx.machine.dataSegmentBaseAddress);
         }
+        public override void AddSymbol(Symbol* symbol)
+        {
+            symbols.Add(symbol);
+        }
+        public override void Write(System.IO.BinaryWriter& writer)
+        {
+            base->Write(writer);
+            long n = symbols.Count();
+            writer.Write(cast<ulong>(n));
+            for (long i = 0; i < n; ++i)
+            {
+                Symbol* symbol = symbols[i];
+                ulong startOffset = symbol->start;
+                writer.Write(startOffset);
+            }
+        }
+        public override void Read(System.IO.BinaryReader& reader)
+        {
+            base->Read(reader);
+            ulong n = reader.ReadULong();
+            for (ulong i = 0u; i < n; ++i)
+            {
+                ulong startOffset = reader.ReadULong();
+                startOffsets.Add(startOffset);
+            }
+        }
+        public override void Dump(StreamWriter& writer)
+        {
+            if (file == null)
+            {
+                throw Exception("file is null");
+            }
+            BinaryFileFormatter formatter(*file);
+            base->Dump(writer);
+            ulong startOffset = cast<ulong>(-1);
+            long startOffsetIndex = 0;
+            if (!startOffsets.IsEmpty())
+            {
+                startOffset = startOffsets[0];
+                ++startOffsetIndex;
+                if (startOffsetIndex < startOffsets.Count())
+                {
+                    startOffset = startOffsets[startOffsetIndex];
+                    ++startOffsetIndex;
+                }
+                else
+                {
+                    startOffset = cast<ulong>(-1);
+                }
+            }
+            pos = 0u;
+            ulong address = 0u;
+            ulong baseAddr = BaseAddress() + address;
+            string currentBytes;
+            string currentChars;
+            string currentHeader = "#" + ToHexString(baseAddr) + " " + Format(formatter.GetLabel(baseAddr), 32);
+            int b = GetByte();
+            while (b != -1)
+            {
+                baseAddr = BaseAddress() + address;
+                if (baseAddr == startOffset)
+                {
+                    writer.WriteLine(currentHeader + " " + currentBytes + " " + currentChars);
+                    currentBytes.Clear();
+                    currentChars.Clear();
+                    currentHeader = "#" + ToHexString(baseAddr) + " " + Format(formatter.GetLabel(baseAddr), 32);
+                    if (startOffsetIndex < startOffsets.Count())
+                    {
+                        startOffset = startOffsets[startOffsetIndex];
+                        ++startOffsetIndex;
+                    }
+                    else
+                    {
+                        startOffset = cast<ulong>(-1);
+                    }
+                }
+                if (!currentBytes.IsEmpty())
+                {
+                    currentBytes.Append(" ");
+                }
+                currentBytes.Append(ToHexString(cast<byte>(b)));
+                char c = '.';
+                if (b >= 32u && b < 127u)
+                {
+                    c = cast<char>(b);
+                }
+                currentChars.Append(c);
+                b = GetByte();
+                ++address;
+            }
+            if (!currentBytes.IsEmpty())
+            {
+                writer.WriteLine(currentHeader + " " + currentBytes + " " + currentChars);
+            }
+        }
+        public override void Finalize()
+        {
+            ulong alignment = 8u;
+            ulong at = Address();
+            ulong a = at & (alignment - 1u);
+            if (a != 0u)
+            {
+                ulong offset = alignment - a;
+                for (ulong i = 0u; i < offset; ++i)
+                {
+                    EmitByte(0u);
+                }
+            }
+        }
+        private List<Symbol*> symbols;
+        private List<ulong> startOffsets;
     }
 
     public class SymbolSection : Section
@@ -643,6 +828,21 @@ namespace cmsx.object
         }
         public override void Finalize()
         {
+            if (file is ExecutableFile*)
+            {
+                SymbolTable& symbolTable = file->GetSymbolTable();
+                for (const UniquePtr<Symbol>& symbol : symbolTable.Symbols())
+                {
+                    if (symbol->section is CodeSection*)
+                    {
+                        symbol->value.value = symbol->start - file->GetCodeSection()->BaseAddress();
+                    }
+                    else if (symbol->section is DataSection*)
+                    {
+                        symbol->value.value = symbol->start - file->GetDataSection()->BaseAddress();
+                    }
+                }
+            }
             EmitSymbols();
         }
         public Segment GetSegment()
@@ -663,20 +863,20 @@ namespace cmsx.object
             }
             return cast<Linkage>(cast<byte>(linkage));
         }
-        public Value.Kind GetValueKind()
+        public Value.Flag GetValueFlags()
         {
-            int kind = GetByte();
-            if (kind == -1)
+            int flags = GetByte();
+            if (flags == -1)
             {
                 throw Exception("unexpected end of " + name + " section of file " + file->FileName());
             }
-            return cast<Value.Kind>(cast<byte>(kind));
+            return cast<Value.Flag>(cast<byte>(flags));
         }
         public Value GetValue()
         {
-            Value.Kind kind = GetValueKind();
+            Value.Flag flags = GetValueFlags();
             ulong v = GetULong();
-            Value value(kind, v, null);
+            Value value(flags, v, null);
             return value;
         }
         public override void Read(System.IO.BinaryReader& reader)
@@ -688,17 +888,64 @@ namespace cmsx.object
             {
                 uint symbolIndex = GetUInt();
                 string symbolName = GetString();
+                string symbolLocalName = GetString();
                 Segment segment = GetSegment();
+                Section* section = null;
+                if (segment == Segment.text)
+                {
+                    section = file->GetCodeSection();
+                }
+                else if (segment == Segment.data)
+                {
+                    section = file->GetDataSection();
+                }
                 Linkage linkage = GetLinkage();
                 Value value = GetValue();
+                ulong start = GetULong();
+                ulong length = GetULong();
                 Symbol* symbol = new Symbol();
                 symbol->index = cast<int>(symbolIndex);
                 symbol->name = symbolName;
+                symbol->localName = symbolLocalName;
                 symbol->segment = segment;
                 symbol->linkage = linkage;
                 symbol->value = value;
-                symbol->absoluteAddress = 0u;
+                symbol->start = start;
+                symbol->length = length;
+                symbol->section = section;
                 file->GetSymbolTable().AddSymbol(symbol, false);
+            }
+            ulong numInternalSymbols = GetULong();
+            for (ulong i = 0u; i < numInternalSymbols; ++i)
+            {
+                uint symbolIndex = GetUInt();
+                string symbolName = GetString();
+                string symbolLocalName = GetString();
+                Segment segment = GetSegment();
+                Section* section = null;
+                if (segment == Segment.text)
+                {
+                    section = file->GetCodeSection();
+                }
+                else if (segment == Segment.data)
+                {
+                    section = file->GetDataSection();
+                }
+                Linkage linkage = GetLinkage();
+                Value value = GetValue();
+                ulong start = GetULong();
+                ulong length = GetULong();
+                Symbol* symbol = new Symbol();
+                symbol->index = cast<int>(symbolIndex);
+                symbol->name = symbolName;
+                symbol->localName = symbolLocalName;
+                symbol->segment = segment;
+                symbol->linkage = linkage;
+                symbol->value = value;
+                symbol->start = start;
+                symbol->length = length;
+                symbol->section = section;
+                file->GetSymbolTable().AddInternalSymbol(symbol, false);
             }
         }
         public void EmitSymbols()
@@ -713,18 +960,26 @@ namespace cmsx.object
             {
                 EmitSymbol(symbol.Get());
             }
+            EmitULong(cast<ulong>(symbolTable.InternalSymbols().Count()));
+            for (const UniquePtr<Symbol>& symbol : symbolTable.InternalSymbols())
+            {
+                EmitSymbol(symbol.Get());
+            }
         }
         public void EmitSymbol(Symbol* symbol)
         {
             EmitUInt(cast<uint>(symbol->index));
             EmitString(symbol->name);
+            EmitString(symbol->localName);
             EmitByte(symbol->segment);
             EmitByte(symbol->linkage);
             EmitValue(symbol->value);
+            EmitULong(symbol->start);
+            EmitULong(symbol->length);
         }
         public void EmitValue(const Value& value)
         {
-            EmitByte(value.kind);
+            EmitByte(value.flags);
             EmitULong(value.value);
         }
         public override void AddSymbolsToAddressMap()
@@ -743,9 +998,9 @@ namespace cmsx.object
             {
                 string symbolLine;
                 string absoluteAddress;
-                if (symbol->value.kind == Value.Kind.pure)
+                if (symbol->value.GetFlag(Value.Flag.pure))
                 {
-                    absoluteAddress = "#" + ToHexString(symbol->absoluteAddress);
+                    absoluteAddress = "#" + ToHexString(symbol->start);
                 }
                 symbolLine.Append(Format(absoluteAddress, 17));
                 symbolLine.Append(" ").Append(Format(ToString(symbol->index), 11));
@@ -753,6 +1008,11 @@ namespace cmsx.object
                 symbolLine.Append(" ").Append(Format(SegmentStr(symbol->segment), 7));
                 symbolLine.Append(" ").Append(Format(LinkageStr(symbol->linkage), 8)); 
                 symbolLine.Append(" ").Append(ValueStr(symbol->value));
+                if (symbol->value.GetFlag(Value.Flag.function) || symbol->value.GetFlag(Value.Flag.structure))
+                {
+                    symbolLine.Append(" ").Append("#").Append(ToHexString(symbol->start));
+                    symbolLine.Append(" ").Append("#").Append(ToHexString(symbol->length));
+                }
                 writer.WriteLine(symbolLine);
             }
         }
@@ -769,7 +1029,7 @@ namespace cmsx.object
             {
                 throw Exception("file is null");
             }
-            FileFormatter formatter(*file);
+            BinaryFileFormatter formatter(*file);
             base->Dump(writer);
             pos = 0u;
             int x = GetByte();
@@ -795,18 +1055,12 @@ namespace cmsx.object
                         linkLine.Append(" #").Append(ToHexString(address));
                         break;
                     }
-                    case LinkCode.absoluteRegisterValue:
+                    case LinkCode.absoluteAddrValue:
                     {
                         uint index = GetUInt();
                         linkLine.Append(" ").Append(Format(ToString(index), 11));
                         ulong address = GetULong();
                         linkLine.Append(" #").Append(ToHexString(address));
-                        int reg = GetByte();
-                        if (reg == - 1)
-                        {
-                            throw Exception("unexpected end of file " + file->FileName());
-                        }
-                        linkLine.Append(" ").Append(formatter.FormatRegisterNumber(cast<byte>(reg)));
                         break;
                     }
                     case LinkCode.farJump:

@@ -19,6 +19,8 @@ Project("{A8A06387-5A08-470D-8F9C-CD5ECF2DDB09}") = "cmsxo", "cmsxo\cmsxo.cmproj
 EndProject
 Project("{A8A06387-5A08-470D-8F9C-CD5ECF2DDB09}") = "cmsxdump", "cmsxdump\cmsxdump.cmproj", "{A5CE21A7-7F2F-4E4F-AC3B-0C21F66A55DD}"
 EndProject
+Project("{A8A06387-5A08-470D-8F9C-CD5ECF2DDB09}") = "cmsxlink", "cmsxlink\cmsxlink.cmproj", "{18CCEE7A-DC2E-4E4F-AA0F-F73C4809A3C0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{A5CE21A7-7F2F-4E4F-AC3B-0C21F66A55DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A5CE21A7-7F2F-4E4F-AC3B-0C21F66A55DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A5CE21A7-7F2F-4E4F-AC3B-0C21F66A55DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18CCEE7A-DC2E-4E4F-AA0F-F73C4809A3C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18CCEE7A-DC2E-4E4F-AA0F-F73C4809A3C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18CCEE7A-DC2E-4E4F-AA0F-F73C4809A3C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18CCEE7A-DC2E-4E4F-AA0F-F73C4809A3C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

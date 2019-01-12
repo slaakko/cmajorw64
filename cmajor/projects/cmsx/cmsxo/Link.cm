@@ -1,10 +1,11 @@
 using System;
+using System.Collections;
 
 namespace cmsx.object
 {
     public enum LinkCode : byte
     {
-        forwardLongJump = 0u, forwardShortJump = 1u, absoluteRegisterValue = 2u, farJump = 3u, farOcta = 4u
+        forwardLongJump = 0u, forwardShortJump = 1u, absoluteAddrValue = 2u, farJump = 3u, farOcta = 4u
     }
 
     public const int maxLinkCodeStrLength = 17;
@@ -15,11 +16,177 @@ namespace cmsx.object
         {
             case LinkCode.forwardLongJump: return  "LINKFWDLONGJUMP";
             case LinkCode.forwardShortJump: return "LINKFWDSHORTJMP";
-            case LinkCode.absoluteRegisterValue: return "LINKABSOLUTEREG";
+            case LinkCode.absoluteAddrValue: return "LINKABSOLUTEADDR";
             case LinkCode.farJump: return "LINKFARJUMP";
             case LinkCode.farOcta: return "LINKFAROCTA";
         }
         return "";
+    }
+
+    public abstract class LinkCommand
+    {
+        public nothrow LinkCommand(ObjectFile* objectFile_, ulong address_) : objectFile(objectFile_), address(address_)
+        {
+        }
+        public default virtual ~LinkCommand();
+        public abstract void Execute(ulong value);
+        public ObjectFile* objectFile;
+        public ulong address;
+    }
+
+    public class LinkAbsoluteAddressCommand : LinkCommand
+    {
+        public nothrow LinkAbsoluteAddressCommand(ObjectFile* objectFile_, ulong address_) : base(objectFile_, address_)
+        {
+        }
+        public override void Execute(ulong value)
+        {
+            byte b0 = cast<byte>(value);
+            value = value >> 8u;
+            byte b1 = cast<byte>(value);
+            value = value >> 8u;
+            byte b2 = cast<byte>(value);
+            value = value >> 8u;
+            byte b3 = cast<byte>(value);
+            value = value >> 8u;
+            byte b4 = cast<byte>(value);
+            value = value >> 8u;
+            byte b5 = cast<byte>(value);
+            value = value >> 8u;
+            byte b6 = cast<byte>(value);
+            value = value >> 8u;
+            byte b7 = cast<byte>(value);
+            value = value >> 8u;
+            ushort offset = (cast<ushort>(b7) << 8u) | cast<ushort>(b6);
+            objectFile->codeSection->EmitShortOffset(address, offset);
+            offset = (cast<ushort>(b5) << 8u) | cast<ushort>(b4);
+            objectFile->codeSection->EmitShortOffset(address + 4u, offset);
+            offset = (cast<ushort>(b3) << 8u) | cast<ushort>(b2);
+            objectFile->codeSection->EmitShortOffset(address + 8u, offset);
+            offset = (cast<ushort>(b1) << 8u) | cast<ushort>(b0);
+            objectFile->codeSection->EmitShortOffset(address + 12u, offset);
+        }
+    }
+
+    public class LinkFarJumpCommand : LinkCommand
+    {
+        public nothrow LinkFarJumpCommand(ObjectFile* objectFile_, ulong address_) : base(objectFile_, address_)
+        {
+        }
+        public override void Execute(ulong value)
+        {
+            byte opCode = cmsx.machine.JMP;
+            ulong offset = 0u;
+            if (value >= address)
+            {
+                offset = (value - address) >> 2u;
+            }
+            else
+            {
+                opCode = cmsx.machine.JMPB;
+                offset = (address - value) >> 2u;
+            }
+            if (offset >= cast<ulong>(MaxValue<ushort>()) << 8u)
+            {
+                throw Exception("jump too far");
+            }
+            objectFile->codeSection->EmitByte(address, opCode);
+            objectFile->codeSection->EmitLongOffset(address, cast<uint>(offset));
+        }
+    }
+
+    public class LinkFarOctaCommand : LinkCommand
+    {
+        public nothrow LinkFarOctaCommand(ObjectFile* objectFile_, ulong address_) : base(objectFile_, address_)
+        {
+        }
+        public override void Execute(ulong value)
+        {
+            objectFile->dataSection->EmitULong(address, value);
+        }
+    }
+
+    public class CopyRange
+    {
+        public nothrow CopyRange(Section* fromSection_, Section* toSection_, ulong startPos_, ulong length_) : fromSection(fromSection_), toSection(toSection_), startPos(startPos_), length(length_)
+        {
+        }
+        public Section* fromSection;
+        public Section* toSection;
+        public ulong startPos;
+        public ulong length;
+    }
+
+    public class LinkTable
+    {
+        public void AddLinkCommand(const string& symbolName, LinkCommand* command)
+        {
+            List<LinkCommand*>& commands = linkCommandMap[symbolName];
+            commands.Add(command);
+        }
+        public void ExecuteLinkCommands(const string& symbolName, ulong value)
+        {
+            Map<string, List<LinkCommand*>>.ConstIterator it = linkCommandMap.CFind(symbolName);
+            if (it != linkCommandMap.CEnd())
+            {
+                List<LinkCommand*>& commands = it->second;
+                for (LinkCommand* command : commands)
+                {
+                    command->Execute(value);
+                    delete command;
+                }
+                linkCommandMap.Remove(symbolName);
+            }
+        }
+        public void AddCopyRange(const CopyRange& copyRange)
+        {
+            copyRanges.Add(copyRange);
+        }
+        public void ReportUnresolvedSymbols()
+        {
+            bool hasUnresolvedSymbols = false;
+            for (Pair<string, List<LinkCommand*>>& p : linkCommandMap)
+            {
+                for (LinkCommand* command : p.second)
+                {
+                    hasUnresolvedSymbols = true;
+                    Console.Error() << "unresolved external symbol '" << p.first << "' detected in file " << command->objectFile->FileName() << endl();
+                }
+            }
+            if (hasUnresolvedSymbols)
+            {
+                throw Exception("linking failed because unresolved external symbols detected");
+            }
+        }
+        public void CopyRanges()
+        {
+            for (const CopyRange& copyRange : copyRanges)
+            {
+                ulong n = copyRange.length;
+                if (n > 0u)
+                {
+                    Section* fromSection = copyRange.fromSection;
+                    Section* toSection = copyRange.toSection;
+                    ulong startPos = copyRange.startPos;
+                    for (ulong i = 0u; i < n; ++i)
+                    {
+                        toSection->data.Add(fromSection->data[cast<long>(startPos + i)]);
+                    }
+                }
+            }
+        }
+        public ~LinkTable()
+        {
+            for (Pair<string, List<LinkCommand*>>& p : linkCommandMap)
+            {
+                for (LinkCommand* command : p.second)
+                {
+                    delete command;
+                }
+            }
+        }
+        private Map<string, List<LinkCommand*>> linkCommandMap;
+        private List<CopyRange> copyRanges;
     }
 
     public void LinkInternal(ObjectFile& objectFile)
@@ -44,8 +211,7 @@ namespace cmsx.object
                     Symbol* symbol = symbolTable.GetSymbol(cast<int>(symbolIndex));
                     #assert(symbol != null);
                     #assert(symbol->segment == Segment.text);
-                    #assert(symbol->linkage == Linkage.internal_);
-                    #assert(symbol->value.kind == Value.Kind.pure);
+                    #assert(symbol->value.GetFlag(Value.Flag.address));
                     ulong toAddress = symbol->value.value;
                     #assert(toAddress >= fromAddress);
                     ulong offset = (toAddress - fromAddress) >> 2u;
@@ -63,8 +229,7 @@ namespace cmsx.object
                     Symbol* symbol = symbolTable.GetSymbol(cast<int>(symbolIndex));
                     #assert(symbol != null);
                     #assert(symbol->segment == Segment.text);
-                    #assert(symbol->linkage == Linkage.internal_);
-                    #assert(symbol->value.kind == Value.Kind.pure);
+                    #assert(symbol->value.GetFlag(Value.Flag.address));
                     ulong toAddress = symbol->value.value;
                     #assert(toAddress >= fromAddress);
                     ulong offset = (toAddress - fromAddress) >> 2u;
@@ -75,19 +240,13 @@ namespace cmsx.object
                     codeSection->EmitShortOffset(fromAddress, cast<ushort>(offset));
                     break;
                 }
-                case LinkCode.absoluteRegisterValue:
+                case LinkCode.absoluteAddrValue:
                 {
                     uint index = linkSection->GetUInt();
                     ulong address = linkSection->GetULong();
-                    int reg = linkSection->GetByte();
-                    if (reg == - 1)
-                    {
-                        throw Exception("unexpected end of file " + objectFile.FileName());
-                    }
-                    newLinkSection.EmitByte(LinkCode.absoluteRegisterValue);
+                    newLinkSection.EmitByte(LinkCode.absoluteAddrValue);
                     newLinkSection.EmitUInt(cast<uint>(index));
                     newLinkSection.EmitULong(address);
-                    newLinkSection.EmitByte(cast<byte>(reg));
                     break;
                 }
                 case LinkCode.farJump:
@@ -112,5 +271,260 @@ namespace cmsx.object
             x = linkSection->GetByte();
         }
         Swap(linkSection->data, newLinkSection.data);
+    }
+
+    public void ProcessSymbols(LinkTable& linkTable, ExecutableFile& executable, SymbolTable& objectFileSymbolTable)
+    {
+        SymbolTable& executableSymbolTable = executable.GetSymbolTable();
+        for (const UniquePtr<Symbol>& symbol : objectFileSymbolTable.Symbols())
+        {
+            if (symbol->linkage == Linkage.internal_)
+            {
+                if (symbol->value.GetFlag(Value.Flag.address) && symbol->value.GetFlag(Value.Flag.address) && (symbol->segment == Segment.text || symbol->segment == Segment.data))
+                {
+                    symbol->start = symbol->section->baseAddress + symbol->value.value;
+                    Symbol* executableSymbol = symbol->Clone();
+                    #assert(executableSymbol->section != null);
+                    if (executableSymbol->section is DataSection*)
+                    {
+                        executable.dataSection->AddSymbol(executableSymbol);
+                    }
+                    executableSymbolTable.AddInternalSymbol(executableSymbol, true);
+                }
+            }
+            else if (symbol->linkage == Linkage.external)
+            {
+                if (symbol->value.GetFlag(Value.Flag.address) && symbol->value.GetFlag(Value.Flag.address) && (symbol->segment == Segment.text || symbol->segment == Segment.data))
+                {
+                    Symbol* prevSymbol = executableSymbolTable.GetSymbol(symbol->name);
+                    if (prevSymbol != null)
+                    {
+                        #assert(prevSymbol->section != null);
+                        #assert(symbol->section != null);
+                        throw Exception("Duplicate external symbol '" + symbol->name +
+                            "'. Original defined in " + prevSymbol->section->name + " section of file " + prevSymbol->section->file->FileName() + 
+                            ". Duplicate detected in " + symbol->section->name + " section of file " + symbol->section->file->FileName() + ".");
+                    }
+                    else
+                    {
+                        symbol->start = symbol->section->baseAddress + symbol->value.value;
+                        Symbol* executableSymbol = symbol->Clone();
+                        #assert(executableSymbol->section != null);
+                        if (executableSymbol->section is DataSection*)
+                        {
+                            executable.dataSection->AddSymbol(executableSymbol);
+                        }
+                        executableSymbolTable.AddSymbol(executableSymbol);
+                        linkTable.ExecuteLinkCommands(symbol->name, symbol->start);
+                    }
+                }
+                else if (symbol->value.flags == Value.Flag.undefined)
+                {
+                    Symbol* prevSymbol = executableSymbolTable.GetSymbol(symbol->name);
+                    if (prevSymbol != null)
+                    {
+                        symbol->start = prevSymbol->start;
+                    }
+                }
+            }
+            else if (symbol->linkage == Linkage.once)
+            {
+                if (symbol->value.GetFlag(Value.Flag.address) && symbol->value.GetFlag(Value.Flag.address) && (symbol->segment == Segment.text || symbol->segment == Segment.data))
+                {
+                    Symbol* prevSymbol = executableSymbolTable.GetSymbol(symbol->name);
+                    if (prevSymbol == null)
+                    {
+                        symbol->start = symbol->section->baseAddress + symbol->value.value;
+                        Symbol* executableSymbol = symbol->Clone();
+                        #assert(executableSymbol->section != null);
+                        if (executableSymbol->section is DataSection*)
+                        {
+                            executable.dataSection->AddSymbol(executableSymbol);
+                        }
+                        executableSymbolTable.AddSymbol(executableSymbol);
+                        linkTable.ExecuteLinkCommands(symbol->name, symbol->start);
+                    }
+                    else
+                    {
+                        symbol->linkage = Linkage.remove;
+                    }
+                }
+            }
+        }
+    }
+
+    public void ProcessLinkSection(LinkTable& linkTable, ExecutableFile& executable, ObjectFile* objectFile)
+    {
+        SymbolTable& executableSymbolTable = executable.GetSymbolTable();
+        Section* codeSection = objectFile->codeSection;
+        codeSection->copyStartPos = 0u;
+        codeSection->copyLength = 0u;
+        codeSection->copyTargetSection = executable.codeSection;
+        Section* dataSection = objectFile->dataSection;
+        dataSection->copyStartPos = 0u;
+        dataSection->copyLength = 0u;
+        dataSection->copyTargetSection = executable.dataSection;
+        Section* linkSection = objectFile->linkSection;
+        linkSection->pos = 0u;
+        int x = linkSection->GetByte();
+        ulong prevCodeSectionLength = codeSection->length;
+        ulong prevDataSectionLength = dataSection->length;
+        while (x != -1)
+        {
+            LinkCode linkCode = cast<LinkCode>(cast<byte>(x));
+            Symbol* symbol = null;
+            UniquePtr<LinkCommand> linkCommand;
+            switch (linkCode)
+            {
+                case LinkCode.absoluteAddrValue:
+                {
+                    uint index = linkSection->GetUInt();
+                    ulong address = linkSection->GetULong();
+                    symbol = objectFile->GetSymbolTable().GetSymbol(cast<int>(index));
+                    if (symbol->value.flags == Value.Flag.undefined)
+                    {
+                        Symbol* executableSymbol = executableSymbolTable.GetSymbol(symbol->name);
+                        if (executableSymbol != null)
+                        {
+                            symbol = executableSymbol;
+                        }
+                    }
+                    linkCommand.Reset(new LinkAbsoluteAddressCommand(objectFile, address));
+                    break;
+                }
+                case LinkCode.farJump:
+                {
+                    uint index = linkSection->GetUInt();
+                    ulong address = linkSection->GetULong();
+                    symbol = objectFile->GetSymbolTable().GetSymbol(cast<int>(index));
+                    if (symbol->value.flags == Value.Flag.undefined)
+                    {
+                        Symbol* executableSymbol = executableSymbolTable.GetSymbol(symbol->name);
+                        if (executableSymbol != null)
+                        {
+                            symbol = executableSymbol;
+                        }
+                    }
+                    linkCommand.Reset(new LinkFarJumpCommand(objectFile, address));
+                    break;
+                }
+                case LinkCode.farOcta:
+                {
+                    uint index = linkSection->GetUInt();
+                    ulong address = linkSection->GetULong();
+                    symbol = objectFile->GetSymbolTable().GetSymbol(cast<int>(index));
+                    if (symbol->value.flags == Value.Flag.undefined)
+                    {
+                        Symbol* executableSymbol = executableSymbolTable.GetSymbol(symbol->name);
+                        if (executableSymbol != null)
+                        {
+                            symbol = executableSymbol;
+                        }
+                    }
+                    linkCommand.Reset(new LinkFarOctaCommand(objectFile, address));
+                    break;
+                }
+                default:
+                {
+                    symbol = null;
+                    linkCommand.Reset();
+                    break;
+                }
+            }
+            if (!linkCommand.IsNull() && symbol != null)
+            {
+                if (symbol->linkage == Linkage.remove)
+                {
+                    if (symbol->section->copyLength > 0u)
+                    {
+                        linkTable.AddCopyRange(CopyRange(symbol->section, symbol->section->copyTargetSection, symbol->section->copyStartPos, symbol->section->copyLength));
+                        symbol->section->copyLength = 0u;
+                    }
+                    symbol->section->copyStartPos = symbol->value.value + symbol->length;
+                    symbol->section->length = symbol->section->length - symbol->length;
+                }
+                if (symbol->value.GetFlag(Value.Flag.address))
+                {
+                    if (symbol->value.value >= symbol->section->copyStartPos)
+                    {
+                        linkCommand->Execute(symbol->start);
+                        symbol->section->copyLength = symbol->value.value - symbol->section->copyStartPos;
+                    }
+                }
+                else if (symbol->value.flags == Value.Flag.undefined)
+                {
+                    linkTable.AddLinkCommand(symbol->name, linkCommand.Release());
+                }
+            }
+            x = linkSection->GetByte();
+        }
+        if (codeSection->copyStartPos < prevCodeSectionLength)
+        {
+            linkTable.AddCopyRange(CopyRange(codeSection, codeSection->copyTargetSection, codeSection->copyStartPos, prevCodeSectionLength - codeSection->copyStartPos));
+        }
+        if (dataSection->copyStartPos < prevDataSectionLength)
+        {
+            linkTable.AddCopyRange(CopyRange(dataSection, dataSection->copyTargetSection, dataSection->copyStartPos, prevDataSectionLength - dataSection->copyStartPos));
+        }
+    }
+
+    public void LinkObjectFile(LinkTable& linkTable, ExecutableFile& executable, ObjectFile* objectFile, Section*& prevCodeSection, Section*& prevDataSection)
+    {
+        SymbolTable& executableSymbolTable = executable.GetSymbolTable();
+        Section* codeSection = objectFile->codeSection;
+        if (prevCodeSection == null)
+        {
+            codeSection->baseAddress = cmsx.machine.textSegmentBaseAddress + 4096u;
+            executable.codeSection->baseAddress = codeSection->baseAddress;
+        }
+        else
+        {
+            codeSection->baseAddress = prevCodeSection->baseAddress + prevCodeSection->length;
+        }
+        prevCodeSection = codeSection;
+        Section* dataSection = objectFile->dataSection;
+        if (prevDataSection == null)
+        {
+            dataSection->baseAddress = cmsx.machine.dataSegmentBaseAddress;
+            executable.dataSection->baseAddress = dataSection->baseAddress;
+        }
+        else
+        {
+            dataSection->baseAddress = prevDataSection->baseAddress + prevDataSection->length;
+        }
+        prevDataSection = dataSection;
+        ProcessSymbols(linkTable, executable, objectFile->GetSymbolTable());
+        ProcessLinkSection(linkTable, executable, objectFile);
+    }
+
+    public void Link(ExecutableFile& executable, List<UniquePtr<BinaryFile>>& binaryFiles)
+    {
+        LinkTable linkTable;
+        CodeSection* prevCodeSection = null;
+        DataSection* prevDataSection = null;
+        for (const UniquePtr<BinaryFile>& binaryFile : binaryFiles)
+        {
+            if (binaryFile.Get() is ObjectFile*)
+            {
+                ObjectFile* objectFile = cast<ObjectFile*>(binaryFile.Get());
+                LinkObjectFile(linkTable, executable, objectFile, prevCodeSection, prevDataSection);
+            }
+            else if (binaryFile.Get() is LibraryFile*)
+            {
+                LibraryFile* libraryFile = cast<LibraryFile*>(binaryFile.Get());
+                for (const UniquePtr<ObjectFile>& objectFile : libraryFile->objectFiles)
+                {
+                    LinkObjectFile(linkTable, executable, objectFile.Get(), prevCodeSection, prevDataSection);
+                }
+            }
+            else
+            {
+                throw Exception("cannot link '" + binaryFile->FileName() + "': not an object or library file");
+            }
+        }
+        linkTable.ReportUnresolvedSymbols();
+        linkTable.CopyRanges();
+        executable.Finalize();
+        executable.Write();
     }
 }

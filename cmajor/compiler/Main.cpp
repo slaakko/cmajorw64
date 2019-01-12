@@ -45,7 +45,7 @@ struct InitDone
     }
 };
 
-const char* version = "3.1.0";
+const char* version = "3.2.0";
 
 void PrintHelp()
 {
@@ -88,7 +88,7 @@ void PrintHelp()
         "--bdt2xml (-bd)\n" <<
         "   output bound tree as xml\n" <<
         "--link-with-debug-runtime (-d)\n" <<
-        "   link with the debug version of the runtime library cmrt310(d).dll\n" <<
+        "   link with the debug version of the runtime library cmrt320(d).dll\n" <<
         "--link-using-ms-link (-m)\n" <<
         "   use Microsoft's link.exe as the linker\n" << 
         "--define SYMBOL (-D SYMBOL)\n" <<

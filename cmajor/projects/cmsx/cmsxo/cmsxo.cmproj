@@ -11,7 +11,7 @@
   <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets" />
   <ItemGroup>
     <CmCompile Include="Link.cm" />
-    <CmCompile Include="Format.cm" />
+    <CmCompile Include="BinaryFile.cm" />
     <CmCompile Include="Symbol.cm" />
   </ItemGroup>
   <ItemGroup>

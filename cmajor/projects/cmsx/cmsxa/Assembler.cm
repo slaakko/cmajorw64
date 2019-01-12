@@ -7,7 +7,7 @@ namespace cmsx.assembly
 {
     public enum Stage : byte 
     {
-        resolve = 0u, assemble = 1u, bytes = 2u, wydes = 3u, tetras = 4u, octas = 8u
+        resolve = 0u, assemble = 1u, is_ = 2u, setExternal = 3u, setLinkOnce = 4u, bytes = 5u, wydes = 6u, tetras = 7u, octas = 8u
     }
 
     public void Error(const string& message, const Span& span)
@@ -18,8 +18,8 @@ namespace cmsx.assembly
     public class Assembler : Visitor
     {
         public Assembler(const string& objectFileName) :
-            objectFile(objectFileName), stage(Stage.resolve), currentSegment(Segment.text), currentSection(objectFile.codeSection), currentInstruction(null), currentSymbol(null),
-            currentValue(Value.Kind.undefined, undefinedValue, null)
+            objectFile(objectFileName), stage(Stage.resolve), currentSegment(Segment.text), currentSection(objectFile.codeSection), currentInstruction(null), currentSymbol(null), currentValue(),
+            currentFunctionSymbol(null), currentStructureSymbol(null)
         {
             InstallStandardSymbols();
         }
@@ -30,49 +30,49 @@ namespace cmsx.assembly
             ax->name = "ax";
             ax->segment = Segment.unknown;
             ax->linkage = Linkage.internal_;
-            ax->value = Value(Value.Kind.register, cmsx.machine.regAX, ax);
+            ax->value = Value(Value.Flag.register, cmsx.machine.regAX, ax);
             objectFile.GetSymbolTable().AddSymbol(ax);
             Symbol* bx = new Symbol();
             bx->index = -1;
             bx->name = "bx";
             bx->segment = Segment.unknown;
             bx->linkage = Linkage.internal_;
-            bx->value = Value(Value.Kind.register, cmsx.machine.regBX, bx);
+            bx->value = Value(Value.Flag.register, cmsx.machine.regBX, bx);
             objectFile.GetSymbolTable().AddSymbol(bx);
             Symbol* cx = new Symbol();
             cx->index = -1;
             cx->name = "cx";
             cx->segment = Segment.unknown;
             cx->linkage = Linkage.internal_;
-            cx->value = Value(Value.Kind.register, cmsx.machine.regCX, cx);
+            cx->value = Value(Value.Flag.register, cmsx.machine.regCX, cx);
             objectFile.GetSymbolTable().AddSymbol(cx);
             Symbol* dx = new Symbol();
             dx->index = -1;
             dx->name = "dx";
             dx->segment = Segment.unknown;
             dx->linkage = Linkage.internal_;
-            dx->value = Value(Value.Kind.register, cmsx.machine.regDX, dx);
+            dx->value = Value(Value.Flag.register, cmsx.machine.regDX, dx);
             objectFile.GetSymbolTable().AddSymbol(dx);
             Symbol* ex = new Symbol();
             ex->index = -1;
             ex->name = "ex";
             ex->segment = Segment.unknown;
             ex->linkage = Linkage.internal_;
-            ex->value = Value(Value.Kind.register, cmsx.machine.regEX, ex);
+            ex->value = Value(Value.Flag.register, cmsx.machine.regEX, ex);
             objectFile.GetSymbolTable().AddSymbol(ex);
             Symbol* sp = new Symbol();
             sp->index = -1;
             sp->name = "sp";
             sp->segment = Segment.unknown;
             sp->linkage = Linkage.internal_;
-            sp->value = Value(Value.Kind.register, cmsx.machine.regSP, sp);
+            sp->value = Value(Value.Flag.register, cmsx.machine.regSP, sp);
             objectFile.GetSymbolTable().AddSymbol(sp);
             Symbol* fp = new Symbol();
             fp->index = -1;
             fp->name = "fp";
             fp->segment = Segment.unknown;
             fp->linkage = Linkage.internal_;
-            fp->value = Value(Value.Kind.register, cmsx.machine.regFP, fp);
+            fp->value = Value(Value.Flag.register, cmsx.machine.regFP, fp);
             objectFile.GetSymbolTable().AddSymbol(fp);
         }
         public void Assemble(List<UniquePtr<Instruction>>& instructions)
@@ -102,11 +102,11 @@ namespace cmsx.assembly
         }
         public Value Evaluate(Node* node)
         {
-            currentValue = Value(Value.Kind.undefined, undefinedValue, null);
+            currentValue = Value();
             currentSymbol = null;
             node->Accept(*this);
             Value value = currentValue;
-            currentValue = Value(Value.Kind.undefined, undefinedValue, null);
+            currentValue = Value();
             return value;
         }
         public void EmitOpCode(byte opCode)
@@ -119,7 +119,7 @@ namespace cmsx.assembly
         }
         public void EmitRegisterValue(const string& paramName, const Value& v)
         {
-            if (v.kind == Value.Kind.register)
+            if (v.flags == Value.Flag.register)
             {
                 if (v.value < 256u)
                 {
@@ -137,7 +137,7 @@ namespace cmsx.assembly
         }
         public void EmitPureByteValue(const string& paramName, const Value& v)
         {
-            if (v.kind == Value.Kind.pure)
+            if (v.GetFlag(Value.Flag.pure))
             {
                 if (v.value < 256u)
                 {
@@ -225,7 +225,7 @@ namespace cmsx.assembly
         {
             #assert(symbol->index != -1);
             byte reg = 0u;
-            if (registerNumber.kind == Value.Kind.register)
+            if (registerNumber.flags == Value.Flag.register)
             {
                 if (registerNumber.value < 256u)
                 {
@@ -244,10 +244,9 @@ namespace cmsx.assembly
             {
                 Error(currentInstruction->opCode->name + " instruction can appear only in .CODE section", currentInstruction->opCode->span);
             }
-            objectFile.linkSection->EmitByte(LinkCode.absoluteRegisterValue);
+            objectFile.linkSection->EmitByte(LinkCode.absoluteAddrValue);
             objectFile.linkSection->EmitUInt(cast<uint>(symbol->index));
             objectFile.linkSection->EmitULong(objectFile.codeSection->Address());
-            objectFile.linkSection->EmitByte(reg);
             objectFile.codeSection->EmitByte(cmsx.machine.SETH);
             objectFile.codeSection->EmitByte(reg);
             objectFile.codeSection->EmitShortOffset(cast<ushort>(-1));
@@ -290,7 +289,7 @@ namespace cmsx.assembly
         public void EmitForwardShortJump(const string& paramName, byte opCode, const Value& registerNumber, Symbol* symbol)
         {
             byte reg = 0u;
-            if (registerNumber.kind == Value.Kind.register)
+            if (registerNumber.flags == Value.Flag.register)
             {
                 if (registerNumber.value < 256u)
                 {
@@ -345,7 +344,12 @@ namespace cmsx.assembly
                 }
                 if (!inst.label.IsNull())
                 {
-                    if (currentInstruction->opCode->value != IS && currentInstruction->opCode->value != GREG)
+                    int opc = currentInstruction->opCode->value;
+                    if (opc == EXTERN || opc == LINKONCE)
+                    {
+                        Error("no label field allowed for EXTERN or LINKONCE instruction", inst.label->span);
+                    }
+                    else if (opc != IS)
                     {
                         inst.label->Accept(*this);
                     }
@@ -353,13 +357,14 @@ namespace cmsx.assembly
             }
             else if (stage == Stage.assemble)
             {
-                if (currentInstruction->opCode->value == CODE)
+                int opc = currentInstruction->opCode->value;
+                if (opc == CODE)
                 {
                     currentSegment = Segment.text;
                     currentSection = objectFile.codeSection;
                     return;
                 }
-                else if (currentInstruction->opCode->value == DATA)
+                else if (opc == DATA)
                 {
                     currentSegment = Segment.data;
                     currentSection = objectFile.dataSection;
@@ -369,13 +374,40 @@ namespace cmsx.assembly
                 AlignAt();
                 if (!inst.label.IsNull())
                 {
-                    if (currentInstruction->opCode->value != IS && currentInstruction->opCode->value != GREG)
+                    if (opc == EXTERN || opc == LINKONCE)
+                    {
+                        Error("no label field allowed for EXTERN or LINKONCE instruction", inst.label->span);
+                    }
+                    else if (opc != IS)
                     {
                         currentInstruction->label->Accept(*this);
                         if (currentSymbol != null)
                         {
-                            currentSymbol->value = Value(Value.Kind.pure, currentSection->Address(), currentSymbol);
-                            currentSymbol->absoluteAddress = currentSection->BaseAddress() + currentSection->Address();
+                            if (opc == FUNC)
+                            {
+                                currentSymbol->value = Value(cast<Value.Flag>(Value.Flag.pure | Value.Flag.address | Value.Flag.function), currentSection->Address(), currentSymbol);
+                                currentFunctionSymbol = currentSymbol;
+                                currentSymbol->start = currentSection->BaseAddress() + currentSection->Address();
+                            }
+                            else if (opc == STRUCT)
+                            {
+                                currentSymbol->value = Value(cast<Value.Flag>(Value.Flag.pure | Value.Flag.address | Value.Flag.structure), currentSection->Address(), currentSymbol);
+                                currentStructureSymbol = currentSymbol;
+                                currentSymbol->start = currentSection->BaseAddress() + currentSection->Address();
+                            }
+                            else if (opc == ENDF)
+                            {
+                                currentSymbol->length = currentSection->BaseAddress() + currentSection->Address() - currentSymbol->start;
+                            }
+                            else if (opc == ENDS)
+                            {
+                                currentSymbol->length = currentSection->BaseAddress() + currentSection->Address() - currentSymbol->start;
+                            }
+                            else
+                            {
+                                currentSymbol->value = Value(cast<Value.Flag>(Value.Flag.pure | Value.Flag.address), currentSection->Address(), currentSymbol);
+                                currentSymbol->start = currentSection->BaseAddress() + currentSection->Address();
+                            }
                             objectFile.GetSymbolTable().AddSymbolToAddressMap(currentSymbol);
                         }
                         else
@@ -384,8 +416,11 @@ namespace cmsx.assembly
                         }
                     }
                 }
-                AssemblyInstruction* assemblyInstruction = AssemblyInstructionMap.Instance().GetAssemblyInstruction(currentInstruction->opCode->value, currentInstruction->span);
-                assemblyInstruction->Assemble(*this, currentInstruction);
+                if (opc != FUNC && opc != ENDF && opc != STRUCT && opc != ENDS)
+                {
+                    AssemblyInstruction* assemblyInstruction = AssemblyInstructionMap.Instance().GetAssemblyInstruction(opc, currentInstruction->span);
+                    assemblyInstruction->Assemble(*this, currentInstruction);
+                }
             }
         }
         public override void Visit(OpCode& opCode)
@@ -401,33 +436,100 @@ namespace cmsx.assembly
                 Error("unknown opcode '" + opCodeName + "'", opCode.span);
             }
         }
-        public override void Visit(LocalLabel& ll)
-        {
-            // todo
-        }
         public override void Visit(SymbolNode& node)
         {
+            int opc = currentInstruction->opCode->value;
             if (stage == Stage.resolve)
             {
                 Symbol* symbol = objectFile.GetSymbolTable().GetSymbol(node.name);
                 if (symbol != null)
                 {
-                    Error("symbol '" + node.name + "' already defined", node.span);
+                    if (opc == ENDF)
+                    {
+                        currentFunctionSymbol = null;
+                    }
+                    else if (opc == ENDS)
+                    {
+                        currentStructureSymbol = null;
+                    }
+                    else
+                    {
+                        Error("symbol '" + node.name + "' already defined", node.span);
+                    }
                 }
                 else
                 {
+                    if (opc == ENDF)
+                    {
+                        Error("no corresponding FUNC '" + node.name + "' seen", node.span);
+                    }
+                    else if (opc == ENDS)
+                    {
+                        Error("no corresponding STRUCT '" + node.name + "' seen", node.span);
+                    }
                     symbol = new Symbol();
                     symbol->index = -1;
-                    symbol->name = node.name;
+                    if (node.local)
+                    {
+                        if (currentFunctionSymbol != null)
+                        {
+                            symbol->name = currentFunctionSymbol->name + node.name;
+                            symbol->localName = node.name;
+                        }
+                        else
+                        {
+                            Error("local symbols can be used only inside FUNC", node.span);
+                        }
+                    }
+                    else
+                    {
+                        symbol->name = node.name;
+                    }
                     symbol->segment = currentSegment;
                     symbol->linkage = Linkage.internal_;
-                    symbol->value = Value(Value.Kind.undefined, undefinedValue, symbol);
+                    symbol->value = Value(Value.Flag.undefined, undefinedValue, symbol);
+                    if (opc == FUNC)
+                    {
+                        currentFunctionSymbol = symbol;
+                    }
+                    else if (opc == STRUCT)
+                    {
+                        currentStructureSymbol = symbol;
+                    }
+                    symbol->start = 0u;
+                    symbol->length = 0u;
                     objectFile.GetSymbolTable().AddSymbol(symbol);
+                    if (currentSegment == Segment.data)
+                    {
+                        currentSection->AddSymbol(symbol);
+                    }
                 }
             }
             else if (stage == Stage.assemble)
             {
-                currentSymbol = objectFile.GetSymbolTable().GetSymbol(node.name);
+                if (opc == ENDF)
+                {
+                    currentFunctionSymbol = null;
+                }
+                if (opc == ENDS)
+                {
+                    currentStructureSymbol = null;
+                }
+                if (node.local)
+                {
+                    if (currentFunctionSymbol != null)
+                    {
+                        currentSymbol = objectFile.GetSymbolTable().GetSymbol(currentFunctionSymbol->name + node.name);
+                    }
+                    else
+                    {
+                        Error("local symbols can be used only inside FUNC", node.span);
+                    }
+                }
+                else
+                {
+                    currentSymbol = objectFile.GetSymbolTable().GetSymbol(node.name);
+                }
                 if (currentSymbol == null)
                 {
                     currentSymbol = new Symbol();
@@ -435,10 +537,56 @@ namespace cmsx.assembly
                     currentSymbol->name = node.name;
                     currentSymbol->segment = Segment.unknown;
                     currentSymbol->linkage = Linkage.external;
-                    currentSymbol->value = Value(Value.Kind.undefined, undefinedValue, currentSymbol);
+                    currentSymbol->value = Value(Value.Flag.undefined, undefinedValue, currentSymbol);
+                    currentSymbol->start = 0u;
+                    currentSymbol->length = 0u;
                     objectFile.GetSymbolTable().AddSymbol(currentSymbol);
                 }
                 currentValue = currentSymbol->value;
+            }
+            else if (stage == Stage.is_)
+            {
+                currentSymbol = objectFile.GetSymbolTable().GetSymbol(node.name);
+                if (currentSymbol != null)
+                {
+                    Error("symbol '" + node.name + "' already defined", node.span);
+                }
+                else
+                {
+                    currentSymbol = new Symbol();
+                    currentSymbol->index = -1;
+                    currentSymbol->name = node.name;
+                    currentSymbol->segment = Segment.unknown;
+                    currentSymbol->linkage = Linkage.internal_;
+                    currentSymbol->value = Value(Value.Flag.undefined, undefinedValue, currentSymbol);
+                    currentSymbol->start = 0u;
+                    currentSymbol->length = 0u;
+                    objectFile.GetSymbolTable().AddSymbol(currentSymbol);
+                }
+            }
+            else if (stage == Stage.setExternal)
+            {
+                currentSymbol = objectFile.GetSymbolTable().GetSymbol(node.name);
+                if (currentSymbol != null)
+                {
+                    currentSymbol->linkage = Linkage.external;
+                }
+                else
+                {
+                    Error("symbol '" + node.name + " not found", node.span);
+                }
+            }
+            else if (stage == Stage.setLinkOnce)
+            {
+                currentSymbol = objectFile.GetSymbolTable().GetSymbol(node.name);
+                if (currentSymbol != null)
+                {
+                    currentSymbol->linkage = Linkage.once;
+                }
+                else
+                {
+                    Error("symbol '" + node.name + " not found", node.span);
+                }
             }
             else if (stage == Stage.octas)
             {
@@ -454,7 +602,7 @@ namespace cmsx.assembly
                     currentSymbol->name = node.name;
                     currentSymbol->segment = Segment.unknown;
                     currentSymbol->linkage = Linkage.external;
-                    currentSymbol->value = Value(Value.Kind.undefined, undefinedValue, currentSymbol);
+                    currentSymbol->value = Value(Value.Flag.undefined, undefinedValue, currentSymbol);
                     objectFile.GetSymbolTable().AddSymbol(currentSymbol);
                 }
                 objectFile.linkSection->EmitByte(LinkCode.farOcta);
@@ -469,7 +617,7 @@ namespace cmsx.assembly
         }
         private void ProcessValue(ulong value, const Span& span)
         {
-            currentValue = Value(Value.Kind.pure, value, null);
+            currentValue = Value(Value.Flag.pure, value, null);
             if (stage == Stage.bytes)
             {
                 if (value > 255u)
@@ -557,7 +705,7 @@ namespace cmsx.assembly
         }
         public override void Visit(CharacterConstant& cc)
         {
-            currentValue = Value(Value.Kind.pure, cast<ulong>(cc.value), null);
+            currentValue = Value(Value.Flag.pure, cast<ulong>(cc.value), null);
             if (stage == Stage.bytes)
             {
                 string s = ToString(cc.value);
@@ -619,7 +767,7 @@ namespace cmsx.assembly
         }
         public override void Visit(At&)
         {
-            currentValue = Value(Value.Kind.pure, currentSection->Address(), null);
+            currentValue = Value(cast<Value.Flag>(Value.Flag.pure | Value.Flag.address), currentSection->Address(), null);
         }
         public override void Visit(StringConstant& sc)
         {
@@ -636,23 +784,19 @@ namespace cmsx.assembly
                 Error("string constant can appear only inside a BYTE instruction", sc.span);
             }
         }
-        public override void Visit(LocalOperand& operand)
-        {
-            currentValue = Value(Value.Kind.undefined, undefinedValue, null);
-        }
         public override void Visit(OperandList& operandList)
         {
             for (const UniquePtr<Node>& node : operandList.operands)
             {
-                currentValue = Value(Value.Kind.undefined, undefinedValue, null);
+                currentValue = Value();
                 node->Accept(*this);
             }
         }
         public override void Visit(UnaryExpression& expr)
         {
-            currentValue = Value(Value.Kind.undefined, undefinedValue, null);
+            currentValue = Value();
             expr.subject->Accept(*this);
-            if (currentValue.kind == Value.Kind.undefined)
+            if (currentValue.flags == Value.Flag.undefined)
             {
                 Error("operand is undefined", expr.subject->span);
             }
@@ -664,7 +808,7 @@ namespace cmsx.assembly
                 }
                 case Operator.unaryMinus:
                 {
-                    if (currentValue.kind == Value.Kind.pure)
+                    if (currentValue.GetFlag(Value.Flag.pure))
                     {
                         currentValue.value = cast<ulong>(-currentValue.value);
                     }
@@ -676,7 +820,7 @@ namespace cmsx.assembly
                 }
                 case Operator.complement:
                 {
-                    if (currentValue.kind == Value.Kind.pure)
+                    if (currentValue.GetFlag(Value.Flag.pure))
                     {
                         currentValue.value = ~currentValue.value;
                     }
@@ -688,9 +832,9 @@ namespace cmsx.assembly
                 }
                 case Operator.register:
                 {
-                    if (currentValue.value >= 0u && currentValue.value <= 255u && currentValue.kind == Value.Kind.pure)
+                    if (currentValue.value >= 0u && currentValue.value <= 255u && currentValue.GetFlag(Value.Flag.pure))
                     {
-                        currentValue.kind = Value.Kind.register;
+                        currentValue.SetRegister();
                     }
                     else
                     {
@@ -700,35 +844,39 @@ namespace cmsx.assembly
                 }
                 case Operator.serial:
                 {
-                    // todo
+                    Error("serial not implemented", expr.span);
                     break;
                 }
             }
         }
         public override void Visit(BinaryExpression& expr)
         {
-            currentValue = Value(Value.Kind.undefined, undefinedValue, null);
+            currentValue = Value();
             expr.left->Accept(*this);
-            if (currentValue.kind == Value.Kind.undefined)
+            if (currentValue.flags == Value.Flag.undefined)
             {
                 Error("left operand is undefined", expr.left->span);
             }
             Value leftValue = currentValue;
-            currentValue = Value(Value.Kind.undefined, undefinedValue, null);
+            currentValue = Value();
             expr.right->Accept(*this);
-            if (currentValue.kind == Value.Kind.undefined)
+            if (currentValue.flags == Value.Flag.undefined)
             {
                 Error("right operand is undefined", expr.right->span);
             }
             Value rightValue = currentValue;
-            currentValue = Value(Value.Kind.undefined, undefinedValue, null);
+            currentValue = Value();
             switch (expr.op)
             {
                 case Operator.multiply:
                 {
-                    if (leftValue.kind == Value.Kind.pure && rightValue.kind == Value.Kind.pure)
+                    if (leftValue.GetFlag(Value.Flag.pure) && rightValue.GetFlag(Value.Flag.pure))
                     {
-                        currentValue = Value(Value.Kind.pure, leftValue.value * rightValue.value, null);
+                        currentValue = Value(Value.Flag.pure, leftValue.value * rightValue.value, null);
+                        if (leftValue.GetFlag(Value.Flag.address) || rightValue.GetFlag(Value.Flag.address))
+                        {
+                            currentValue.SetAddress();
+                        }
                     }
                     else
                     {
@@ -738,9 +886,13 @@ namespace cmsx.assembly
                 }
                 case Operator.divide:
                 {
-                    if (leftValue.kind == Value.Kind.pure && rightValue.kind == Value.Kind.pure)
+                    if (leftValue.GetFlag(Value.Flag.pure) && rightValue.GetFlag(Value.Flag.pure))
                     {
-                        currentValue = Value(Value.Kind.pure, leftValue.value / rightValue.value, null);
+                        currentValue = Value(Value.Flag.pure, leftValue.value / rightValue.value, null);
+                        if (leftValue.GetFlag(Value.Flag.address) || rightValue.GetFlag(Value.Flag.address))
+                        {
+                            currentValue.SetAddress();
+                        }
                     }
                     else
                     {
@@ -750,9 +902,13 @@ namespace cmsx.assembly
                 }
                 case Operator.modulus:
                 {
-                    if (leftValue.kind == Value.Kind.pure && rightValue.kind == Value.Kind.pure)
+                    if (leftValue.GetFlag(Value.Flag.pure) && rightValue.GetFlag(Value.Flag.pure))
                     {
-                        currentValue = Value(Value.Kind.pure, leftValue.value % rightValue.value, null);
+                        currentValue = Value(Value.Flag.pure, leftValue.value % rightValue.value, null);
+                        if (leftValue.GetFlag(Value.Flag.address) || rightValue.GetFlag(Value.Flag.address))
+                        {
+                            currentValue.SetAddress();
+                        }
                     }
                     else
                     {
@@ -762,9 +918,13 @@ namespace cmsx.assembly
                 }
                 case Operator.shiftLeft:
                 {
-                    if (leftValue.kind == Value.Kind.pure && rightValue.kind == Value.Kind.pure)
+                    if (leftValue.GetFlag(Value.Flag.pure) && rightValue.GetFlag(Value.Flag.pure))
                     {
-                        currentValue = Value(Value.Kind.pure, leftValue.value << rightValue.value, null);
+                        currentValue = Value(Value.Flag.pure, leftValue.value << rightValue.value, null);
+                        if (leftValue.GetFlag(Value.Flag.address) || rightValue.GetFlag(Value.Flag.address))
+                        {
+                            currentValue.SetAddress();
+                        }
                     }
                     else
                     {
@@ -774,9 +934,13 @@ namespace cmsx.assembly
                 }
                 case Operator.shiftRight:
                 {
-                    if (leftValue.kind == Value.Kind.pure && rightValue.kind == Value.Kind.pure)
+                    if (leftValue.GetFlag(Value.Flag.pure) && rightValue.GetFlag(Value.Flag.pure))
                     {
-                        currentValue = Value(Value.Kind.pure, leftValue.value >> rightValue.value, null);
+                        currentValue = Value(Value.Flag.pure, leftValue.value >> rightValue.value, null);
+                        if (leftValue.GetFlag(Value.Flag.address) || rightValue.GetFlag(Value.Flag.address))
+                        {
+                            currentValue.SetAddress();
+                        }
                     }
                     else
                     {
@@ -786,9 +950,13 @@ namespace cmsx.assembly
                 }
                 case Operator.bitwiseAnd:
                 {
-                    if (leftValue.kind == Value.Kind.pure && rightValue.kind == Value.Kind.pure)
+                    if (leftValue.GetFlag(Value.Flag.pure) && rightValue.GetFlag(Value.Flag.pure))
                     {
-                        currentValue = Value(Value.Kind.pure, leftValue.value & rightValue.value, null);
+                        currentValue = Value(Value.Flag.pure, leftValue.value & rightValue.value, null);
+                        if (leftValue.GetFlag(Value.Flag.address) || rightValue.GetFlag(Value.Flag.address))
+                        {
+                            currentValue.SetAddress();
+                        }
                     }
                     else
                     {
@@ -798,9 +966,13 @@ namespace cmsx.assembly
                 }
                 case Operator.bitwiseOr:
                 {
-                    if (leftValue.kind == Value.Kind.pure && rightValue.kind == Value.Kind.pure)
+                    if (leftValue.GetFlag(Value.Flag.pure) && rightValue.GetFlag(Value.Flag.pure))
                     {
-                        currentValue = Value(Value.Kind.pure, leftValue.value | rightValue.value, null);
+                        currentValue = Value(Value.Flag.pure, leftValue.value | rightValue.value, null);
+                        if (leftValue.GetFlag(Value.Flag.address) || rightValue.GetFlag(Value.Flag.address))
+                        {
+                            currentValue.SetAddress();
+                        }
                     }
                     else
                     {
@@ -810,9 +982,13 @@ namespace cmsx.assembly
                 }
                 case Operator.bitwiseXor:
                 {
-                    if (leftValue.kind == Value.Kind.pure && rightValue.kind == Value.Kind.pure)
+                    if (leftValue.GetFlag(Value.Flag.pure) && rightValue.GetFlag(Value.Flag.pure))
                     {
-                        currentValue = Value(Value.Kind.pure, leftValue.value ^ rightValue.value, null);
+                        currentValue = Value(Value.Flag.pure, leftValue.value ^ rightValue.value, null);
+                        if (leftValue.GetFlag(Value.Flag.address) || rightValue.GetFlag(Value.Flag.address))
+                        {
+                            currentValue.SetAddress();
+                        }
                     }
                     else
                     {
@@ -822,17 +998,21 @@ namespace cmsx.assembly
                 }
                 case Operator.add:
                 {
-                    if (leftValue.kind == Value.Kind.pure && rightValue.kind == Value.Kind.pure)
+                    if (leftValue.GetFlag(Value.Flag.pure) && rightValue.GetFlag(Value.Flag.pure))
                     {
-                        currentValue = Value(Value.Kind.pure, leftValue.value + rightValue.value, null);
+                        currentValue = Value(Value.Flag.pure, leftValue.value + rightValue.value, null);
+                        if (leftValue.GetFlag(Value.Flag.address) || rightValue.GetFlag(Value.Flag.address))
+                        {
+                            currentValue.SetAddress();
+                        }
                     }
-                    else if (leftValue.kind == Value.Kind.register && rightValue.kind == Value.Kind.pure)
+                    else if (leftValue.flags == Value.Flag.register && rightValue.GetFlag(Value.Flag.pure))
                     {
-                        currentValue = Value(Value.Kind.register, leftValue.value + rightValue.value, null);
+                        currentValue = Value(Value.Flag.register, leftValue.value + rightValue.value, null);
                     }
-                    else if (rightValue.kind == Value.Kind.register && rightValue.kind == Value.Kind.pure)
+                    else if (rightValue.flags == Value.Flag.register && leftValue.GetFlag(Value.Flag.pure))
                     {
-                        currentValue = Value(Value.Kind.register, leftValue.value + rightValue.value, null);
+                        currentValue = Value(Value.Flag.register, leftValue.value + rightValue.value, null);
                     }
                     else
                     {
@@ -842,19 +1022,23 @@ namespace cmsx.assembly
                 }
                 case Operator.subtract:
                 {
-                    if (leftValue.kind == Value.Kind.pure && rightValue.kind == Value.Kind.pure)
+                    if (leftValue.GetFlag(Value.Flag.pure) && rightValue.GetFlag(Value.Flag.pure))
                     {
-                        currentValue = Value(Value.Kind.pure, leftValue.value - rightValue.value, null);
-                    }
-                    else if (leftValue.kind == Value.Kind.register)
-                    {
-                        if (rightValue.kind == Value.Kind.pure)
+                        currentValue = Value(Value.Flag.pure, leftValue.value - rightValue.value, null);
+                        if (leftValue.GetFlag(Value.Flag.address) || rightValue.GetFlag(Value.Flag.address))
                         {
-                            currentValue = Value(Value.Kind.register, leftValue.value - rightValue.value, null);
+                            currentValue.SetAddress();
                         }
-                        else if (rightValue.kind == Value.Kind.register)
+                    }
+                    else if (leftValue.flags == Value.Flag.register)
+                    {
+                        if (rightValue.GetFlag(Value.Flag.pure))
                         {
-                            currentValue = Value(Value.Kind.pure, leftValue.value - rightValue.value, null);
+                            currentValue = Value(Value.Flag.register, leftValue.value - rightValue.value, null);
+                        }
+                        else if (rightValue.flags == Value.Flag.register)
+                        {
+                            currentValue = Value(Value.Flag.pure, leftValue.value - rightValue.value, null);
                         }
                         else
                         {
@@ -869,15 +1053,15 @@ namespace cmsx.assembly
                 }
                 default:
                 {
-                    currentValue = Value(Value.Kind.undefined, undefinedValue, null);
+                    currentValue = Value();
                     break;
                 }
             }
-            if (currentValue.kind == Value.Kind.undefined)
+            if (currentValue.flags == Value.Flag.undefined)
             {
                 Error("invalid binary expression", expr.span);
             }
-            else if (currentValue.kind == Value.Kind.register)
+            else if (currentValue.flags == Value.Flag.register)
             {
                 if (!(currentValue.value >= 0u && currentValue.value <= 255u))
                 {
@@ -887,9 +1071,9 @@ namespace cmsx.assembly
         }
         public override void Visit(ParenthesizedExpression& expr)
         {
-            currentValue = Value(Value.Kind.undefined, undefinedValue, null);
+            currentValue = Value();
             expr.subject->Accept(*this);
-            if (currentValue.kind == Value.Kind.undefined)
+            if (currentValue.flags == Value.Flag.undefined)
             {
                 Error("invalid parenthesized expression", expr.span);
             }
@@ -905,7 +1089,7 @@ namespace cmsx.assembly
             {
                 alignment = 4u;
             }
-            else if (currentInstruction->opCode->value == OCTA)
+            else if (currentInstruction->opCode->value == OCTA || currentInstruction->opCode->value == STRUCT)
             {
                 alignment = 8u;
             }
@@ -918,32 +1102,6 @@ namespace cmsx.assembly
                 {
                     currentSection->EmitByte(0u);
                 }
-                at = at + offset;
-            }
-        }
-        private void ProcessOp()
-        {
-            switch (currentInstruction->opCode->value)
-            {
-                case IS:
-                {
-                    ProcessIs();
-                    break;
-                }
-            }
-        }
-        private void ProcessIs()
-        {
-            if (currentInstruction->operandList->operands.Count() != 1)
-            {
-                Error("IS takes one operand", currentInstruction->span);
-            }
-            Node* expr = currentInstruction->operandList->operands[0].Get();
-            currentValue = Value(Value.Kind.undefined, undefinedValue, null);
-            expr->Accept(*this);
-            if (currentValue.kind == Value.Kind.undefined)
-            {
-                Error("invalid IS expression value", currentInstruction->span);
             }
         }
         public Stage stage;
@@ -952,6 +1110,8 @@ namespace cmsx.assembly
         public Section* currentSection;
         public Symbol* currentSymbol;
         public Segment currentSegment;
+        private Symbol* currentFunctionSymbol;
+        private Symbol* currentStructureSymbol;
         private Instruction* currentInstruction;
     }
 }

@@ -43,7 +43,7 @@ int main(int argc, const char** argv)
             }
             else
             {
-                assemblyFiles.Add(arg);
+                assemblyFiles.Add(GetFullPath(arg));
             }
         }
         if (assemblyFiles.IsEmpty())

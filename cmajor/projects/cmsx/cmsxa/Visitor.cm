@@ -10,8 +10,6 @@ namespace cmsx.assembly
         public virtual void Visit(CharacterConstant& cc) {}
         public virtual void Visit(StringConstant& sc) {}
         public virtual void Visit(SymbolNode& node) {}
-        public virtual void Visit(LocalOperand& lo) {}
-        public virtual void Visit(LocalLabel& ll) {}
         public virtual void Visit(At& at) {}
         public virtual void Visit(UnaryExpression& expr) {}
         public virtual void Visit(BinaryExpression& expr) {}

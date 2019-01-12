@@ -377,7 +377,10 @@ void TypeResolver::Visit(DotNode& dotNode)
         NamespaceTypeSymbol* nsType = static_cast<NamespaceTypeSymbol*>(type);
         scope = nsType->Ns()->GetContainerScope();
     }
-    else if (type->IsClassTypeSymbol() || type->IsArrayType() || (flags & TypeResolverFlags::createMemberSymbols) != TypeResolverFlags::none && type->GetSymbolType() == SymbolType::templateParameterSymbol)
+    else if (type->IsClassTypeSymbol() ||
+        type->IsArrayType() ||
+        type->IsEnumeratedType() || 
+        (flags & TypeResolverFlags::createMemberSymbols) != TypeResolverFlags::none && type->GetSymbolType() == SymbolType::templateParameterSymbol)
     {
         scope = type->GetContainerScope();
     }

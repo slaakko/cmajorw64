@@ -318,6 +318,45 @@ namespace cmsx.assembly
             }
         }
 
+        public class LocalSymbolRule : System.Text.Parsing.RuleParser
+        {
+            public LocalSymbolRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                SetValueTypeName(ToUtf32("SymbolNode*"));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    stack.Push(UniquePtr<Object>(new ValueObject<SymbolNode*>(context->value)));
+                }
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+                a0ActionParser->SetAction(A0Action);
+            }
+            public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = new SymbolNode(span, ToUtf8(ustring(matchBegin, matchEnd)), true);
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : value()
+                {
+                }
+                public SymbolNode* value;
+            }
+        }
+
         public class SymbolRule : System.Text.Parsing.RuleParser
         {
             public SymbolRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
@@ -346,7 +385,7 @@ namespace cmsx.assembly
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new SymbolNode(span, ToUtf8(ustring(matchBegin, matchEnd)));
+                context->value = new SymbolNode(span, ToUtf8(ustring(matchBegin, matchEnd)), false);
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -354,116 +393,6 @@ namespace cmsx.assembly
                 {
                 }
                 public SymbolNode* value;
-            }
-        }
-
-        public class LocalOperandRule : System.Text.Parsing.RuleParser
-        {
-            public LocalOperandRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
-            {
-                SetValueTypeName(ToUtf32("LocalOperand*"));
-                AddLocalVariable(AttrOrVar(ToUtf32("uchar"), ToUtf32("d")));
-            }
-            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
-            {
-                parsingData->PushContext(Id(), new Context());
-                Context* context = cast<Context*>(parsingData->GetContext(Id()));
-            }
-            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
-            {
-                Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (matched)
-                {
-                    stack.Push(UniquePtr<Object>(new ValueObject<LocalOperand*>(context->value)));
-                }
-                parsingData->PopContext(Id());
-            }
-            public override void Link()
-            {
-                ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
-                a0ActionParser->SetAction(A0Action);
-                ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
-                a1ActionParser->SetAction(A1Action);
-                ActionParser* a2ActionParser = GetAction(ToUtf32("A2"));
-                a2ActionParser->SetAction(A2Action);
-                ActionParser* a3ActionParser = GetAction(ToUtf32("A3"));
-                a3ActionParser->SetAction(A3Action);
-            }
-            public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
-            {
-                Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new LocalOperand(span, context->d, Direction.backward);
-            }
-            public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
-            {
-                Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->d = *matchBegin;
-            }
-            public void A2Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
-            {
-                Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new LocalOperand(span, context->d, Direction.forward);
-            }
-            public void A3Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
-            {
-                Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->d = *matchBegin;
-            }
-            public class Context : System.Text.Parsing.Context
-            {
-                public Context() : value(), d()
-                {
-                }
-                public LocalOperand* value;
-                public uchar d;
-            }
-        }
-
-        public class LocalLabelRule : System.Text.Parsing.RuleParser
-        {
-            public LocalLabelRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
-            {
-                SetValueTypeName(ToUtf32("LocalLabel*"));
-                AddLocalVariable(AttrOrVar(ToUtf32("uchar"), ToUtf32("d")));
-            }
-            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
-            {
-                parsingData->PushContext(Id(), new Context());
-                Context* context = cast<Context*>(parsingData->GetContext(Id()));
-            }
-            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
-            {
-                Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (matched)
-                {
-                    stack.Push(UniquePtr<Object>(new ValueObject<LocalLabel*>(context->value)));
-                }
-                parsingData->PopContext(Id());
-            }
-            public override void Link()
-            {
-                ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
-                a0ActionParser->SetAction(A0Action);
-                ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
-                a1ActionParser->SetAction(A1Action);
-            }
-            public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
-            {
-                Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new LocalLabel(span, context->d);
-            }
-            public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
-            {
-                Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->d = *matchBegin;
-            }
-            public class Context : System.Text.Parsing.Context
-            {
-                public Context() : value(), d()
-                {
-                }
-                public LocalLabel* value;
-                public uchar d;
             }
         }
 
@@ -540,8 +469,8 @@ namespace cmsx.assembly
                 a4ActionParser->SetAction(A4Action);
                 ActionParser* a5ActionParser = GetAction(ToUtf32("A5"));
                 a5ActionParser->SetAction(A5Action);
-                NonterminalParser* localOperandNonterminalParser = GetNonterminal(ToUtf32("LocalOperand"));
-                localOperandNonterminalParser->SetPost(PostLocalOperand);
+                NonterminalParser* localSymbolNonterminalParser = GetNonterminal(ToUtf32("LocalSymbol"));
+                localSymbolNonterminalParser->SetPost(PostLocalSymbol);
                 NonterminalParser* constantNonterminalParser = GetNonterminal(ToUtf32("Constant"));
                 constantNonterminalParser->SetPost(PostConstant);
                 NonterminalParser* symbolNonterminalParser = GetNonterminal(ToUtf32("Symbol"));
@@ -558,7 +487,7 @@ namespace cmsx.assembly
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = context->fromLocalOperand;
+                context->value = context->fromLocalSymbol;
             }
             public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
@@ -585,13 +514,13 @@ namespace cmsx.assembly
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 context->value = new UnaryExpression(span, context->fromUnaryOperator, context->fromPrimaryExpression);
             }
-            public void PostLocalOperand(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            public void PostLocalSymbol(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 if (matched)
                 {
-                    UniquePtr<Object> fromLocalOperand_value = stack.Pop();
-                    context->fromLocalOperand = *cast<ValueObject<LocalOperand*>*>(fromLocalOperand_value.Get());
+                    UniquePtr<Object> fromLocalSymbol_value = stack.Pop();
+                    context->fromLocalSymbol = *cast<ValueObject<SymbolNode*>*>(fromLocalSymbol_value.Get());
                 }
             }
             public void PostConstant(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
@@ -650,11 +579,11 @@ namespace cmsx.assembly
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : value(), fromLocalOperand(), fromConstant(), fromSymbol(), fromAt(), fromExpression(), fromUnaryOperator(), fromPrimaryExpression()
+                public Context() : value(), fromLocalSymbol(), fromConstant(), fromSymbol(), fromAt(), fromExpression(), fromUnaryOperator(), fromPrimaryExpression()
                 {
                 }
                 public Node* value;
-                public LocalOperand* fromLocalOperand;
+                public SymbolNode* fromLocalSymbol;
                 public Constant* fromConstant;
                 public SymbolNode* fromSymbol;
                 public At* fromAt;
@@ -1213,25 +1142,34 @@ namespace cmsx.assembly
                 a1ActionParser->SetAction(A1Action);
                 ActionParser* a2ActionParser = GetAction(ToUtf32("A2"));
                 a2ActionParser->SetAction(A2Action);
+                NonterminalParser* localSymbolNonterminalParser = GetNonterminal(ToUtf32("LocalSymbol"));
+                localSymbolNonterminalParser->SetPost(PostLocalSymbol);
                 NonterminalParser* symbolNonterminalParser = GetNonterminal(ToUtf32("Symbol"));
                 symbolNonterminalParser->SetPost(PostSymbol);
-                NonterminalParser* localLabelNonterminalParser = GetNonterminal(ToUtf32("LocalLabel"));
-                localLabelNonterminalParser->SetPost(PostLocalLabel);
             }
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = context->fromSymbol;
+                context->value = context->fromLocalSymbol;
             }
             public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = context->fromLocalLabel;
+                context->value = context->fromSymbol;
             }
             public void A2Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 context->value = null;
+            }
+            public void PostLocalSymbol(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromLocalSymbol_value = stack.Pop();
+                    context->fromLocalSymbol = *cast<ValueObject<SymbolNode*>*>(fromLocalSymbol_value.Get());
+                }
             }
             public void PostSymbol(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
@@ -1242,23 +1180,14 @@ namespace cmsx.assembly
                     context->fromSymbol = *cast<ValueObject<SymbolNode*>*>(fromSymbol_value.Get());
                 }
             }
-            public void PostLocalLabel(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
-            {
-                Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (matched)
-                {
-                    UniquePtr<Object> fromLocalLabel_value = stack.Pop();
-                    context->fromLocalLabel = *cast<ValueObject<LocalLabel*>*>(fromLocalLabel_value.Get());
-                }
-            }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : value(), fromSymbol(), fromLocalLabel()
+                public Context() : value(), fromLocalSymbol(), fromSymbol()
                 {
                 }
                 public Node* value;
+                public SymbolNode* fromLocalSymbol;
                 public SymbolNode* fromSymbol;
-                public LocalLabel* fromLocalLabel;
             }
         }
 
@@ -1582,6 +1511,13 @@ namespace cmsx.assembly
                             new System.Text.Parsing.NonterminalParser(ToUtf32("CharacterConstant"), ToUtf32("CharacterConstant"), 0))),
                     new System.Text.Parsing.ActionParser(ToUtf32("A3"),
                         new System.Text.Parsing.NonterminalParser(ToUtf32("StringConstant"), ToUtf32("StringConstant"), 0)))));
+            AddRule(new LocalSymbolRule(ToUtf32("LocalSymbol"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                    new System.Text.Parsing.TokenParser(
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.CharParser('@'),
+                            new System.Text.Parsing.PositiveParser(
+                                new System.Text.Parsing.DigitParser()))))));
             AddRule(new SymbolRule(ToUtf32("Symbol"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.TokenParser(
@@ -1599,27 +1535,6 @@ namespace cmsx.assembly
                                             new System.Text.Parsing.IdContParser(),
                                             new System.Text.Parsing.CharParser(':')),
                                         new System.Text.Parsing.CharParser('_')))))))));
-            AddRule(new LocalOperandRule(ToUtf32("LocalOperand"), GetScope(), Domain()->GetNextRuleId(),
-                new System.Text.Parsing.AlternativeParser(
-                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                        new System.Text.Parsing.TokenParser(
-                            new System.Text.Parsing.SequenceParser(
-                                new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                    new System.Text.Parsing.DigitParser()),
-                                new System.Text.Parsing.CharParser('B')))),
-                    new System.Text.Parsing.ActionParser(ToUtf32("A2"),
-                        new System.Text.Parsing.TokenParser(
-                            new System.Text.Parsing.SequenceParser(
-                                new System.Text.Parsing.ActionParser(ToUtf32("A3"),
-                                    new System.Text.Parsing.DigitParser()),
-                                new System.Text.Parsing.CharParser('F')))))));
-            AddRule(new LocalLabelRule(ToUtf32("LocalLabel"), GetScope(), Domain()->GetNextRuleId(),
-                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.TokenParser(
-                        new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                new System.Text.Parsing.DigitParser()),
-                            new System.Text.Parsing.CharParser('H'))))));
             AddRule(new AtRule(ToUtf32("At"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.CharParser('@'))));
@@ -1631,7 +1546,7 @@ namespace cmsx.assembly
                                 new System.Text.Parsing.AlternativeParser(
                                     new System.Text.Parsing.AlternativeParser(
                                         new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                                            new System.Text.Parsing.NonterminalParser(ToUtf32("LocalOperand"), ToUtf32("LocalOperand"), 0)),
+                                            new System.Text.Parsing.NonterminalParser(ToUtf32("LocalSymbol"), ToUtf32("LocalSymbol"), 0)),
                                         new System.Text.Parsing.ActionParser(ToUtf32("A1"),
                                             new System.Text.Parsing.NonterminalParser(ToUtf32("Constant"), ToUtf32("Constant"), 0))),
                                     new System.Text.Parsing.ActionParser(ToUtf32("A2"),
@@ -1752,9 +1667,9 @@ namespace cmsx.assembly
                 new System.Text.Parsing.AlternativeParser(
                     new System.Text.Parsing.AlternativeParser(
                         new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("Symbol"), ToUtf32("Symbol"), 0)),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("LocalSymbol"), ToUtf32("LocalSymbol"), 0)),
                         new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("LocalLabel"), ToUtf32("LocalLabel"), 0))),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("Symbol"), ToUtf32("Symbol"), 0))),
                     new System.Text.Parsing.ActionParser(ToUtf32("A2"),
                         new System.Text.Parsing.EmptyParser()))));
             AddRule(new OpCodeRule(ToUtf32("OpCode"), GetScope(), Domain()->GetNextRuleId(),
@@ -1829,7 +1744,7 @@ namespace cmsx.assembly
                                                             new System.Text.Parsing.IdStartParser(),
                                                             new System.Text.Parsing.CharParser(':')),
                                                         new System.Text.Parsing.CharParser('_')),
-                                                    new System.Text.Parsing.DigitParser()),
+                                                    new System.Text.Parsing.CharParser('@')),
                                                 new System.Text.Parsing.CharParser(';')),
                                             new System.Text.Parsing.CharParser('.')),
                                         new System.Text.Parsing.NonterminalParser(ToUtf32("NL"), ToUtf32("NL"), 0)))))),

@@ -1296,7 +1296,13 @@ void TypeBinder::Visit(EnumTypeNode& enumTypeNode)
     {
         EnumConstantNode* enumConstantNode = enumTypeNode.Constants()[i];
         enumConstantNode->Accept(*this);
-    } 
+    }
+    TypedefSymbol* underlyingTypedef = new TypedefSymbol(enumTypeNode.GetSpan(), U"UnderlyingType");
+    underlyingTypedef->SetModule(module);
+    underlyingTypedef->SetAccess(SymbolAccess::public_);
+    underlyingTypedef->SetType(underlyingType);
+    underlyingTypedef->SetBound();
+    enumTypeSymbol->AddMember(underlyingTypedef);
     EnumTypeDefaultConstructor* defaultConstructor = new EnumTypeDefaultConstructor(enumTypeSymbol);
     symbolTable.SetFunctionIdFor(defaultConstructor);
     enumTypeSymbol->AddMember(defaultConstructor);

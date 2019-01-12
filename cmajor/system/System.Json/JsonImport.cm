@@ -23,7 +23,7 @@ namespace System.Json
     
     public concept JsonValueType<T>
     {
-        where System.Meta.IsBasicType<T>() or T is string or T is wstring or T is ustring;
+        where System.Meta.IsBasicType<T>() or System.Meta.IsEnumeratedType<T>() or T is string or T is wstring or T is ustring;
     }
     
     public void FromJson(JsonValue* value, int& field)
@@ -62,6 +62,20 @@ namespace System.Json
         else
         {
             throw JsonImportException("JSON Boolean expected");
+        }
+    }
+    
+    public void FromJson<T>(JsonValue* value, T& field)
+        where System.Meta.IsEnumeratedType<T>()
+    {
+        if (value is JsonNumber*)
+        {
+            JsonNumber* number = cast<JsonNumber*>(value);
+            field = cast<T>(cast<T.UnderlyingType>(number->Value()));
+        }
+        else
+        {
+            throw JsonImportException("JSON number expected");
         }
     }
 
@@ -558,7 +572,41 @@ namespace System.Json
             throw JsonImportException("JSON object expected");
         }
     }
-                
+    
+    public void FromJson<T>(JsonValue* container, const string& fieldName, T& field)
+        where System.Meta.IsEnumeratedType<T>()
+    {
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+
+    public void FromJson<T>(JsonValue* container, const wstring& fieldName, T& field)
+        where System.Meta.IsEnumeratedType<T>()
+    {
+        FromJson(container, ToUtf32(fieldName), field);
+    }         
+
+    public void FromJson<T>(JsonValue* container, const ustring& fieldName, T& field)
+        where System.Meta.IsEnumeratedType<T>()
+    {
+        if (container is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(container);
+            JsonValue* value = object->GetField(fieldName);
+            if (value != null)
+            {
+                FromJson(value, field);
+            }
+            else
+            {
+                throw JsonImportException("field '" + ToUtf8(fieldName) + "' not found");
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+          
     public void FromJson(JsonValue* container, const string& fieldName, string& field)
     {   
         FromJson(container, ToUtf32(fieldName), field);

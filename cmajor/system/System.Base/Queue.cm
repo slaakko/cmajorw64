@@ -40,6 +40,10 @@ namespace System.Collections
         {
             items.Clear();
         }
+        public inline nothrow List<ValueType>& Rep()
+        {
+            return items;
+        }
         private List<ValueType> items;
     }
 }

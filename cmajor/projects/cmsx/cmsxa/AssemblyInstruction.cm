@@ -14,6 +14,90 @@ namespace cmsx.assembly
         }
     }
 
+    public class IsInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            Stage prevStage = assembler.stage;
+            assembler.stage = Stage.assemble;
+            OperandList& operandList = *inst->operandList;
+            if (operandList.operands.Count() == 1)
+            {
+                if (!inst->label.IsNull())
+                {
+                    Stage prevStage = assembler.stage;
+                    assembler.stage = Stage.is_;
+                    inst->label->Accept(assembler);
+                    assembler.stage = prevStage;
+                    Symbol* symbol = assembler.currentSymbol;
+                    if (symbol != null)
+                    {
+                        Value x = assembler.Evaluate(operandList.operands[0].Get());
+                        if (x.GetFlag(Value.Flag.pure) || x.flags == Value.Flag.register)
+                        {
+                            symbol->value = x;
+                        }
+                        else
+                        {
+                            Error("operand of " + inst->opCode->name + " instruction not defined", inst->span);
+                        }
+                    }
+                    else
+                    {
+                        Error("label of " + inst->opCode->name + " instruction not defined", inst->span);
+                    }
+                }
+                else
+                {
+                    Error("label of " + inst->opCode->name + " instruction not defined", inst->span);
+                }
+            }
+            else
+            {
+                Error("IS needs one operand", inst->span);
+            }
+            assembler.stage = prevStage;
+        }
+    }
+
+    public class ExternInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            Stage prevStage = assembler.stage;
+            assembler.stage = Stage.setExternal;
+            OperandList& operandList = *inst->operandList;
+            if (inst->operandList->operands.Count() > 0)
+            {
+                inst->operandList->Accept(assembler);
+            }
+            else
+            {
+                Error("EXTERN needs at least one operand", inst->span);
+            }
+            assembler.stage = prevStage;
+        }
+    }
+
+    public class LinkOnceInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            Stage prevStage = assembler.stage;
+            assembler.stage = Stage.setLinkOnce;
+            OperandList& operandList = *inst->operandList;
+            if (inst->operandList->operands.Count() > 0)
+            {
+                inst->operandList->Accept(assembler);
+            }
+            else
+            {
+                Error("LINKONCE needs at least one operand", inst->span);
+            }
+            assembler.stage = prevStage;
+        }
+    }
+
     public class ByteInstruction : AssemblyInstruction
     {
         public override void Assemble(Assembler& assembler, Instruction* inst)
@@ -31,6 +115,7 @@ namespace cmsx.assembly
             }
         }
     }
+
     public class WydeInstruction : AssemblyInstruction
     {
         public override void Assemble(Assembler& assembler, Instruction* inst)
@@ -48,6 +133,7 @@ namespace cmsx.assembly
             }
         }
     }
+
     public class TetraInstruction : AssemblyInstruction
     {
         public override void Assemble(Assembler& assembler, Instruction* inst)
@@ -65,6 +151,7 @@ namespace cmsx.assembly
             }
         }
     }
+
     public class OctaInstruction : AssemblyInstruction
     {
         public override void Assemble(Assembler& assembler, Instruction* inst)
@@ -80,9 +167,9 @@ namespace cmsx.assembly
             {
                 Error("OCTA needs at least one operand", inst->span);
             }
-
         }
     }
+
     public class LoadInstruction : AssemblyInstruction
     {
         public override void Assemble(Assembler& assembler, Instruction* inst)
@@ -96,23 +183,23 @@ namespace cmsx.assembly
             {
                 Value x = assembler.Evaluate(operandList.operands[0].Get());
                 Value y = assembler.Evaluate(operandList.operands[1].Get());
-                Value z = Value(Value.Kind.undefined, undefinedValue, null);
+                Value z = Value();
                 if (operandList.operands.Count() == 3)
                 {
                     z = assembler.Evaluate(operandList.operands[2].Get());
                 }
-                if (x.kind == Value.Kind.register)
+                if (x.flags == Value.Flag.register)
                 {
-                    if (y.kind == Value.Kind.register)
+                    if (y.flags == Value.Flag.register)
                     {
-                        if (z.kind == Value.Kind.register)
+                        if (z.flags == Value.Flag.register)
                         {
                             assembler.EmitOpCode(opCode);
                             assembler.EmitRegisterValue("X", x);
                             assembler.EmitRegisterValue("Y", y);
                             assembler.EmitRegisterValue("Z", z);
                         }
-                        else if (z.kind == Value.Kind.pure)
+                        else if (z.GetFlag(Value.Flag.pure))
                         {
                             if (z.value <= MaxValue<byte>())
                             {
@@ -127,7 +214,7 @@ namespace cmsx.assembly
                                 assembler.EmitOpCode(opCode);
                                 assembler.EmitRegisterValue("X", x);
                                 assembler.EmitRegisterValue("Y", y);
-                                assembler.EmitRegisterValue("Z", Value(Value.Kind.register, 255u, null));
+                                assembler.EmitRegisterValue("Z", Value(Value.Flag.register, 255u, null));
                             }
                         }
                         else
@@ -137,7 +224,7 @@ namespace cmsx.assembly
                     }
                     else 
                     {
-                        if (z.kind == Value.Kind.undefined)
+                        if (z.flags == Value.Flag.undefined)
                         {
                             if (y.symbol != null)
                             {
@@ -145,7 +232,7 @@ namespace cmsx.assembly
                                 assembler.EmitOpCode(opCode + 1u);
                                 assembler.EmitRegisterValue("X", x);
                                 assembler.EmitRegisterValue("X", x);
-                                assembler.EmitPureByteValue("Z", Value(Value.Kind.pure, 0u, null));
+                                assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, 0u, null));
                             }
                             else
                             {
@@ -170,6 +257,7 @@ namespace cmsx.assembly
             assembler.stage = prevStage;
         }
     }
+
     public class StoreInstruction : AssemblyInstruction
     {
         public override void Assemble(Assembler& assembler, Instruction* inst)
@@ -183,23 +271,23 @@ namespace cmsx.assembly
             {
                 Value x = assembler.Evaluate(operandList.operands[0].Get());
                 Value y = assembler.Evaluate(operandList.operands[1].Get());
-                Value z = Value(Value.Kind.undefined, undefinedValue, null);
+                Value z = Value();
                 if (operandList.operands.Count() == 3)
                 {
                     z = assembler.Evaluate(operandList.operands[2].Get());
                 }
-                if (x.kind == Value.Kind.register)
+                if (x.flags == Value.Flag.register)
                 {
-                    if (y.kind == Value.Kind.register)
+                    if (y.flags == Value.Flag.register)
                     {
-                        if (z.kind == Value.Kind.register)
+                        if (z.flags == Value.Flag.register)
                         {
                             assembler.EmitOpCode(opCode);
                             assembler.EmitRegisterValue("X", x);
                             assembler.EmitRegisterValue("Y", y);
                             assembler.EmitRegisterValue("Z", z);
                         }
-                        else if (z.kind == Value.Kind.pure)
+                        else if (z.GetFlag(Value.Flag.pure))
                         {
                             if (z.value <= MaxValue<byte>())
                             {
@@ -214,7 +302,7 @@ namespace cmsx.assembly
                                 assembler.EmitOpCode(opCode);
                                 assembler.EmitRegisterValue("X", x);
                                 assembler.EmitRegisterValue("Y", y);
-                                assembler.EmitRegisterValue("Z", Value(Value.Kind.register, 255u, null));
+                                assembler.EmitRegisterValue("Z", Value(Value.Flag.register, 255u, null));
                             }
                         }
                         else
@@ -224,15 +312,15 @@ namespace cmsx.assembly
                     }
                     else 
                     {
-                        if (z.kind == Value.Kind.undefined)
+                        if (z.flags == Value.Flag.undefined)
                         {
                             if (y.symbol != null)
                             {
-                                assembler.EmitAbsoluteRegisterValue(Value(Value.Kind.register, 255u, null), "X", y.symbol);
+                                assembler.EmitAbsoluteRegisterValue(Value(Value.Flag.register, 255u, null), "X", y.symbol);
                                 assembler.EmitOpCode(opCode + 1u);
                                 assembler.EmitRegisterValue("X", x);
-                                assembler.EmitRegisterValue("Y", Value(Value.Kind.register, 255u, null));
-                                assembler.EmitPureByteValue("Z", Value(Value.Kind.pure, 0u, null));
+                                assembler.EmitRegisterValue("Y", Value(Value.Flag.register, 255u, null));
+                                assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, 0u, null));
                             }
                             else
                             {
@@ -257,6 +345,7 @@ namespace cmsx.assembly
             assembler.stage = prevStage;
         }
     }
+
     public class StoreConstantInstruction : AssemblyInstruction
     {
         public override void Assemble(Assembler& assembler, Instruction* inst)
@@ -270,23 +359,23 @@ namespace cmsx.assembly
             {
                 Value x = assembler.Evaluate(operandList.operands[0].Get());
                 Value y = assembler.Evaluate(operandList.operands[1].Get());
-                Value z = Value(Value.Kind.undefined, undefinedValue, null);
+                Value z = Value();
                 if (operandList.operands.Count() == 3)
                 {
                     z = assembler.Evaluate(operandList.operands[2].Get());
                 }
-                if (x.kind == Value.Kind.pure)
+                if (x.GetFlag(Value.Flag.pure))
                 {
-                    if (y.kind == Value.Kind.register)
+                    if (y.flags == Value.Flag.register)
                     {
-                        if (z.kind == Value.Kind.register)
+                        if (z.flags == Value.Flag.register)
                         {
                             assembler.EmitOpCode(opCode);
                             assembler.EmitPureByteValue("X", x);
                             assembler.EmitRegisterValue("Y", y);
                             assembler.EmitRegisterValue("Z", z);
                         }
-                        else if (z.kind == Value.Kind.pure)
+                        else if (z.GetFlag(Value.Flag.pure))
                         {
                             if (z.value <= MaxValue<byte>())
                             {
@@ -301,7 +390,7 @@ namespace cmsx.assembly
                                 assembler.EmitOpCode(opCode);
                                 assembler.EmitPureByteValue("X", x);
                                 assembler.EmitRegisterValue("Y", y);
-                                assembler.EmitRegisterValue("Z", Value(Value.Kind.register, 255u, null));
+                                assembler.EmitRegisterValue("Z", Value(Value.Flag.register, 255u, null));
                             }
                         }
                         else
@@ -311,15 +400,15 @@ namespace cmsx.assembly
                     }
                     else 
                     {
-                        if (z.kind == Value.Kind.undefined)
+                        if (z.flags == Value.Flag.undefined)
                         {
                             if (y.symbol != null)
                             {
-                                assembler.EmitAbsoluteRegisterValue(Value(Value.Kind.register, 255u, null), "X", y.symbol);
+                                assembler.EmitAbsoluteRegisterValue(Value(Value.Flag.register, 255u, null), "X", y.symbol);
                                 assembler.EmitOpCode(opCode + 1u);
                                 assembler.EmitRegisterValue("X", x);
-                                assembler.EmitRegisterValue("Y", Value(Value.Kind.register, 255u, null));
-                                assembler.EmitPureByteValue("Z", Value(Value.Kind.pure, 0u, null));
+                                assembler.EmitRegisterValue("Y", Value(Value.Flag.register, 255u, null));
+                                assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, 0u, null));
                             }
                             else
                             {
@@ -344,6 +433,7 @@ namespace cmsx.assembly
             assembler.stage = prevStage;
         }
     }
+
     public class RegisterInstruction : AssemblyInstruction
     {
         public override void Assemble(Assembler& assembler, Instruction* inst)
@@ -361,21 +451,21 @@ namespace cmsx.assembly
             {
                 Value x = assembler.Evaluate(operandList.operands[0].Get());
                 Value y = assembler.Evaluate(operandList.operands[1].Get());
-                Value z = Value(Value.Kind.undefined, undefinedValue, null);
+                Value z = Value();
                 if (operandList.operands.Count() == 3)
                 {
                     z = assembler.Evaluate(operandList.operands[2].Get());
                 }
-                if (x.kind == Value.Kind.register && y.kind == Value.Kind.register)
+                if (x.flags == Value.Flag.register && y.flags == Value.Flag.register)
                 {
-                    if (z.kind == Value.Kind.register)
+                    if (z.flags == Value.Flag.register)
                     {
                         assembler.EmitOpCode(opCode);
                         assembler.EmitRegisterValue("X", x);
                         assembler.EmitRegisterValue("Y", y);
                         assembler.EmitRegisterValue("Z", z);
                     }
-                    else if (z.kind == Value.Kind.pure)
+                    else if (z.GetFlag(Value.Flag.pure))
                     {
                         if (z.value <= MaxValue<byte>())
                         {
@@ -390,15 +480,15 @@ namespace cmsx.assembly
                             assembler.EmitOpCode(opCode);
                             assembler.EmitRegisterValue("X", x);
                             assembler.EmitRegisterValue("Y", y);
-                            assembler.EmitRegisterValue("Z", Value(Value.Kind.register, 255u, null));
+                            assembler.EmitRegisterValue("Z", Value(Value.Flag.register, 255u, null));
                         }
                     }
-                    else if (z.kind == Value.Kind.undefined)
+                    else if (z.flags == Value.Flag.undefined)
                     {
                         assembler.EmitOpCode(opCode + 1u);
                         assembler.EmitRegisterValue("X", x);
                         assembler.EmitRegisterValue("Y", y);
-                        assembler.EmitPureByteValue("Z", Value(Value.Kind.pure, 0u, null));
+                        assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, 0u, null));
                     }
                 }
                 else
@@ -413,6 +503,7 @@ namespace cmsx.assembly
             assembler.stage = prevStage;
         }
     }
+
     public class FloatingPointInstruction : AssemblyInstruction
     {
         public override void Assemble(Assembler& assembler, Instruction* inst)
@@ -431,7 +522,7 @@ namespace cmsx.assembly
                 Value x = assembler.Evaluate(operandList.operands[0].Get());
                 Value y = assembler.Evaluate(operandList.operands[1].Get());
                 Value z = assembler.Evaluate(operandList.operands[2].Get());
-                if (x.kind == Value.Kind.register && y.kind == Value.Kind.register && z.kind == Value.Kind.register)
+                if (x.flags == Value.Flag.register && y.flags == Value.Flag.register && z.flags == Value.Flag.register)
                 {
                     assembler.EmitOpCode(opCode);
                     assembler.EmitRegisterValue("X", x);
@@ -450,6 +541,7 @@ namespace cmsx.assembly
             assembler.stage = prevStage;
         }
     }
+
     public class SetInstruction : AssemblyInstruction
     {
         public override void Assemble(Assembler& assembler, Instruction* inst)
@@ -461,16 +553,16 @@ namespace cmsx.assembly
             {
                 Value x = assembler.Evaluate(operandList.operands[0].Get());
                 Value y = assembler.Evaluate(operandList.operands[1].Get());
-                if (x.kind == Value.Kind.register)
+                if (x.flags == Value.Flag.register)
                 {
-                    if (y.kind == Value.Kind.register)
+                    if (y.flags == Value.Flag.register)
                     {
-                        assembler.EmitOpCode(cmsx.machine.OR);
+                        assembler.EmitOpCode(cmsx.machine.ORI);
                         assembler.EmitRegisterValue("X", x);
                         assembler.EmitRegisterValue("Y", y);
-                        assembler.EmitPureByteValue("Z", Value(Value.Kind.pure, 0u, null));
+                        assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, 0u, null));
                     }
-                    else if (y.kind == Value.Kind.pure)
+                    else if (y.GetFlag(Value.Flag.pure))
                     {
                         ulong value = y.value;
                         if (value <= MaxValue<ushort>())
@@ -481,8 +573,8 @@ namespace cmsx.assembly
                             value = value >> 8u;
                             assembler.EmitOpCode(cmsx.machine.SETL);
                             assembler.EmitRegisterValue("X", x);
-                            assembler.EmitPureByteValue("Y", Value(Value.Kind.pure, b1, null));
-                            assembler.EmitPureByteValue("Z", Value(Value.Kind.pure, b0, null));
+                            assembler.EmitPureByteValue("Y", Value(Value.Flag.pure, b1, null));
+                            assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, b0, null));
                         }
                         else if (value <= MaxValue<uint>())
                         {
@@ -496,12 +588,12 @@ namespace cmsx.assembly
                             value = value >> 8u;
                             assembler.EmitOpCode(cmsx.machine.SETML);
                             assembler.EmitRegisterValue("X", x);
-                            assembler.EmitPureByteValue("Y", Value(Value.Kind.pure, b3, null));
-                            assembler.EmitPureByteValue("Z", Value(Value.Kind.pure, b2, null));
+                            assembler.EmitPureByteValue("Y", Value(Value.Flag.pure, b3, null));
+                            assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, b2, null));
                             assembler.EmitOpCode(cmsx.machine.ORL);
                             assembler.EmitRegisterValue("X", x);
-                            assembler.EmitPureByteValue("Y", Value(Value.Kind.pure, b1, null));
-                            assembler.EmitPureByteValue("Z", Value(Value.Kind.pure, b0, null));
+                            assembler.EmitPureByteValue("Y", Value(Value.Flag.pure, b1, null));
+                            assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, b0, null));
                         }
                         else
                         {
@@ -523,20 +615,20 @@ namespace cmsx.assembly
                             value = value >> 8u;
                             assembler.EmitOpCode(cmsx.machine.SETH);
                             assembler.EmitRegisterValue("X", x);
-                            assembler.EmitPureByteValue("Y", Value(Value.Kind.pure, b7, null));
-                            assembler.EmitPureByteValue("Z", Value(Value.Kind.pure, b6, null));
+                            assembler.EmitPureByteValue("Y", Value(Value.Flag.pure, b7, null));
+                            assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, b6, null));
                             assembler.EmitOpCode(cmsx.machine.ORMH);
                             assembler.EmitRegisterValue("X", x);
-                            assembler.EmitPureByteValue("Y", Value(Value.Kind.pure, b5, null));
-                            assembler.EmitPureByteValue("Z", Value(Value.Kind.pure, b4, null));
+                            assembler.EmitPureByteValue("Y", Value(Value.Flag.pure, b5, null));
+                            assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, b4, null));
                             assembler.EmitOpCode(cmsx.machine.ORML);
                             assembler.EmitRegisterValue("X", x);
-                            assembler.EmitPureByteValue("Y", Value(Value.Kind.pure, b3, null));
-                            assembler.EmitPureByteValue("Z", Value(Value.Kind.pure, b2, null));
+                            assembler.EmitPureByteValue("Y", Value(Value.Flag.pure, b3, null));
+                            assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, b2, null));
                             assembler.EmitOpCode(cmsx.machine.ORL);
                             assembler.EmitRegisterValue("X", x);
-                            assembler.EmitPureByteValue("Y", Value(Value.Kind.pure, b1, null));
-                            assembler.EmitPureByteValue("Z", Value(Value.Kind.pure, b0, null));
+                            assembler.EmitPureByteValue("Y", Value(Value.Flag.pure, b1, null));
+                            assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, b0, null));
                         }
                     }
                     else
@@ -556,6 +648,7 @@ namespace cmsx.assembly
             assembler.stage = prevStage;
         }
     }
+
     public class NegateInstruction : AssemblyInstruction
     {
         public override void Assemble(Assembler& assembler, Instruction* inst)
@@ -569,23 +662,23 @@ namespace cmsx.assembly
             {
                 Value x = assembler.Evaluate(operandList.operands[0].Get());
                 Value y = assembler.Evaluate(operandList.operands[1].Get());
-                Value z = Value(Value.Kind.undefined, undefinedValue, null);
+                Value z = Value();
                 if (operandList.operands.Count() == 3)
                 {
                     z = assembler.Evaluate(operandList.operands[2].Get());
                 }
-                if (x.kind == Value.Kind.register)
+                if (x.flags == Value.Flag.register)
                 {
-                    if (y.kind == Value.Kind.pure)
+                    if (y.GetFlag(Value.Flag.pure))
                     {
-                        if (z.kind == Value.Kind.register)
+                        if (z.flags == Value.Flag.register)
                         {
                             assembler.EmitOpCode(opCode);
                             assembler.EmitRegisterValue("X", x);
                             assembler.EmitPureByteValue("Y", y);
                             assembler.EmitRegisterValue("Z", z);
                         }
-                        else if (z.kind == Value.Kind.pure)
+                        else if (z.GetFlag(Value.Flag.pure))
                         {
                             if (z.value <= MaxValue<byte>())
                             {
@@ -600,24 +693,24 @@ namespace cmsx.assembly
                                 assembler.EmitOpCode(opCode);
                                 assembler.EmitPureByteValue("X", x);
                                 assembler.EmitPureByteValue("Y", y);
-                                assembler.EmitRegisterValue("Z", Value(Value.Kind.register, 255u, null));
+                                assembler.EmitRegisterValue("Z", Value(Value.Flag.register, 255u, null));
                             }
                         }
-                        else if (z.kind == Value.Kind.undefined)
+                        else if (z.flags == Value.Flag.undefined)
                         {
                             assembler.EmitOpCode(opCode + 1u);
                             assembler.EmitPureByteValue("X", x);
                             assembler.EmitRegisterValue("Y", y);
-                            assembler.EmitPureByteValue("Z", Value(Value.Kind.pure, 0u, null));
+                            assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, 0u, null));
                         }
                     }
-                    else if (y.kind == Value.Kind.register)
+                    else if (y.flags == Value.Flag.register)
                     {
-                        if (z.kind == Value.Kind.undefined)
+                        if (z.flags == Value.Flag.undefined)
                         {
                             assembler.EmitOpCode(opCode + 1u);
                             assembler.EmitRegisterValue("X", x);
-                            assembler.EmitPureByteValue("Y", Value(Value.Kind.pure, 0u, null));
+                            assembler.EmitPureByteValue("Y", Value(Value.Flag.pure, 0u, null));
                             assembler.EmitPureByteValue("Z", y);
                         }
                         else
@@ -638,6 +731,7 @@ namespace cmsx.assembly
             assembler.stage = prevStage;
         }
     }
+
     public class FloatingRoundingInstruction : AssemblyInstruction
     {
         public override void Assemble(Assembler& assembler, Instruction* inst)
@@ -651,19 +745,19 @@ namespace cmsx.assembly
             {
                 Value x = assembler.Evaluate(operandList.operands[0].Get());
                 Value y = assembler.Evaluate(operandList.operands[1].Get());
-                Value z = Value(Value.Kind.undefined, undefinedValue, null);
+                Value z = Value();
                 if (operandList.operands.Count() == 3)
                 {
                     z = assembler.Evaluate(operandList.operands[2].Get());
                 }
-                if (x.kind == Value.Kind.register && y.kind == Value.Kind.register && z.kind == Value.Kind.undefined)
+                if (x.flags == Value.Flag.register && y.flags == Value.Flag.register && z.flags == Value.Flag.undefined)
                 {
                     assembler.EmitOpCode(opCode);
                     assembler.EmitRegisterValue("X", x);
-                    assembler.EmitPureByteValue("Y", Value(Value.kind.pure, 1u, null));
-                    assembler.EmitRegisterValue("Z", z);
+                    assembler.EmitPureByteValue("Y", Value(Value.Flag.pure, 1u, null));
+                    assembler.EmitRegisterValue("Z", y);
                 }
-                else if (x.kind == Value.Kind.register && y.kind == Value.Kind.pure && z.kind == Value.Kind.register)
+                else if (x.flags == Value.Flag.register && y.GetFlag(Value.Flag.pure) && z.flags == Value.Flag.register)
                 {
                     assembler.EmitOpCode(opCode);
                     assembler.EmitRegisterValue("X", x);
@@ -682,6 +776,7 @@ namespace cmsx.assembly
             assembler.stage = prevStage;
         }
     }
+
     public class WydeImmediateInstruction : AssemblyInstruction
     {
         public override void Assemble(Assembler& assembler, Instruction* inst)
@@ -695,9 +790,9 @@ namespace cmsx.assembly
             {
                 Value x = assembler.Evaluate(operandList.operands[0].Get());
                 Value y = assembler.Evaluate(operandList.operands[1].Get());
-                if (x.kind == Value.Kind.register)
+                if (x.flags == Value.Flag.register)
                 {
-                    if (y.kind == Value.Kind.pure && y.value <= MaxValue<ushort>())
+                    if (y.GetFlag(Value.Flag.pure) && y.value <= MaxValue<ushort>())
                     {
                         ulong value = y.value;
                         byte b0 = cast<byte>(value);
@@ -706,8 +801,8 @@ namespace cmsx.assembly
                         value = value >> 8u;
                         assembler.EmitOpCode(opCode);
                         assembler.EmitRegisterValue("X", x);
-                        assembler.EmitPureByteValue("Y", Value(Value.Kind.pure, b1, null));
-                        assembler.EmitPureByteValue("Z", Value(Value.Kind.pure, b0, null));
+                        assembler.EmitPureByteValue("Y", Value(Value.Flag.pure, b1, null));
+                        assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, b0, null));
                     }
                     else 
                     {
@@ -726,6 +821,7 @@ namespace cmsx.assembly
             assembler.stage = prevStage;
         }
     }
+
     public class JumpInstruction : AssemblyInstruction
     {
         public override void Assemble(Assembler& assembler, Instruction* inst)
@@ -743,7 +839,7 @@ namespace cmsx.assembly
                 {
                     if (symbol->linkage == Linkage.internal_)
                     {
-                        if (symbol->value.kind == Value.Kind.pure)
+                        if (symbol->value.GetFlag(Value.Flag.address))
                         {
                             ulong to = symbol->value.value;
                             ulong at = assembler.currentSection->Address();
@@ -774,7 +870,7 @@ namespace cmsx.assembly
                                 }
                             }
                         }
-                        else if (symbol->value.kind == Value.Kind.undefined)
+                        else if (symbol->value.flags == Value.Flag.undefined)
                         {
                             assembler.EmitForwardLongJump(symbol);
                         }
@@ -800,6 +896,7 @@ namespace cmsx.assembly
             assembler.stage = prevStage;
         }
     }
+
     public class GoInstruction : AssemblyInstruction
     {
         public override void Assemble(Assembler& assembler, Instruction* inst)
@@ -813,23 +910,23 @@ namespace cmsx.assembly
             {
                 Value x = assembler.Evaluate(operandList.operands[0].Get());
                 Value y = assembler.Evaluate(operandList.operands[1].Get());
-                Value z = Value(Value.Kind.undefined, undefinedValue, null);
+                Value z = Value();
                 if (operandList.operands.Count() == 3)
                 {
                     z = assembler.Evaluate(operandList.operands[2].Get());
                 }
-                if (x.kind == Value.Kind.register)
+                if (x.flags == Value.Flag.register)
                 {
-                    if (y.kind == Value.Kind.register)
+                    if (y.flags == Value.Flag.register)
                     {
-                        if (z.kind == Value.Kind.register)
+                        if (z.flags == Value.Flag.register)
                         {
                             assembler.EmitOpCode(opCode);
                             assembler.EmitRegisterValue("X", x);
                             assembler.EmitRegisterValue("Y", y);
                             assembler.EmitRegisterValue("Z", z);
                         }
-                        else if (z.kind == Value.Kind.pure)
+                        else if (z.GetFlag(Value.Flag.pure))
                         {
                             if (z.value <= MaxValue<byte>())
                             {
@@ -844,28 +941,28 @@ namespace cmsx.assembly
                                 assembler.EmitOpCode(opCode);
                                 assembler.EmitRegisterValue("X", x);
                                 assembler.EmitRegisterValue("Y", y);
-                                assembler.EmitRegisterValue("Z", Value(Value.Kind.register, 255u, null));
+                                assembler.EmitRegisterValue("Z", Value(Value.Flag.register, 255u, null));
                             }
                         }
-                        else if (z.kind == Value.Kind.undefined)
+                        else if (z.flags == Value.Flag.undefined)
                         {
                             assembler.EmitOpCode(opCode + 1u);
                             assembler.EmitRegisterValue("X", x);
                             assembler.EmitRegisterValue("Y", y);
-                            assembler.EmitPureByteValue("Z", Value(Value.Kind.pure, 0u, null));
+                            assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, 0u, null));
                         }
                     }
                     else if (y.symbol != null)
                     {
                         assembler.EmitAbsoluteRegisterValue(x, "X", y.symbol);
-                        if (z.kind == Value.Kind.register)
+                        if (z.flags == Value.Flag.register)
                         {
                             assembler.EmitOpCode(opCode);
                             assembler.EmitRegisterValue("X", x);
                             assembler.EmitRegisterValue("X", x);
                             assembler.EmitRegisterValue("Z", z);
                         }
-                        else if (z.kind == Value.Kind.pure)
+                        else if (z.GetFlag(Value.Flag.pure))
                         {
                             if (z.value <= MaxValue<byte>())
                             {
@@ -879,12 +976,12 @@ namespace cmsx.assembly
                                 Error("Z operand of " + inst->opCode->name + " instruction must be either a register number or a pure byte value", inst->span);
                             }
                         }
-                        else if (z.kind == Value.Kind.undefined)
+                        else if (z.flags == Value.Flag.undefined)
                         {
                             assembler.EmitOpCode(opCode + 1u);
                             assembler.EmitRegisterValue("X", x);
                             assembler.EmitRegisterValue("X", x);
-                            assembler.EmitPureByteValue("Z", Value(Value.Kind.pure, 0u, null));
+                            assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, 0u, null));
                         }
                     }
                     else
@@ -904,6 +1001,7 @@ namespace cmsx.assembly
             assembler.stage = prevStage;
         }
     }
+
     public class BranchInstruction : AssemblyInstruction
     {
         public override void Assemble(Assembler& assembler, Instruction* inst)
@@ -917,58 +1015,51 @@ namespace cmsx.assembly
             {
                 Value x = assembler.Evaluate(operandList.operands[0].Get());
                 Value y = assembler.Evaluate(operandList.operands[1].Get());
-                if (x.kind == Value.Kind.register)
+                if (x.flags == Value.Flag.register)
                 {
                     Symbol* symbol = y.symbol;
                     if (symbol != null)
                     {
-                        if (symbol->linkage == Linkage.internal_)
+                        if (symbol->value.GetFlag(Value.Flag.address))
                         {
-                            if (symbol->value.kind == Value.Kind.pure)
+                            ulong to = symbol->value.value;
+                            ulong at = assembler.currentSection->Address();
+                            if (at >= to)
                             {
-                                ulong to = symbol->value.value;
-                                ulong at = assembler.currentSection->Address();
-                                if (at >= to)
+                                ulong offset = (at - to) >> 2u;
+                                if (offset <= cast<ulong>(MaxValue<ushort>()))
                                 {
-                                    ulong offset = (at - to) >> 2u;
-                                    if (offset <= cast<ulong>(MaxValue<ushort>()))
-                                    {
-                                        assembler.EmitOpCode(opCode + 1u);
-                                        assembler.EmitRegisterValue("X", x);
-                                        assembler.EmitShortOffset(cast<ushort>(offset));
-                                    }
-                                    else
-                                    {
-                                        Error(inst->opCode->name + " too far", inst->span);
-                                    }
+                                    assembler.EmitOpCode(opCode + 1u);
+                                    assembler.EmitRegisterValue("X", x);
+                                    assembler.EmitShortOffset(cast<ushort>(offset));
                                 }
                                 else
                                 {
-                                    ulong offset = (to - at) >> 2u;
-                                    if (offset <= cast<ulong>(MaxValue<ushort>()))
-                                    {
-                                        assembler.EmitOpCode(opCode);
-                                        assembler.EmitRegisterValue("X", x);
-                                        assembler.EmitShortOffset(cast<ushort>(offset));
-                                    }
-                                    else
-                                    {
-                                        Error(inst->opCode->name + " too far", inst->span);
-                                    }
+                                    Error(inst->opCode->name + " too far", inst->span);
                                 }
-                            }
-                            else if (symbol->value.kind == Value.Kind.undefined)
-                            {
-                                assembler.EmitForwardShortJump("X", opCode, x, symbol);
                             }
                             else
                             {
-                                Error("symbol operand of " + inst->opCode->name + " instruction cannot be a register number", inst->span);
+                                ulong offset = (to - at) >> 2u;
+                                if (offset <= cast<ulong>(MaxValue<ushort>()))
+                                {
+                                    assembler.EmitOpCode(opCode);
+                                    assembler.EmitRegisterValue("X", x);
+                                    assembler.EmitShortOffset(cast<ushort>(offset));
+                                }
+                                else
+                                {
+                                    Error(inst->opCode->name + " too far", inst->span);
+                                }
                             }
+                        }
+                        else if (symbol->value.flags == Value.Flag.undefined)
+                        {
+                            assembler.EmitForwardShortJump("X", opCode, x, symbol);
                         }
                         else
                         {
-                            Error(inst->opCode->name + " to an external symbol not allowed", inst->span);
+                            Error("symbol operand of " + inst->opCode->name + " instruction cannot be a register number", inst->span);
                         }
                     }
                     else
@@ -988,6 +1079,7 @@ namespace cmsx.assembly
             assembler.stage = prevStage;
         }
     }
+
     public class TrapInstruction : AssemblyInstruction
     {
         public override void Assemble(Assembler& assembler, Instruction* inst)
@@ -1000,9 +1092,9 @@ namespace cmsx.assembly
             if (operandList.operands.Count() == 3)
             {
                 Value x = assembler.Evaluate(operandList.operands[0].Get());
-                Value y = assembler.Evaluate(operandList.operands[0].Get());
-                Value z = assembler.Evaluate(operandList.operands[0].Get());
-                if (x.kind == Value.Kind.pure && y.kind == Value.Kind.pure && z.kind == Value.Kind.pure)
+                Value y = assembler.Evaluate(operandList.operands[1].Get());
+                Value z = assembler.Evaluate(operandList.operands[2].Get());
+                if (x.GetFlag(Value.Flag.pure) && y.GetFlag(Value.Flag.pure) && z.GetFlag(Value.Flag.pure))
                 {
                     assembler.EmitOpCode(opCode);
                     assembler.EmitPureByteValue("X", x);
@@ -1040,6 +1132,16 @@ namespace cmsx.assembly
                 instructions.Add(assemblyInst);
             }
 
+            IsInstruction* isInst = new IsInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(isInst));
+            instructions[IS] = isInst;
+            ExternInstruction* externInst = new ExternInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(externInst));
+            instructions[EXTERN] = externInst;
+            LinkOnceInstruction* linkOnceInst = new LinkOnceInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(linkOnceInst));
+            instructions[LINKONCE] = linkOnceInst;
+            // todo
             ByteInstruction* byteInst = new ByteInstruction();
             instructionList.Add(UniquePtr<AssemblyInstruction>(byteInst));
             instructions[BYTE] = byteInst;

@@ -24,7 +24,7 @@ namespace cmsx.object
 
     public enum Linkage : byte 
     {
-        internal_ = 0u, external = 1u
+        internal_ = 0u, external = 1u, once = 2u, remove = 3u
     }
 
     public string LinkageStr(Linkage linkage)
@@ -33,57 +33,130 @@ namespace cmsx.object
         {
             case Linkage.internal_: return "internal";
             case Linkage.external: return "external";
+            case Linkage.once: return "once";
+            case Linkage.remove: return "remove";
         }
         return "";
     }
 
-    public char ValueKindChar(Value.Kind kind)
+    public string ValueFlagStr(Value.Flag flags)
     {
-        switch (kind)
+        if (flags == Value.Flag.undefined)
         {
-            case Value.Kind.register: return 'R';
-            case Value.Kind.pure: return 'P';
-            case Value.Kind.undefined: return 'U';
+            return "U";
         }
-        return '-';
+        string s;
+        if ((flags & Value.Flag.register) != Value.Flag.undefined)
+        {
+            s.Append('R');
+        }
+        if ((flags & Value.Flag.pure) != Value.Flag.undefined)
+        {
+            s.Append('P');
+        }
+        if ((flags & Value.Flag.address) != Value.Flag.undefined)
+        {
+            s.Append('A');
+        }
+        if ((flags & Value.Flag.function) != Value.Flag.undefined)
+        {
+            s.Append('F');
+        }
+        if ((flags & Value.Flag.structure) != Value.Flag.undefined)
+        {
+            s.Append('S');
+        }
+        return s;
     }
 
     public class Value
     {
-        public enum Kind : byte
+        public enum Flag : byte
         {
-            register, pure, undefined
+            undefined = 0u,
+            register = 1u << 0u,
+            pure = 1u << 1u,
+            address = 1u << 2u,
+            function = 1u << 3u,
+            structure = 1u << 4u
         }
-        public nothrow Value(Kind kind_, ulong value_, Symbol* symbol_) : kind(kind_), value(value_), symbol(symbol_)
+        public nothrow Value() : flags(Flag.undefined), value(undefinedValue), symbol(null)
         {
         }
-        public Kind kind;
+        public nothrow Value(Flag flags_, ulong value_, Symbol* symbol_) : flags(flags_), value(value_), symbol(symbol_)
+        {
+        }
+        public nothrow inline void SetUndefined()
+        {
+            flags = Flag.undefined;
+        }
+        public nothrow inline void SetRegister()
+        {
+            flags = Flag.register;
+        }
+        public nothrow inline void SetPure()
+        {
+            flags = cast<Flag>(flags | Flag.pure);
+        }
+        public nothrow inline void SetAddress()
+        {
+            flags = cast<Flag>(flags | Flag.address);
+        }
+        public nothrow inline void SetFunction()
+        {
+            flags = cast<Flag>(flags | Flag.function);
+        }
+        public nothrow inline void SetStructure()
+        {
+            flags = cast<Flag>(flags | Flag.structure);
+        }
+        public nothrow inline bool GetFlag(Flag flag)
+        {
+            return (flags & flag) != Flag.undefined;
+        }
+        public Flag flags;
         public ulong value;
         public Symbol* symbol;
     }
 
     public string ValueStr(const Value& value)
     {
-        string result = string(ValueKindChar(value.kind)) + " #" + ToHexString(value.value) + " ";
-        if (value.kind == Value.Kind.register)
+        string result = Format(ValueFlagStr(value.flags), 5) + " #" + ToHexString(value.value) + " ";
+        if (value.flags == Value.Flag.register)
         {
-            result.Append("$" + ToString(value.value));
+            result.Append(Format("$" + ToString(value.value), 20));
         }
         else
         {
-            result.Append(ToString(value.value));
+            result.Append(Format(ToString(value.value), 20));
         }
         return result;
     }
 
     public class Symbol
     {
+        public Symbol* Clone()
+        {
+            Symbol* clone = new Symbol();
+            clone->index = -1;
+            clone->name = name;
+            clone->segment = segment;
+            clone->linkage = linkage;
+            clone->value = value;
+            clone->start = start;
+            clone->length = length;
+            clone->section = section;
+            return clone;
+        }
         public int index;
         public string name;
+        public string localName;
         public Segment segment;
         public Linkage linkage;
         public Value value;
-        public ulong absoluteAddress;
+        public ulong start;
+        public ulong length;
+        public Section* section;
     }
 
     public class SymbolTable
@@ -95,6 +168,10 @@ namespace cmsx.object
         public nothrow const List<UniquePtr<Symbol>>& Symbols() const
         {
             return symbols;
+        }
+        public nothrow const List<UniquePtr<Symbol>>& InternalSymbols() const
+        {
+            return internalSymbols;
         }
         public Symbol* GetSymbol(int index) const
         {
@@ -144,7 +221,7 @@ namespace cmsx.object
             }
             symbols.Add(UniquePtr<Symbol>(symbol));
             table[symbol->name] = symbol;
-            if (symbol->value.kind == Value.Kind.register)
+            if (symbol->value.flags == Value.Flag.register)
             {
                 registerMap[cast<byte>(symbol->value.value)] = symbol;
             }
@@ -155,18 +232,24 @@ namespace cmsx.object
         }
         public void AddSymbolToAddressMap(Symbol* symbol)
         {
-            if (symbol->value.kind == Value.Kind.pure)
+            if (symbol->value.GetFlag(Value.Flag.address))
             {
-                ulong segmentBaseAddress = cmsx.machine.textSegmentBaseAddress;
-                if (symbol->segment == Segment.data)
-                {
-                    segmentBaseAddress = cmsx.machine.dataSegmentBaseAddress;
-                }
-                symbol->absoluteAddress = segmentBaseAddress + symbol->value.value;
-                addressMap[symbol->absoluteAddress] = symbol;
+                symbol->start = symbol->section->baseAddress + symbol->value.value;
+                addressMap[symbol->start] = symbol;
             }
         }
+        public void AddInternalSymbol(Symbol* internalSymbol, bool setIndex)
+        {
+            if (setIndex)
+            {
+                internalSymbol->index = cast<int>(internalSymbols.Count());
+            }
+            #assert(internalSymbol->linkage == Linkage.internal_);
+            internalSymbols.Add(UniquePtr<Symbol>(internalSymbol));
+            addressMap[internalSymbol->start] = internalSymbol;
+        }
         private List<UniquePtr<Symbol>> symbols;
+        private List<UniquePtr<Symbol>> internalSymbols;
         private Map<string, Symbol*> table;
         private Map<ulong, Symbol*> addressMap;
         private Map<byte, Symbol*> registerMap;

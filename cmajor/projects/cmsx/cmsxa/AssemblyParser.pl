@@ -7,9 +7,8 @@ namespace cmsx.assembly
         CharacterConstant : CharacterConstant*;
         StringConstant : StringConstant*;
         Constant : Constant*;
+        LocalSymbol : SymbolNode*;
         Symbol : SymbolNode*;
-        LocalOperand(var uchar d) : LocalOperand*;
-        LocalLabel(var uchar d) : LocalLabel*;
         At : At*;
         PrimaryExpression : Node*;
         UnaryOperator : Operator;

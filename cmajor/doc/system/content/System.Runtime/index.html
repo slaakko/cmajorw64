@@ -30,6 +30,9 @@
     <td xml:space="preserve"><a href="file/Keys.cm.html">System.Runtime/Keys.cm</a></td>
    </tr>
    <tr>
+    <td xml:space="preserve"><a href="file/Os.cm.html">System.Runtime/Os.cm</a></td>
+   </tr>
+   <tr>
     <td xml:space="preserve"><a href="file/Runtime.cm.html">System.Runtime/Runtime.cm</a></td>
    </tr>
    <tr>
@@ -38,6 +41,38 @@
   </table>
   <h2>Functions</h2>
   <table>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">ulong</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#OsAllocateMemoryPage">OsAllocateMemoryPage</a>(<span class="kw">ulong</span>&nbsp;pageSize)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#OsCopyMemoryPage">OsCopyMemoryPage</a>(<span class="kw">ulong</span>&nbsp;fromAddress, <span class="kw">ulong</span>&nbsp;toAddress, <span class="kw">ulong</span>&nbsp;pageSize)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#OsFreeMemoryPage">OsFreeMemoryPage</a>(<span class="kw">ulong</span>&nbsp;pageAddress)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>*</td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#OsGetStdHandle">OsGetStdHandle</a>(<span class="kw">int</span>&nbsp;stdInOutOrErr)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#OsReadConsoleInput">OsReadConsoleInput</a>(<span class="kw">void</span>*&nbsp;consoleInputHandle, <span class="kw">uchar</span>*&nbsp;c)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">byte</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#OsReadMemoryByte">OsReadMemoryByte</a>(<span class="kw">ulong</span>&nbsp;address)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#OsRegisterConsoleCallback">OsRegisterConsoleCallback</a>(<span class="kw">void</span>*&nbsp;consoleInputHandle, <span class="kw">ulong</span>&nbsp;callBackValue)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#OsWriteMemoryByte">OsWriteMemoryByte</a>(<span class="kw">ulong</span>&nbsp;address, <span class="kw">byte</span>&nbsp;b)</td>
+   </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
     <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtAbsBigFloat">RtAbsBigFloat</a>(<span class="kw">void</span>*&nbsp;target, <span class="kw">void</span>*&nbsp;subject)</td>
@@ -511,6 +546,10 @@
     <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtGetPathToExecutable">RtGetPathToExecutable</a>(<span class="kw">int</span>&nbsp;pathHandle)</td>
    </tr>
    <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtGetRawCh">RtGetRawCh</a>()</td>
+   </tr>
+   <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span>*</td>
     <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtGetStackTrace">RtGetStackTrace</a>()</td>
    </tr>
@@ -695,6 +734,10 @@
     <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtRetvalStrZlib">RtRetvalStrZlib</a>(<span class="kw">int</span>&nbsp;retVal)</td>
    </tr>
    <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtRunningOnWsl">RtRunningOnWsl</a>()</td>
+   </tr>
+   <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span></td>
     <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtSeek">RtSeek</a>(<span class="kw">int</span>&nbsp;fileHandle, <span class="kw">long</span>&nbsp;pos, <span class="kw">byte</span>&nbsp;origin)</td>
    </tr>
@@ -817,6 +860,10 @@
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
     <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtToggleBitBigInt">RtToggleBitBigInt</a>(<span class="kw">void</span>*&nbsp;bigInt, <span class="kw">uint</span>&nbsp;bitIndex)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtTranslateCh">RtTranslateCh</a>(<span class="kw">int</span>&nbsp;ch)</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
@@ -1159,6 +1206,62 @@
    </tr>
   </table>
   <h2>Function Details</h2>
+  <h3 id="OsAllocateMemoryPage" xml:space="preserve">OsAllocateMemoryPage&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">ulong</span>&nbsp;OsAllocateMemoryPage(<span class="kw">ulong</span>&nbsp;pageSize)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Os.cm.html#6">6</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Os.cm.html">System.Runtime/Os.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="OsCopyMemoryPage" xml:space="preserve">OsCopyMemoryPage&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;OsCopyMemoryPage(<span class="kw">ulong</span>&nbsp;fromAddress, <span class="kw">ulong</span>&nbsp;toAddress, <span class="kw">ulong</span>&nbsp;pageSize)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Os.cm.html#8">8</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Os.cm.html">System.Runtime/Os.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="OsFreeMemoryPage" xml:space="preserve">OsFreeMemoryPage&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;OsFreeMemoryPage(<span class="kw">ulong</span>&nbsp;pageAddress)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Os.cm.html#7">7</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Os.cm.html">System.Runtime/Os.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="OsGetStdHandle" xml:space="preserve">OsGetStdHandle&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>*&nbsp;OsGetStdHandle(<span class="kw">int</span>&nbsp;stdInOutOrErr)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Os.cm.html#11">11</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Os.cm.html">System.Runtime/Os.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="OsReadConsoleInput" xml:space="preserve">OsReadConsoleInput&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;OsReadConsoleInput(<span class="kw">void</span>*&nbsp;consoleInputHandle, <span class="kw">uchar</span>*&nbsp;c)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Os.cm.html#13">13</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Os.cm.html">System.Runtime/Os.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="OsReadMemoryByte" xml:space="preserve">OsReadMemoryByte&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">byte</span>&nbsp;OsReadMemoryByte(<span class="kw">ulong</span>&nbsp;address)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Os.cm.html#10">10</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Os.cm.html">System.Runtime/Os.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="OsRegisterConsoleCallback" xml:space="preserve">OsRegisterConsoleCallback&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;OsRegisterConsoleCallback(<span class="kw">void</span>*&nbsp;consoleInputHandle, <span class="kw">ulong</span>&nbsp;callBackValue)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Os.cm.html#12">12</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Os.cm.html">System.Runtime/Os.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="OsWriteMemoryByte" xml:space="preserve">OsWriteMemoryByte&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;OsWriteMemoryByte(<span class="kw">ulong</span>&nbsp;address, <span class="kw">byte</span>&nbsp;b)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Os.cm.html#9">9</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Os.cm.html">System.Runtime/Os.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
   <h3 id="RtAbsBigFloat" xml:space="preserve">RtAbsBigFloat&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtAbsBigFloat(<span class="kw">void</span>*&nbsp;target, <span class="kw">void</span>*&nbsp;subject)</h4>
   <h5>Definition</h5>
@@ -1316,21 +1419,21 @@
   <h3 id="RtAttrOff" xml:space="preserve">RtAttrOff&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtAttrOff(<span class="kw">int</span>&nbsp;attrs)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#207">207</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#209">209</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="RtAttrOn" xml:space="preserve">RtAttrOn&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtAttrOn(<span class="kw">int</span>&nbsp;attrs)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#206">206</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#208">208</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="RtAttrSet" xml:space="preserve">RtAttrSet&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtAttrSet(<span class="kw">int</span>&nbsp;attrs)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#208">208</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#210">210</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -1953,7 +2056,7 @@
   <h3 id="RtGetNStr" xml:space="preserve">RtGetNStr&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtGetNStr(<span class="kw">char</span>*&nbsp;str, <span class="kw">int</span>&nbsp;size)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#205">205</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#207">207</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -1982,6 +2085,13 @@
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;RtGetPathToExecutable(<span class="kw">int</span>&nbsp;pathHandle)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#182">182</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="RtGetRawCh" xml:space="preserve">RtGetRawCh&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;RtGetRawCh()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#205">205</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -2307,6 +2417,13 @@
   <br/>
   <br/>
   <hr/>
+  <h3 id="RtRunningOnWsl" xml:space="preserve">RtRunningOnWsl&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;RtRunningOnWsl()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#211">211</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
   <h3 id="RtSeek" xml:space="preserve">RtSeek&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;RtSeek(<span class="kw">int</span>&nbsp;fileHandle, <span class="kw">long</span>&nbsp;pos, <span class="kw">byte</span>&nbsp;origin)</h4>
   <h5>Definition</h5>
@@ -2521,6 +2638,13 @@
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtToggleBitBigInt(<span class="kw">void</span>*&nbsp;bigInt, <span class="kw">uint</span>&nbsp;bitIndex)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#105">105</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="RtTranslateCh" xml:space="preserve">RtTranslateCh&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;RtTranslateCh(<span class="kw">int</span>&nbsp;ch)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#206">206</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
   <br/>
   <br/>
   <hr/>

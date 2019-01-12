@@ -1,17 +1,27 @@
+        EXTERN main,sub,rec
+
 .CODE
-Main    LDB $0,Data
-        STB $0,Data
-        GO $0,Sub
-        BZ ax,Over
+
+main    FUNC
+        LDB $0,data
+        STB $0,data
+        GO $0,sub
+        BZ ax,@1
         TRAP 0,0,0
-Over    LDB $0,Data
-        BNZ $0,Over
+@1      LDB $0,data
+        BNZ $0,@1
         TRAP 0,0,0
-        JMP Sub
-        JMP Foo
-Sub     GO $0,$0
+        JMP sub
+        JMP foo
+main    ENDF        
+        
+sub     FUNC
+        GO $0,$0
+sub     ENDF        
 
 .DATA
-Data    BYTE 0
-        OCTA ext
 
+data    BYTE 0
+rec     STRUCT
+        OCTA ext
+rec     ENDS        

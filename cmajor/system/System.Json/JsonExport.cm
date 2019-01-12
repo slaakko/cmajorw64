@@ -62,7 +62,13 @@ namespace System.Json
     {
         return UniquePtr<JsonValue>(new JsonBool(value));
     }
-    
+
+    public nothrow UniquePtr<JsonValue> ToJson<T>(T value)
+        where System.Meta.IsEnumeratedType<T>()
+    {
+        return UniquePtr<JsonValue>(new JsonNumber(cast<double>(cast<T.UnderlyingType>(value))));
+    }
+
     public UniquePtr<JsonValue> ToJson(const string& value)
     {
         return UniquePtr<JsonValue>(new JsonString(ToUtf32(value)));
@@ -82,6 +88,16 @@ namespace System.Json
     {
         UniquePtr<JsonArray> array = new JsonArray();
         for (const T& item : value)
+        {
+            array->AddItem(ToJson(item));
+        }
+        return UniquePtr<JsonValue>(array.Release());
+    }
+
+    public UniquePtr<JsonValue> ToJson<T>(const Queue<T>& value)
+    {
+        UniquePtr<JsonArray> array = new JsonArray();
+        for (const T& item : value.Rep())
         {
             array->AddItem(ToJson(item));
         }

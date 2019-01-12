@@ -29,17 +29,12 @@ namespace cmsx.assembly
             |   StringConstant{ value = StringConstant; }
             ;
 
+        LocalSymbol : SymbolNode*
+            ::= token('@' digit+){ value = new SymbolNode(span, ToUtf8(ustring(matchBegin, matchEnd)), true); }
+            ;
+
         Symbol : SymbolNode*
-            ::= token((idstart | ':' | '_') (idcont | ':' | '_' )*){ value = new SymbolNode(span, ToUtf8(ustring(matchBegin, matchEnd))); }
-            ;
-
-        LocalOperand(var uchar d) : LocalOperand*
-            ::= token(digit{ d = *matchBegin; } 'B'){ value = new LocalOperand(span, d, Direction.backward); }
-            |   token(digit{ d = *matchBegin; } 'F'){ value = new LocalOperand(span, d, Direction.forward); }
-            ;
-
-        LocalLabel(var uchar d) : LocalLabel*
-            ::= token(digit{ d = *matchBegin; } 'H'){ value = new LocalLabel(span, d); }
+            ::= token((idstart | ':' | '_') (idcont | ':' | '_' )*){ value = new SymbolNode(span, ToUtf8(ustring(matchBegin, matchEnd)), false); }
             ;
 
         At : At*
@@ -48,7 +43,7 @@ namespace cmsx.assembly
 
         PrimaryExpression : Node*
             ::= token(
-                LocalOperand{ value = LocalOperand; }
+                LocalSymbol{ value = LocalSymbol; }
             |   Constant{ value = Constant; }
             |   Symbol{ value = Symbol; }
             |   At{ value = At; }
@@ -99,8 +94,8 @@ namespace cmsx.assembly
             ;
 
         Label : Node*
-            ::= Symbol{ value = Symbol; }
-            |   LocalLabel{ value = LocalLabel; }
+            ::= LocalSymbol{ value = LocalSymbol; }
+            |   Symbol{ value = Symbol; }
             |   empty{ value = null; }
             ;
 
@@ -124,7 +119,7 @@ namespace cmsx.assembly
             ;
 
         Comment
-            ::= S? (anychar - (idstart | ':' | '_' | digit | ';' | '.' | NL)) (anychar - NL)*
+            ::= S? (anychar - (idstart | ':' | '_' | '@' | ';' | '.' | NL)) (anychar - NL)*
             ;
 
         CommentLine
