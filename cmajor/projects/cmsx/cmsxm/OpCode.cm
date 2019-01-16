@@ -216,8 +216,8 @@ namespace cmsx.machine
     public const byte PRESTI = 0xBBu;
     public const byte SYNCID = 0xBCu;
     public const byte SYNCIDI = 0xBDu;
-    public const byte PUSHGO = 0xBEu;
-    public const byte PUSHGOI = 0xBFu;
+    public const byte CALL = 0xBEu;
+    public const byte CALLI = 0xBFu;
 
     public const byte OR = 0xC0u;
     public const byte ORI = 0xC1u;
@@ -282,7 +282,7 @@ namespace cmsx.machine
     public const byte PUT = 0xF6u;
     public const byte PUTI = 0xF7u;
 
-    public const byte POP = 0xF8u;
+    public const byte RET = 0xF8u;
     public const byte RESUME = 0xF9u;
     public const byte SAVE = 0xFAu;
     public const byte UNSAVE = 0xFBu;
@@ -515,8 +515,8 @@ namespace cmsx.machine
             codes["PRESTI"] = PRESTI;
             codes["SYNCID"] = SYNCID;
             codes["SYNCIDI"] = SYNCIDI;
-            codes["PUSHGO"] = PUSHGO;
-            codes["PUSHGOI"] = PUSHGOI;
+            codes["CALL"] = CALL;
+            codes["CALLI"] = CALLI;
 
             codes["OR"] = OR;
             codes["ORI"] = ORI;
@@ -581,7 +581,7 @@ namespace cmsx.machine
             codes["PUT"] = PUT;
             codes["PUTI"] = PUTI;
 
-            codes["POP"] = POP;
+            codes["RET"] = RET;
             codes["RESUME"] = RESUME;
             codes["SAVE"] = SAVE;
             codes["UNSAVE"] = UNSAVE;
@@ -803,8 +803,8 @@ namespace cmsx.machine
             names[PRESTI] = "PRESTI";
             names[SYNCID] = "SYNCID";
             names[SYNCIDI] = "SYNCIDI";
-            names[PUSHGO] = "PUSHGO";
-            names[PUSHGOI] = "PUSHGOI";
+            names[CALL] = "CALL";
+            names[CALLI] = "CALLI";
 
             names[OR] = "OR";
             names[ORI] = "ORI";
@@ -869,7 +869,7 @@ namespace cmsx.machine
             names[PUT] = "PUT";
             names[PUTI] = "PUTI";
 
-            names[POP] = "POP";
+            names[RET] = "RET";
             names[RESUME] = "RESUME";
             names[SAVE] = "SAVE";
             names[UNSAVE] = "UNSAVE";

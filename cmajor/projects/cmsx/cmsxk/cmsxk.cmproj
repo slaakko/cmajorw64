@@ -12,8 +12,10 @@
   <ItemGroup>
     <CmCompile Include="Boot.cm" />
     <CmCompile Include="ConsoleInputDriver.cm" />
+    <CmCompile Include="File.cm" />
     <CmCompile Include="InterruptHandler.cm" />
     <CmCompile Include="Kernel.cm" />
+    <CmCompile Include="Loader.cm" />
     <CmCompile Include="Memory.cm" />
     <CmCompile Include="Process.cm" />
     <CmCompile Include="Segment.cm" />
@@ -21,5 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\cmsxm\cmsxm.cmproj" />
+    <ProjectReference Include="..\cmsxo\cmsxo.cmproj" />
+    <ProjectReference Include="..\cmsxu\cmsxu.cmproj" />
   </ItemGroup>
 </Project>

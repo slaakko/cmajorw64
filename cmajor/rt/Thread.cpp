@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2018 Seppo Laakko
+// Copyright (c) 2019 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -87,6 +87,7 @@ class ThreadPool
 public:
     static void Init();
     static void Done();
+    void Exit();
     static ThreadPool& Instance() { Assert(instance, "thread pool not initialized"); return *instance; }
     int32_t StartThreadFunction(ThreadFunction fun);
     int32_t StartThreadFunction(ThreadFunctionWithParam fun, void* param);
@@ -103,6 +104,24 @@ private:
     ThreadPool();
 };
 
+void ThreadPool::Exit()
+{
+    for (std::unique_ptr<std::thread>& t : noLockThreads)
+    {
+        if (t.get())
+        {
+            if (t->joinable())
+            {
+                t->join();
+            }
+        }
+    }
+    for (auto& p : threadMap)
+    {
+        JoinThread(p.first);
+    }
+}
+
 void ThreadPool::Init()
 {
     instance.reset(new ThreadPool());
@@ -110,6 +129,10 @@ void ThreadPool::Init()
 
 void ThreadPool::Done()
 {
+    if (instance)
+    {
+        instance->Exit();
+    }
     instance.reset();
 }
 
@@ -190,7 +213,10 @@ bool ThreadPool::JoinThread(int32_t threadId)
     {
         if (noLockThreads[threadId])
         {
-            noLockThreads[threadId]->join();
+            if (noLockThreads[threadId]->joinable())
+            {
+                noLockThreads[threadId]->join();
+            }
             noLockThreads[threadId].reset();
             return true;
         }
@@ -204,7 +230,10 @@ bool ThreadPool::JoinThread(int32_t threadId)
             std::thread* thread = it->second.get();
             if (thread)
             {
-                thread->join();
+                if (thread->joinable())
+                {
+                    thread->join();
+                }
                 threadMap.erase(threadId);
                 return true;
             }

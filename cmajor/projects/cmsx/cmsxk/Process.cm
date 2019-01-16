@@ -17,7 +17,7 @@ namespace cmsx.kernel
             free = 0u, created = 1u, readyToRun = 2u, running = 3u, asleep = 5u, zombie = 6u
         }
         public nothrow Process() : pid(noPID), state(State.free), parent(null), firstChild(null), lastChild(null), nextSibling(null),
-            nextFree(null), nextReadyToRun(null), prevReadyToRun(null), memoryTable(), sp(0u), retValRegAddress(0u), exitCode(0u), event(noEvent), eventData(0u)
+            nextFree(null), nextReadyToRun(null), prevReadyToRun(null), memoryTable(), sp(0u), regAXAddress(0u), regBXAddress(0u), exitCode(0u), event(noEvent), eventData(0u)
         {
         }
         public nothrow void AddChild(Process* child)
@@ -56,6 +56,7 @@ namespace cmsx.kernel
             child->parent = null;
         }
         public int pid;
+        public string name;
         public State state;
         public Process* parent;
         public Process* firstChild;
@@ -66,7 +67,8 @@ namespace cmsx.kernel
         public Process* prevReadyToRun;
         public MemoryTable memoryTable;
         public ulong sp;
-        public ulong retValRegAddress;
+        public ulong regAXAddress;
+        public ulong regBXAddress;
         public ushort exitCode;
         public ulong event;
         public ulong eventData;
@@ -84,7 +86,7 @@ namespace cmsx.kernel
         private ProcessTable() : machine(GetMachine()), nextPID(0), free(null), init(null), running(null), ready(null), nextFreeProcessSlot(0)
         {
         }
-        public nothrow Process* CreateProcess()
+        public nothrow Process* CreateProcess(const string& name, ulong textSegmentBaseAddress, ulong textSegmentSize, ulong dataSegmentSize, ulong poolSegmentSize, ulong stackSegmentSize)
         {
             Process* process = null;
             if (free != null)
@@ -100,7 +102,12 @@ namespace cmsx.kernel
             {
                 return null;
             }
+            if (nextPID == idlePID)
+            {
+                ++nextPID;
+            }
             process->pid = nextPID++;
+            process->name = name;
             process->state = Process.State.created;
             process->parent = null;
             process->firstChild = null;
@@ -109,7 +116,7 @@ namespace cmsx.kernel
             process->nextFree = null;
             process->nextReadyToRun = null;
             process->prevReadyToRun = null;
-            InitializeProcessMemory(machine, process);
+            InitializeProcessMemory(machine, process, textSegmentBaseAddress, textSegmentSize, dataSegmentSize, poolSegmentSize, stackSegmentSize);
             AddProcessToProcessMap(process);
             return process;
         }
@@ -128,6 +135,10 @@ namespace cmsx.kernel
             else
             {
                 return null;
+            }
+            if (nextPID == idlePID)
+            {
+                ++nextPID;
             }
             child->pid = nextPID++;
             child->state = Process.State.created;
@@ -212,9 +223,10 @@ namespace cmsx.kernel
         return ProcessTable.Instance();
     }
 
-    public nothrow Process* CreateProcess(ProcessTable& processTable)
+    public nothrow Process* CreateProcess(ProcessTable& processTable, const string& name,
+        ulong textSegmentBaseAddress, ulong textSegmentSize, ulong dataSegmentSize, ulong poolSegmentSize, ulong stackSegmentSize)
     {
-        return processTable.CreateProcess();
+        return processTable.CreateProcess(name, textSegmentBaseAddress, textSegmentSize, dataSegmentSize, poolSegmentSize, stackSegmentSize);
     }
 
     public nothrow Process* CloneProcess(ProcessTable& processTable, Process* parent)
@@ -361,9 +373,9 @@ namespace cmsx.kernel
                         return -1;
                     }
                 }
-                if (parent->retValRegAddress != 0u)
+                if (parent->regAXAddress != 0u)
                 {
-                    if (WriteProcessMemory(machine, parent, parent->retValRegAddress, cast<uint>(process->pid), 4u) != 0)
+                    if (WriteProcessMemory(machine, parent, parent->regAXAddress, cast<uint>(process->pid), 8u) != 0)
                     {
                         return -1;
                     }
@@ -417,13 +429,14 @@ namespace cmsx.kernel
     {
         Process* child = CloneProcess(processTable, parent);
         SetProcessReadyToRun(processTable, child);
-        WriteProcessMemory(machine, child, child->retValRegAddress, 0u, 4u);
+        WriteProcessMemory(machine, child, child->regAXAddress, 0u, 8u);
         return child->pid;
     }
 
-    public nothrow void InitializeProcessMemory(Machine& machine, Process* process)
+    public nothrow void InitializeProcessMemory(Machine& machine, Process* process,
+        ulong textSegmentBaseAddress, ulong textSegmentSize, ulong dataSegmentSize, ulong poolSegmentSize, ulong stackSegmentSize)
     {
-        DefaultInitializeMemoryTable(machine, process->memoryTable);
+        InitializeMemoryTable(machine, process->memoryTable, textSegmentBaseAddress, textSegmentSize, dataSegmentSize, poolSegmentSize, stackSegmentSize);
         AllocateMemory(machine.GetMemory(), process->memoryTable);
         ulong sp = stackSegmentBaseAddress + process->memoryTable.segmentDescriptors[stackSegmentIndex]->startAddress;
         Registers& regs = machine.GetRegisters();
@@ -436,7 +449,7 @@ namespace cmsx.kernel
         ulong prevPC = regs.GetPC();
         ulong prevRL = regs.GetSpecial(Registers.rL);
         ulong prevRG = regs.GetSpecial(Registers.rG);
-        ulong pc = textSegmentBaseAddress + process->memoryTable.segmentDescriptors[textSegmentIndex]->startAddress;
+        ulong pc = process->memoryTable.segmentDescriptors[textSegmentIndex]->startAddress;
         regs.SetPC(pc);
         regs.Set(regAX, 0u);
         regs.Set(regBX, 0u);
@@ -446,7 +459,7 @@ namespace cmsx.kernel
         regs.Set(regFP, 0u);
         regs.SetSpecial(Registers.rL, 0u);
         regs.SetSpecial(Registers.rG, firstGlobalReg);
-        process->sp = machine.GetProcessor().SaveContext(process->memoryTable.virtualTranslationRegisterValue, sp, &process->retValRegAddress);
+        process->sp = machine.GetProcessor().SaveContext(process->memoryTable.virtualTranslationRegisterValue, sp, &process->regAXAddress, &process->regBXAddress);
         regs.Set(regAX, prevAX);
         regs.Set(regBX, prevBX);
         regs.Set(regCX, prevCX);
@@ -463,7 +476,7 @@ namespace cmsx.kernel
         InitializeMemoryTableForCloning(machine, child->memoryTable);
         CloneMemory(machine.GetMemory(), child->memoryTable, parent->memoryTable);
         Registers& regs = machine.GetRegisters();
-        child->sp = machine.GetProcessor().SaveContext(child->memoryTable.virtualTranslationRegisterValue, regs.Get(regSP), &child->retValRegAddress);
+        child->sp = machine.GetProcessor().SaveContext(child->memoryTable.virtualTranslationRegisterValue, regs.Get(regSP), &child->regAXAddress, &child->regBXAddress);
     }
 
     public nothrow void FreeProcessMemory(Memory& mem, Process* process)
@@ -485,6 +498,23 @@ namespace cmsx.kernel
             case 4u: value = cast<ulong>(mem.ReadUInt(address, Protection.read)); break;
             case 8u: value = cast<ulong>(mem.ReadULong(address, Protection.read)); break;
             default: regs.SetSpecial(Registers.rV, prevRV); return -1;
+        }
+        regs.SetSpecial(Registers.rV, prevRV);
+        return 0;
+    }
+
+    public nothrow int ReadProcessMemory(Machine& machine, Process* process, ulong address, byte* buffer, ulong size)
+    {
+        Memory& mem = machine.GetMemory();
+        Registers& regs = machine.GetRegisters();
+        ulong prevRV = regs.GetSpecial(Registers.rV);
+        MemoryTable& memoryTable = process->memoryTable;
+        regs.SetSpecial(Registers.rV, memoryTable.virtualTranslationRegisterValue);
+        for (ulong i = 0u; i < size; ++i)
+        {
+            *buffer = mem.ReadByte(address, Protection.read);
+            ++buffer;
+            ++address;
         }
         regs.SetSpecial(Registers.rV, prevRV);
         return 0;
@@ -516,9 +546,35 @@ namespace cmsx.kernel
         }
     }
 
+    public nothrow int WriteProcessMemory(Machine& machine, Process* process, ulong targetAddress, byte* source, ulong size, Protection access)
+    {
+        if (process->state == Process.State.created || process->state == Process.State.readyToRun || process->state == Process.State.running || process->state == Process.State.asleep)
+        {
+            Memory& mem = machine.GetMemory();
+            Registers& regs = machine.GetRegisters();
+            ulong prevRV = regs.GetSpecial(Registers.rV);
+            MemoryTable& memoryTable = process->memoryTable;
+            regs.SetSpecial(Registers.rV, memoryTable.virtualTranslationRegisterValue);
+            ulong address = targetAddress;
+            for (ulong i = 0u; i < size; ++i)
+            {
+                mem.WriteByte(address, *source, access);
+                ++address;
+                ++source;
+            }
+            regs.SetSpecial(Registers.rV, prevRV);
+            return 0;
+        }
+        else
+        {
+            return -1;
+        }
+    }
+
     public nothrow void InitializeIdleProcess(Machine& machine, ProcessTable& processTable, Process* idleProcess)
     {
         idleProcess->pid = idlePID;
+        idleProcess->name = "idle";
         idleProcess->state = Process.State.readyToRun;
         idleProcess->parent = null;
         idleProcess->firstChild = null;
@@ -527,7 +583,7 @@ namespace cmsx.kernel
         idleProcess->nextFree = null;
         idleProcess->nextReadyToRun = idleProcess;
         idleProcess->prevReadyToRun = idleProcess;
-        InitializeProcessMemory(machine, idleProcess);
+        InitializeProcessMemory(machine, idleProcess, 4096u, 4096u, 0u, 0u, 4096u);
         Registers& regs = machine.GetRegisters();
         Memory& mem = machine.GetMemory();
         MemoryTable& memoryTable = idleProcess->memoryTable;
@@ -553,14 +609,28 @@ namespace cmsx.kernel
         processTable.AddProcessToProcessMap(idleProcess);
     }
 
+    public Process* CreateSingleProcess(Machine& machine, ProcessTable& processTable, const string& name,
+        ulong textSegmentBaseAddress, ulong textSegmentSize, ulong dataSegmentSize, ulong poolSegmentSize, ulong stackSegmentSize)
+    {
+        Process* idleProcess = processTable.GetIdle();
+        InitializeIdleProcess(machine, processTable, idleProcess);
+        Process* process = CreateProcess(processTable, name, textSegmentBaseAddress, textSegmentSize, dataSegmentSize, poolSegmentSize, stackSegmentSize);
+        if (process == null)
+        {
+            Panic("could not create process");
+        }
+        SetProcessReadyToRun(processTable, process);
+        return process;
+    }
+
     public void CreateInitAndIdleProcessess(Machine& machine, ProcessTable& processTable)
     {
         Process* idleProcess = processTable.GetIdle();
         InitializeIdleProcess(machine, processTable, idleProcess);
-        Process* initProcess = CreateProcess(processTable);
+        Process* initProcess = CreateProcess(processTable, "init", 4096u, 4096u, 0u, 0u, 4096u);
         if (initProcess == null)
         {
-            throw Exception("could not create init process");
+            Panic("could not create init process");
         }
         processTable.SetInit(initProcess);
         Registers& regs = machine.GetRegisters();
@@ -663,7 +733,7 @@ namespace cmsx.kernel
         Process*  idle = processTable.GetIdle();
         if (running == idle)
         {
-            running->sp = processor.SaveContext(running->memoryTable.virtualTranslationRegisterValue, running->sp, &running->retValRegAddress);
+            running->sp = processor.SaveContext(running->memoryTable.virtualTranslationRegisterValue, running->sp, &running->regAXAddress, &running->regBXAddress);
             running = null;
             processTable.SetRunning(running);
         }
@@ -687,7 +757,7 @@ namespace cmsx.kernel
             {
                 if (prevRunning->state != Process.State.zombie)
                 {
-                    prevRunning->sp = processor.SaveContext(prevRunning->memoryTable.virtualTranslationRegisterValue, prevRunning->sp, &prevRunning->retValRegAddress);
+                    prevRunning->sp = processor.SaveContext(prevRunning->memoryTable.virtualTranslationRegisterValue, prevRunning->sp, &prevRunning->regAXAddress, &prevRunning->regBXAddress);
                 }
                 if (prevRunning->state == Process.State.running)
                 {

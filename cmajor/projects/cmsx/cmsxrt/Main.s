@@ -1,6 +1,6 @@
         EXTERN Main
 
 Main    FUNC
-        GO $0,main
-        GO $0,Exit
+        CALL $0,main
+        CALL $0,exit
 Main    ENDF

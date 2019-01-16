@@ -275,7 +275,7 @@ namespace cmsx.machine
             ulong rootPageAddress = AllocatePage();
             return rootPageAddress;
         }
-        public nothrow void FreePage(ulong pageAddress)
+        public void FreePage(ulong pageAddress)
         {
             HashMap<ulong, PageFrame*>.ConstIterator it = pageFrameMap.CFind(pageAddress);
             if (it != pageFrameMap.CEnd())
@@ -292,15 +292,14 @@ namespace cmsx.machine
             }
             else
             {
-                Console.Error() << "page frame for page address " << ToHexString(pageAddress) + " not found" << endl();
-                RtExit(1);
+                Panic("page frame for page address " + ToHexString(pageAddress) + " not found");
             }
         }
         public nothrow void FreeRootPage(ulong rootPageAddress)
         {
             FreePage(rootPageAddress);
         }
-        public nothrow void SharePage(ulong pageAddress)
+        public void SharePage(ulong pageAddress)
         {
             HashMap<ulong, PageFrame*>.ConstIterator it = pageFrameMap.CFind(pageAddress);
             if (it != pageFrameMap.CEnd())
@@ -311,8 +310,7 @@ namespace cmsx.machine
             }
             else
             {
-                Console.Error() << "page frame for page address " << ToHexString(pageAddress) + " not found" << endl();
-                RtExit(1);
+                Panic("page frame for page address " + ToHexString(pageAddress) + " not found");
             }
         }
         public nothrow void CopyPage(ulong fromAddress, ulong toAddress)

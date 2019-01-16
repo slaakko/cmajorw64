@@ -53,6 +53,9 @@ namespace cmsx.kernel
         TrapHandler forkSystemCallHandler = Fork;
         ulong forkSystemCallAddress = cast<ulong>(cast<void*>(forkSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(forkSystemCall), forkSystemCallAddress, Protection.write);
+        TrapHandler writeSystemCallHandler = Write;
+        ulong writeSystemCallAddress = cast<ulong>(cast<void*>(writeSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(writeSystemCall), writeSystemCallAddress, Protection.write);
     }
 
     public void Boot(Machine& machine)
@@ -67,13 +70,29 @@ namespace cmsx.kernel
         InitializeSystemCalls(machine);
         Kernel& kernel = Kernel.Instance();
         ProcessTable& processTable = kernel.GetProcessTable();
-        CreateInitAndIdleProcessess(machine, processTable);
+        int pid = -1;
+        if (Machine.GetFlag(Machine.Flags.runProgram))
+        {
+            pid = Load(kernel.GetProgramFileName(), kernel.GetProgramArguments());
+            kernel.SetProgramPID(pid);
+        }
+        else
+        {
+            CreateInitAndIdleProcessess(machine, processTable);
+        }
         Schedule(machine, processTable);
         SetProcessorToUserMode(regs);
         EnableAllInterrupts(regs);
         if (Machine.GetFlag(Machine.Flags.verbose))
         {
             Console.Out() << "\b\b\b, done." << endl();
+        }
+        if (Machine.GetFlag(Machine.Flags.runProgram))
+        {
+            if (Machine.GetFlag(Machine.Flags.verbose))
+            {
+                Console.Out() << "running program '" << kernel.GetProgramFileName() << "' as process " << pid << endl();
+            }
         }
     }
 }

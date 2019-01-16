@@ -20,7 +20,14 @@ namespace cmsx.machine
     {
         public const long tick = 50; // 50 ms
 
-        public Clock(Machine& machine_) : machine(machine_)
+        static Clock() : instance(new Clock())
+        {
+        }
+        public static Clock& Instance()
+        {
+            return *instance;
+        }
+        private Clock() : machine(GetMachine())
         {
         }
         public void Start()
@@ -53,10 +60,10 @@ namespace cmsx.machine
             catch (const Exception& ex)
             {
                 Console.Error() << "clock: " << ex.ToString() << endl();
-                RtExit(1);
             }
         }
-        private Machine& machine; 
+        private static UniquePtr<Clock> instance;
+        private Machine& machine;
         private RecursiveMutex mtx;
         private ConditionVariable stop;
         private Thread thread;

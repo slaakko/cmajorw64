@@ -32,7 +32,7 @@ namespace cmsx.machine
 
     public const ulong ALL_INTERRUPT_BITS = 0xFFFFFFFFFFFFFFFFu;
 
-    public nothrow delegate void InterruptHandler(Machine& machine, byte irq);
+    public delegate void InterruptHandler(Machine& machine, byte irq);
 
     public inline nothrow ulong MakeInterruptHandlerPtrAddress(byte irq)
     {

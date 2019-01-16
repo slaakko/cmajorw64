@@ -5,7 +5,7 @@ namespace cmsx.object
 {
     public enum LinkCode : byte
     {
-        forwardLongJump = 0u, forwardShortJump = 1u, absoluteAddrValue = 2u, farJump = 3u, farOcta = 4u
+        forwardLongJump = 0u, forwardShortJump = 1u, absoluteAddrValue = 2u, farJump = 3u, farOcta = 4u, once = 5u
     }
 
     public const int maxLinkCodeStrLength = 17;
@@ -17,8 +17,8 @@ namespace cmsx.object
             case LinkCode.forwardLongJump: return  "LINKFWDLONGJUMP";
             case LinkCode.forwardShortJump: return "LINKFWDSHORTJMP";
             case LinkCode.absoluteAddrValue: return "LINKABSOLUTEADDR";
-            case LinkCode.farJump: return "LINKFARJUMP";
             case LinkCode.farOcta: return "LINKFAROCTA";
+            case LinkCode.once: return "LINKONCE";
         }
         return "";
     }
@@ -29,9 +29,18 @@ namespace cmsx.object
         {
         }
         public default virtual ~LinkCommand();
-        public abstract void Execute(ulong value);
+        public virtual void Execute(ulong value)
+        {
+        }
         public ObjectFile* objectFile;
         public ulong address;
+    }
+
+    public class LinkOnceCommand : LinkCommand
+    {
+        public nothrow LinkOnceCommand(ObjectFile* objectFile_) : base(objectFile_, 0u)
+        {
+        }
     }
 
     public class LinkAbsoluteAddressCommand : LinkCommand
@@ -65,33 +74,6 @@ namespace cmsx.object
             objectFile->codeSection->EmitShortOffset(address + 8u, offset);
             offset = (cast<ushort>(b1) << 8u) | cast<ushort>(b0);
             objectFile->codeSection->EmitShortOffset(address + 12u, offset);
-        }
-    }
-
-    public class LinkFarJumpCommand : LinkCommand
-    {
-        public nothrow LinkFarJumpCommand(ObjectFile* objectFile_, ulong address_) : base(objectFile_, address_)
-        {
-        }
-        public override void Execute(ulong value)
-        {
-            byte opCode = cmsx.machine.JMP;
-            ulong offset = 0u;
-            if (value >= address)
-            {
-                offset = (value - address) >> 2u;
-            }
-            else
-            {
-                opCode = cmsx.machine.JMPB;
-                offset = (address - value) >> 2u;
-            }
-            if (offset >= cast<ulong>(MaxValue<ushort>()) << 8u)
-            {
-                throw Exception("jump too far");
-            }
-            objectFile->codeSection->EmitByte(address, opCode);
-            objectFile->codeSection->EmitLongOffset(address, cast<uint>(offset));
         }
     }
 
@@ -249,15 +231,6 @@ namespace cmsx.object
                     newLinkSection.EmitULong(address);
                     break;
                 }
-                case LinkCode.farJump:
-                {
-                    uint index = linkSection->GetUInt();
-                    ulong address = linkSection->GetULong();
-                    newLinkSection.EmitByte(LinkCode.farJump);
-                    newLinkSection.EmitUInt(cast<uint>(index));
-                    newLinkSection.EmitULong(address);
-                    break;
-                }
                 case LinkCode.farOcta:
                 {
                     uint index = linkSection->GetUInt();
@@ -267,14 +240,24 @@ namespace cmsx.object
                     newLinkSection.EmitULong(address);
                     break;
                 }
+                case LinkCode.once:
+                {
+                    uint index = linkSection->GetUInt();
+                    newLinkSection.EmitByte(LinkCode.once);
+                    newLinkSection.EmitUInt(cast<uint>(index));
+                    break;
+                }
             }
             x = linkSection->GetByte();
         }
         Swap(linkSection->data, newLinkSection.data);
     }
 
-    public void ProcessSymbols(LinkTable& linkTable, ExecutableFile& executable, SymbolTable& objectFileSymbolTable)
+    public void ProcessSymbols(LinkTable& linkTable, ExecutableFile& executable, ObjectFile* objectFile)
     {
+        SymbolTable& objectFileSymbolTable = objectFile->GetSymbolTable();
+        objectFile->codeSection->removeOffset = 0u;
+        objectFile->dataSection->removeOffset = 0u;
         SymbolTable& executableSymbolTable = executable.GetSymbolTable();
         for (const UniquePtr<Symbol>& symbol : objectFileSymbolTable.Symbols())
         {
@@ -282,6 +265,7 @@ namespace cmsx.object
             {
                 if (symbol->value.GetFlag(Value.Flag.address) && symbol->value.GetFlag(Value.Flag.address) && (symbol->segment == Segment.text || symbol->segment == Segment.data))
                 {
+                    symbol->value.value = symbol->value.value - symbol->section->removeOffset;
                     symbol->start = symbol->section->baseAddress + symbol->value.value;
                     Symbol* executableSymbol = symbol->Clone();
                     #assert(executableSymbol->section != null);
@@ -292,7 +276,7 @@ namespace cmsx.object
                     executableSymbolTable.AddInternalSymbol(executableSymbol, true);
                 }
             }
-            else if (symbol->linkage == Linkage.external)
+            else if (symbol->linkage == Linkage.external || symbol->linkage == Linkage.undefined)
             {
                 if (symbol->value.GetFlag(Value.Flag.address) && symbol->value.GetFlag(Value.Flag.address) && (symbol->segment == Segment.text || symbol->segment == Segment.data))
                 {
@@ -307,8 +291,10 @@ namespace cmsx.object
                     }
                     else
                     {
+                        symbol->value.value = symbol->value.value - symbol->section->removeOffset;
                         symbol->start = symbol->section->baseAddress + symbol->value.value;
                         Symbol* executableSymbol = symbol->Clone();
+                        executableSymbol->linkage = Linkage.external;
                         #assert(executableSymbol->section != null);
                         if (executableSymbol->section is DataSection*)
                         {
@@ -324,6 +310,7 @@ namespace cmsx.object
                     if (prevSymbol != null)
                     {
                         symbol->start = prevSymbol->start;
+                        symbol->linkage = Linkage.external;
                     }
                 }
             }
@@ -334,6 +321,7 @@ namespace cmsx.object
                     Symbol* prevSymbol = executableSymbolTable.GetSymbol(symbol->name);
                     if (prevSymbol == null)
                     {
+                        symbol->value.value = symbol->value.value - symbol->section->removeOffset;
                         symbol->start = symbol->section->baseAddress + symbol->value.value;
                         Symbol* executableSymbol = symbol->Clone();
                         #assert(executableSymbol->section != null);
@@ -347,6 +335,7 @@ namespace cmsx.object
                     else
                     {
                         symbol->linkage = Linkage.remove;
+                        symbol->section->removeOffset = symbol->section->removeOffset + symbol->length;
                     }
                 }
             }
@@ -358,11 +347,9 @@ namespace cmsx.object
         SymbolTable& executableSymbolTable = executable.GetSymbolTable();
         Section* codeSection = objectFile->codeSection;
         codeSection->copyStartPos = 0u;
-        codeSection->copyLength = 0u;
         codeSection->copyTargetSection = executable.codeSection;
         Section* dataSection = objectFile->dataSection;
         dataSection->copyStartPos = 0u;
-        dataSection->copyLength = 0u;
         dataSection->copyTargetSection = executable.dataSection;
         Section* linkSection = objectFile->linkSection;
         linkSection->pos = 0u;
@@ -392,22 +379,6 @@ namespace cmsx.object
                     linkCommand.Reset(new LinkAbsoluteAddressCommand(objectFile, address));
                     break;
                 }
-                case LinkCode.farJump:
-                {
-                    uint index = linkSection->GetUInt();
-                    ulong address = linkSection->GetULong();
-                    symbol = objectFile->GetSymbolTable().GetSymbol(cast<int>(index));
-                    if (symbol->value.flags == Value.Flag.undefined)
-                    {
-                        Symbol* executableSymbol = executableSymbolTable.GetSymbol(symbol->name);
-                        if (executableSymbol != null)
-                        {
-                            symbol = executableSymbol;
-                        }
-                    }
-                    linkCommand.Reset(new LinkFarJumpCommand(objectFile, address));
-                    break;
-                }
                 case LinkCode.farOcta:
                 {
                     uint index = linkSection->GetUInt();
@@ -424,6 +395,21 @@ namespace cmsx.object
                     linkCommand.Reset(new LinkFarOctaCommand(objectFile, address));
                     break;
                 }
+                case LinkCode.once:
+                {
+                    uint index = linkSection->GetUInt();
+                    symbol = objectFile->GetSymbolTable().GetSymbol(cast<int>(index));
+                    if (symbol->value.flags == Value.Flag.undefined)
+                    {
+                        Symbol* executableSymbol = executableSymbolTable.GetSymbol(symbol->name);
+                        if (executableSymbol != null)
+                        {
+                            symbol = executableSymbol;
+                        }
+                    }
+                    linkCommand.Reset(new LinkOnceCommand(objectFile));
+                    break;
+                }
                 default:
                 {
                     symbol = null;
@@ -435,10 +421,9 @@ namespace cmsx.object
             {
                 if (symbol->linkage == Linkage.remove)
                 {
-                    if (symbol->section->copyLength > 0u)
+                    if (symbol->value.value >= symbol->section->copyStartPos)
                     {
-                        linkTable.AddCopyRange(CopyRange(symbol->section, symbol->section->copyTargetSection, symbol->section->copyStartPos, symbol->section->copyLength));
-                        symbol->section->copyLength = 0u;
+                        linkTable.AddCopyRange(CopyRange(symbol->section, symbol->section->copyTargetSection, symbol->section->copyStartPos, symbol->value.value - symbol->section->copyStartPos));
                     }
                     symbol->section->copyStartPos = symbol->value.value + symbol->length;
                     symbol->section->length = symbol->section->length - symbol->length;
@@ -448,7 +433,6 @@ namespace cmsx.object
                     if (symbol->value.value >= symbol->section->copyStartPos)
                     {
                         linkCommand->Execute(symbol->start);
-                        symbol->section->copyLength = symbol->value.value - symbol->section->copyStartPos;
                     }
                 }
                 else if (symbol->value.flags == Value.Flag.undefined)
@@ -466,6 +450,10 @@ namespace cmsx.object
         {
             linkTable.AddCopyRange(CopyRange(dataSection, dataSection->copyTargetSection, dataSection->copyStartPos, prevDataSectionLength - dataSection->copyStartPos));
         }
+        codeSection->copyStartPos = 0u;
+        codeSection->copyTargetSection = null;
+        dataSection->copyStartPos = 0u;
+        dataSection->copyTargetSection = null;
     }
 
     public void LinkObjectFile(LinkTable& linkTable, ExecutableFile& executable, ObjectFile* objectFile, Section*& prevCodeSection, Section*& prevDataSection)
@@ -493,7 +481,7 @@ namespace cmsx.object
             dataSection->baseAddress = prevDataSection->baseAddress + prevDataSection->length;
         }
         prevDataSection = dataSection;
-        ProcessSymbols(linkTable, executable, objectFile->GetSymbolTable());
+        ProcessSymbols(linkTable, executable, objectFile);
         ProcessLinkSection(linkTable, executable, objectFile);
     }
 

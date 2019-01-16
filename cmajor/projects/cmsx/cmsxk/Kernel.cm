@@ -1,15 +1,9 @@
 using System;
-
-using System;
+using System.Collections;
 using cmsx.machine;
 
 namespace cmsx.kernel
 {
-    public Machine& GetMachine()
-    {
-        return Machine.Instance();
-    }
-
     public class Kernel
     {
         static Kernel() : instance(new Kernel())
@@ -39,9 +33,36 @@ namespace cmsx.kernel
         {
             return memoryTable;
         }
+        public nothrow void SetProgramFileName(const string& programFileName_)
+        {
+            programFileName = programFileName_;
+        }
+        public nothrow void SetProgramArguments(const List<string>& programArguments_)
+        {
+            programArguments = programArguments_;
+        }
+        public nothrow const string& GetProgramFileName() const
+        {
+            return programFileName;
+        }
+        public nothrow const List<string>& GetProgramArguments() const
+        {
+            return programArguments;
+        }
+        public nothrow void SetProgramPID(int pid)
+        {
+            programPID = pid;
+        }
+        public nothrow int GetProgramPID()
+        {
+            return programPID;
+        }
         private static UniquePtr<Kernel> instance;
         private Machine& machine;
         private ProcessTable& processTable;
         private MemoryTable memoryTable;
+        private string programFileName;
+        private List<string> programArguments;
+        private int programPID;
     }
 }

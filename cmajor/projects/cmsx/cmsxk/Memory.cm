@@ -44,6 +44,23 @@ namespace cmsx.kernel
         memoryTable.virtualTranslationRegisterValue = MakeVirtualTranslationRegisterValue(memoryTable.rootPageAddress, memoryTable.addressSpaceNumber);
     }
 
+    public nothrow void InitializeMemoryTable(Machine& machine, MemoryTable& memoryTable,
+        ulong textSegmentBaseAddress, ulong textSegmentSize, ulong dataSegmentSize, ulong poolSegmentSize, ulong stackSegmentSize)
+    {
+        Memory& mem = machine.GetMemory();
+        memoryTable.rootPageAddress = mem.AllocateRootPage();
+        memoryTable.addressSpaceNumber = GetNextAddressSpaceNumber();
+        if (textSegmentBaseAddress == 0u)
+        {
+            textSegmentBaseAddress = pageSize;
+        }
+        memoryTable.segmentDescriptors[textSegmentIndex] = CreateSegmentDescriptor(textSegmentBaseAddress, textSegmentSize);
+        memoryTable.segmentDescriptors[dataSegmentIndex] = CreateSegmentDescriptor(0u, dataSegmentSize);
+        memoryTable.segmentDescriptors[poolSegmentIndex] = CreateSegmentDescriptor(0u, poolSegmentSize);
+        memoryTable.segmentDescriptors[stackSegmentIndex] = CreateSegmentDescriptor(0u, stackSegmentSize);
+        memoryTable.virtualTranslationRegisterValue = MakeVirtualTranslationRegisterValue(memoryTable.rootPageAddress, memoryTable.addressSpaceNumber);
+    }
+
     public nothrow void InitializeMemoryTableForCloning(Machine& machine, MemoryTable& memoryTable)
     {
         Memory& mem = machine.GetMemory();

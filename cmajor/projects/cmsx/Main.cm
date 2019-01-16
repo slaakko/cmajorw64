@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Threading;
 using cmsx.machine;
 using cmsx.kernel;
@@ -27,6 +28,15 @@ void Run(Machine& machine)
 void Terminate(Machine& machine)
 {
     Kernel& kernel = Kernel.Instance();
+    if (Machine.GetFlag(Machine.Flags.runProgram))
+    {
+        int pid = kernel.GetProgramPID();
+        Process* process = kernel.GetProcessTable().GetProcess(pid);
+        if (process != null)
+        {
+            Console.Out() << "program exited with code " << process->exitCode << endl();
+        }
+    }
     Registers& regs = machine.GetRegisters();
     SetProcessorToKernelMode(regs);
     regs.SetSpecial(Registers.rV, MakeVirtualTranslationRegisterValue(machine.GetKernelRootPageAddress(), kernelAddressSpaceNumber));
@@ -49,18 +59,24 @@ void MachineThreadFunction(void* machineParam)
     catch (const Exception& ex)
     {
         System.Console.Error() << ex.ToString() << endl();
-        RtExit(1);
     }
 }
 
 class MachineDriver
 {
-    public MachineDriver(Machine& machine_) : machine(machine_), machineThread(Thread.StartFunction(MachineThreadFunction, &machine))
+    public MachineDriver(Machine& machine_) : machine(machine_), machineThread()
     {
+    }
+    public void RunThread()
+    {
+        machineThread = Thread.StartFunction(MachineThreadFunction, &machine);
     }
     public ~MachineDriver()
     {
-        machine.Exit();
+        if (!Machine.GetFlag(Machine.Flags.runProgram))
+        {
+            machine.Exit();
+        }
         machineThread.Join();
     }
     private Machine& machine;
@@ -71,14 +87,18 @@ void Run()
 {
     Machine& machine = Machine.Instance();
     MachineDriver machineDriver(machine);
-    string line = Console.ReadLine();
-    while (!Console.In().EndOfStream())
+    machineDriver.RunThread();
+    if (!machine.GetFlag(Machine.Flags.runProgram))
     {
-        if (line == "logout" || line == "exit")
+        string line = Console.ReadLine();
+        while (!Console.In().EndOfStream())
         {
-            break;
+            if (line == "logout" || line == "exit")
+            {
+                break;
+            }
+            line = Console.ReadLine();
         }
-        line = Console.ReadLine();
     }
 }
 
@@ -87,10 +107,13 @@ int main(int argc, const char** argv)
     Debug.Start();
     try
     {
+        string programFileName;
+        List<string> programArguments;
+        bool cmsxOptions = true;
         for (int i = 1; i < argc; ++i)
         {
             string arg = argv[i];
-            if (arg.StartsWith("-"))
+            if (cmsxOptions && arg.StartsWith("-"))
             {
                 if (arg == "--verbose" || arg == "-v")
                 {
@@ -104,7 +127,26 @@ int main(int argc, const char** argv)
                 {
                     Machine.SetFlag(Machine.Flags.debug);
                 }
+                else
+                {
+                    throw Exception("unknown option '" + arg + "'");
+                }
             }
+            else if (programFileName.IsEmpty())
+            {
+                programFileName = arg;
+                cmsxOptions = false;
+                Machine.SetFlag(Machine.Flags.runProgram);
+            }
+            else
+            {
+                programArguments.Add(arg);
+            }
+        }
+        if (Machine.GetFlag(Machine.Flags.runProgram))
+        {
+            Kernel.Instance().SetProgramFileName(programFileName);
+            Kernel.Instance().SetProgramArguments(programArguments);
         }
         Run();
     }

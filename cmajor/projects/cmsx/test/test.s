@@ -11,8 +11,6 @@ main    FUNC
 @1      LDB $0,data
         BNZ $0,@1
         TRAP 0,0,0
-        JMP sub
-        JMP foo
 main    ENDF        
         
 sub     FUNC

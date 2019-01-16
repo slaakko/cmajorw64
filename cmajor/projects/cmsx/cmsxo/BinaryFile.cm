@@ -96,10 +96,9 @@ namespace cmsx.object
         writer.Write(x0);
     }
 
-    public UniquePtr<BinaryFile> ReadBinaryFile(const string& fileName)
+    public UniquePtr<BinaryFile> ReadBinaryFile(System.IO.BinaryReader& reader, const string& fileName)
     {
         UniquePtr<BinaryFile> file;
-        System.IO.BinaryReader reader = System.IO.File.OpenBinary(fileName);        
         string fileHeaderName = ReadHeaderName(fileName, reader, 8);
         string headerBaseName = fileHeaderName.Substring(0, fileHeaderName.Length() - 1);
         string fileVersion = fileHeaderName.Substring(fileHeaderName.Length() - 1, 1);
@@ -107,7 +106,7 @@ namespace cmsx.object
         {
             if (fileVersion == ObjectFileVersionStr())
             {
-                file.Reset(new ObjectFile(fileName, false));
+                file.Reset(new ObjectFile(fileName, false, false));
             }
             else
             {
@@ -118,7 +117,7 @@ namespace cmsx.object
         {
             if (fileVersion == LibraryFileVersionStr())
             {
-                file.Reset(new LibraryFile(fileName, false));
+                file.Reset(new LibraryFile(fileName, false, false));
             }
             else
             {
@@ -129,7 +128,7 @@ namespace cmsx.object
         {
             if (fileVersion == ExecutableFileVersionStr())
             {
-                file.Reset(new ExecutableFile(fileName, false));
+                file.Reset(new ExecutableFile(fileName, false, false, 0u, 0u));
             }
             else
             {
@@ -142,6 +141,12 @@ namespace cmsx.object
         }
         file->Read(reader);
         return file;
+    }
+
+    public UniquePtr<BinaryFile> ReadBinaryFile(const string& fileName)
+    {
+        System.IO.BinaryReader reader = System.IO.File.OpenBinary(fileName);
+        return ReadBinaryFile(reader, fileName);
     }
 
     public class BinaryFileFormatter : Formatter
@@ -185,7 +190,7 @@ namespace cmsx.object
 
     public class BinaryFile
     {
-        public nothrow BinaryFile(const string& fileName_, Section* headerSection_) : fileName(fileName_), headerSection(headerSection_)
+        public nothrow BinaryFile(const string& fileName_, Section* headerSection_, bool initSymbolTable) : fileName(fileName_), headerSection(headerSection_), symbolTable(this, initSymbolTable)
         {
         }
         public default virtual ~BinaryFile();
@@ -201,6 +206,10 @@ namespace cmsx.object
             section->file = this;
             sections.Add(UniquePtr<Section>(section));
         }
+        public nothrow Section* GetHeaderSection() const
+        {
+            return headerSection.Get();
+        }
         public virtual nothrow Section* GetCodeSection()  const
         {
             return null;
@@ -213,19 +222,19 @@ namespace cmsx.object
         {
             if (sectionName == "CODE")
             {
-                return new CodeSection();
+                return new CodeSection(this);
             }
             else if (sectionName == "DATA")
             {
-                return new DataSection();
+                return new DataSection(this);
             }
             else if (sectionName == "SYMB")
             {
-                return new SymbolSection();
+                return new SymbolSection(this);
             }
             else if (sectionName == "LINK")
             {
-                return new LinkSection();
+                return new LinkSection(this);
             }
             else
             {
@@ -235,7 +244,12 @@ namespace cmsx.object
         public void Write()
         {
             System.IO.BinaryWriter writer = System.IO.File.CreateBinary(fileName);
+            Write(writer);
+        }
+        public virtual void Write(System.IO.BinaryWriter& writer)
+        {
             WriteHeaderName(writer, headerSection->name);
+            headerSection->Write(writer);
             ulong numSections = cast<ulong>(sections.Count());
             WriteULong(writer, numSections);
             for (const UniquePtr<Section>& section : sections)
@@ -244,8 +258,9 @@ namespace cmsx.object
                 section->Write(writer);
             }
         }
-        public void Read(System.IO.BinaryReader& reader)
+        public virtual void Read(System.IO.BinaryReader& reader)
         {
+            headerSection->Read(reader);
             ulong numSections = ReadULong(fileName, reader);
             for (ulong i = 0u; i < numSections; ++i)
             {
@@ -260,6 +275,7 @@ namespace cmsx.object
         }
         public virtual void Dump(StreamWriter& writer)
         {
+            headerSection->Dump(writer);
             for (const UniquePtr<Section>& section : sections)
             {
                 section->Dump(writer);
@@ -282,17 +298,17 @@ namespace cmsx.object
 
     public class ObjectFile : BinaryFile
     {
-        public ObjectFile(const string& fileName_, bool createSections_) : base(fileName_, new ObjectFileHeaderSection())
+        public ObjectFile(const string& fileName_, bool createSections_, bool initSymbolTable) : base(fileName_, new ObjectFileHeaderSection(this), initSymbolTable)
         {
             if (createSections_)
             {
-                AddSection(new CodeSection());
-                AddSection(new DataSection());
-                AddSection(new SymbolSection());
-                AddSection(new LinkSection());
+                AddSection(new CodeSection(this));
+                AddSection(new DataSection(this));
+                AddSection(new SymbolSection(this));
+                AddSection(new LinkSection(this));
             }
         }
-        public ObjectFile(const string& fileName_) : this(fileName_, true)
+        public ObjectFile(const string& fileName_, bool initSymbolTable) : this(fileName_, true, initSymbolTable)
         {
         }
         public override void AddSection(Section* section)
@@ -335,28 +351,94 @@ namespace cmsx.object
 
     public class LibraryFile : BinaryFile
     {
-        public LibraryFile(const string& fileName_, bool createSections_) : base(fileName_, new LibraryFileHeaderSection())
+        public LibraryFile(const string& fileName_, bool createSections_, bool initSymbolTable) : base(fileName_, new LibraryFileHeaderSection(this), initSymbolTable)
         {
         }
-        public LibraryFile(const string& fileName_) : this(fileName_, true)
+        public LibraryFile(const string& fileName_, bool initSymbolTable) : this(fileName_, true, initSymbolTable)
         {
+        }
+        public override void Write(System.IO.BinaryWriter& writer)
+        {
+            base->Write(writer);
+            ulong numObjectFiles = cast<ulong>(objectFiles.Count());
+            WriteULong(writer, numObjectFiles);
+            for (const UniquePtr<ObjectFile>& objectFile : objectFiles)
+            {
+                writer.Write(objectFile->FileName());
+                objectFile->Write(writer);
+            }
+        }
+        public override void Read(System.IO.BinaryReader& reader)
+        {
+            base->Read(reader);
+            ulong numObjectFiles = ReadULong(FileName(), reader);
+            for (ulong i = 0u; i < numObjectFiles; ++i)
+            {
+                string objectFileName = reader.ReadString();
+                UniquePtr<BinaryFile> binaryFile = ReadBinaryFile(reader, objectFileName);
+                if (binaryFile.Get() is ObjectFile*)
+                {
+                    objectFiles.Add(UniquePtr<ObjectFile>(cast<ObjectFile*>(binaryFile.Release())));
+                }
+                else
+                {
+                    throw Exception("object file expected");
+                }
+            }
+        }
+        public override void Dump(StreamWriter& writer)
+        {
+            writer.WriteLine(ToString(objectFiles.Count()) + " object files:");
+            for (UniquePtr<ObjectFile>& objectFile : objectFiles)
+            {
+                writer.WriteLine(objectFile->FileName() + ":");
+                objectFile->Dump(writer);
+                writer.WriteLine();
+            }
         }
         public List<UniquePtr<ObjectFile>> objectFiles;
     }
 
     public class ExecutableFile : BinaryFile
     {
-        public ExecutableFile(const string& fileName_, bool createSections_) : base(fileName_, new ExecutableFileHeaderSection())
+        public ExecutableFile(const string& fileName_, bool createSections_, bool initSymbolTable, ulong stackSize_, ulong poolSize_) :
+            base(fileName_, new ExecutableFileHeaderSection(this, stackSize_, poolSize_), initSymbolTable)
         {
             if (createSections_)
             {
-                AddSection(new CodeSection());
-                AddSection(new DataSection());
-                AddSection(new SymbolSection());
+                AddSection(new CodeSection(this));
+                AddSection(new DataSection(this));
+                AddSection(new SymbolSection(this));
             }
         }
-        public ExecutableFile(const string& fileName_) : this(fileName_, true)
+        public ExecutableFile(const string& fileName_, bool initSymbolTable, ulong stackSize_, ulong poolSize_) : this(fileName_, true, initSymbolTable, stackSize_, poolSize_)
         {
+        }
+        public nothrow ulong StackSize() const
+        {
+            Section* headerSection = GetHeaderSection();
+            if (headerSection is ExecutableFileHeaderSection*)
+            {
+                ExecutableFileHeaderSection* executableFileHeaderSection = cast<ExecutableFileHeaderSection*>(headerSection);
+                return executableFileHeaderSection->stackSize;
+            }
+            else
+            {
+                return 0u;
+            }
+        }
+        public nothrow ulong PoolSize() const
+        {
+            Section* headerSection = GetHeaderSection();
+            if (headerSection is ExecutableFileHeaderSection*)
+            {
+                ExecutableFileHeaderSection* executableFileHeaderSection = cast<ExecutableFileHeaderSection*>(headerSection);
+                return executableFileHeaderSection->poolSize;
+            }
+            else
+            {
+                return 0u;
+            }
         }
         public override nothrow Section* GetCodeSection()  const
         {
@@ -393,7 +475,10 @@ namespace cmsx.object
 
     public abstract class Section
     {
-        public nothrow Section(const string& name_) : file(null), name(name_), pos(0), baseAddress(0u), length(0u), copyStartPos(0u), copyLength(0u)
+        public nothrow Section() : file(null), name(), pos(0), baseAddress(0u), length(0u), copyStartPos(0u), removeOffset(0u)
+        {
+        }
+        public nothrow Section(BinaryFile* file_, const string& name_) : file(file_), name(name_), pos(0), baseAddress(0u), length(0u), copyStartPos(0u), removeOffset(0u)
         {
         }
         public default virtual ~Section();
@@ -637,34 +722,74 @@ namespace cmsx.object
         public ulong baseAddress;
         public ulong length;
         public ulong copyStartPos;
-        public ulong copyLength;
+        public ulong removeOffset;
         public Section* copyTargetSection;
     }
 
     public class ObjectFileHeaderSection : Section
     {
-        public nothrow ObjectFileHeaderSection() : base("CMSXOBJ" + ObjectFileVersionStr())
+        public nothrow ObjectFileHeaderSection(BinaryFile* file_) : base(file_, "CMSXOBJ" + ObjectFileVersionStr())
+        {
+        }
+        public override void Write(System.IO.BinaryWriter& writer)
+        {
+        }
+        public override void Read(System.IO.BinaryReader& reader)
+        {
+        }
+        public override void Dump(StreamWriter& writer)
         {
         }
     }
 
     public class LibraryFileHeaderSection : Section
     {
-        public nothrow LibraryFileHeaderSection() : base("CMSXLIB" + LibraryFileVersionStr())
+        public nothrow LibraryFileHeaderSection(BinaryFile* file_) : base(file_, "CMSXLIB" + LibraryFileVersionStr())
+        {
+        }
+        public override void Write(System.IO.BinaryWriter& writer)
+        {
+        }
+        public override void Read(System.IO.BinaryReader& reader)
+        {
+        }
+        public override void Dump(StreamWriter& writer)
         {
         }
     }
 
     public class ExecutableFileHeaderSection : Section
     {
-        public nothrow ExecutableFileHeaderSection() : base("CMSXEXE" + ExecutableFileVersionStr())
+        public nothrow ExecutableFileHeaderSection(BinaryFile* file_, ulong stackSize_, ulong poolSize_) :
+            base(file_, "CMSXEXE" + ExecutableFileVersionStr()), stackSize(stackSize_), poolSize(poolSize_)
         {
         }
+        public override void Write(System.IO.BinaryWriter& writer)
+        {
+            base->Write(writer);
+            WriteULong(writer, stackSize);
+            WriteULong(writer, poolSize);
+        }
+        public override void Read(System.IO.BinaryReader& reader)
+        {
+            base->Read(reader);
+            stackSize = ReadULong(file->FileName(), reader);
+            poolSize = ReadULong(file->FileName(), reader);
+        }
+        public override void Dump(StreamWriter& writer)
+        {
+            writer.WriteLine("HEADER section");
+            writer.WriteLine(Format("stack size:", 17) + " #" + ToHexString(stackSize));
+            writer.WriteLine(Format("pool size:", 17) + " #" + ToHexString(poolSize));
+            writer.WriteLine();
+        }
+        public ulong stackSize;
+        public ulong poolSize;
     }
 
     public class CodeSection : Section
     {
-        public nothrow CodeSection() : base("CODE")
+        public nothrow CodeSection(BinaryFile* file_) : base(file_, "CODE")
         {
         }
         public override void Dump(StreamWriter& writer)
@@ -704,7 +829,7 @@ namespace cmsx.object
 
     public class DataSection : Section
     {
-        public nothrow DataSection() : base("DATA")
+        public nothrow DataSection(BinaryFile* file_) : base(file_, "DATA")
         {
             SetBaseAddress(cmsx.machine.dataSegmentBaseAddress);
         }
@@ -823,7 +948,7 @@ namespace cmsx.object
 
     public class SymbolSection : Section
     {
-        public nothrow SymbolSection() : base("SYMB")
+        public nothrow SymbolSection(BinaryFile* file_) : base(file_, "SYMB")
         {
         }
         public override void Finalize()
@@ -833,13 +958,16 @@ namespace cmsx.object
                 SymbolTable& symbolTable = file->GetSymbolTable();
                 for (const UniquePtr<Symbol>& symbol : symbolTable.Symbols())
                 {
-                    if (symbol->section is CodeSection*)
+                    if (symbol->section != null)
                     {
-                        symbol->value.value = symbol->start - file->GetCodeSection()->BaseAddress();
-                    }
-                    else if (symbol->section is DataSection*)
-                    {
-                        symbol->value.value = symbol->start - file->GetDataSection()->BaseAddress();
+                        if (symbol->section is CodeSection*)
+                        {
+                            symbol->value.value = symbol->start - file->GetCodeSection()->BaseAddress();
+                        }
+                        else if (symbol->section is DataSection*)
+                        {
+                            symbol->value.value = symbol->start - file->GetDataSection()->BaseAddress();
+                        }
                     }
                 }
             }
@@ -1006,7 +1134,28 @@ namespace cmsx.object
                 symbolLine.Append(" ").Append(Format(ToString(symbol->index), 11));
                 symbolLine.Append(" ").Append(Format(symbol->name, 32));
                 symbolLine.Append(" ").Append(Format(SegmentStr(symbol->segment), 7));
-                symbolLine.Append(" ").Append(Format(LinkageStr(symbol->linkage), 8)); 
+                symbolLine.Append(" ").Append(Format(LinkageStr(symbol->linkage), 9)); 
+                symbolLine.Append(" ").Append(ValueStr(symbol->value));
+                if (symbol->value.GetFlag(Value.Flag.function) || symbol->value.GetFlag(Value.Flag.structure))
+                {
+                    symbolLine.Append(" ").Append("#").Append(ToHexString(symbol->start));
+                    symbolLine.Append(" ").Append("#").Append(ToHexString(symbol->length));
+                }
+                writer.WriteLine(symbolLine);
+            }
+            for (const UniquePtr<Symbol>& symbol : symbolTable.InternalSymbols())
+            {
+                string symbolLine;
+                string absoluteAddress;
+                if (symbol->value.GetFlag(Value.Flag.pure))
+                {
+                    absoluteAddress = "#" + ToHexString(symbol->start);
+                }
+                symbolLine.Append(Format(absoluteAddress, 17));
+                symbolLine.Append(" ").Append(Format(ToString(symbol->index), 11));
+                symbolLine.Append(" ").Append(Format(symbol->name, 32));
+                symbolLine.Append(" ").Append(Format(SegmentStr(symbol->segment), 7));
+                symbolLine.Append(" ").Append(Format(LinkageStr(symbol->linkage), 9)); 
                 symbolLine.Append(" ").Append(ValueStr(symbol->value));
                 if (symbol->value.GetFlag(Value.Flag.function) || symbol->value.GetFlag(Value.Flag.structure))
                 {
@@ -1020,7 +1169,7 @@ namespace cmsx.object
 
     public class LinkSection : Section
     {
-        public nothrow LinkSection() : base("LINK")
+        public nothrow LinkSection(BinaryFile* file_) : base(file_, "LINK")
         {
         }
         public override void Dump(StreamWriter& writer)
@@ -1077,6 +1226,12 @@ namespace cmsx.object
                         linkLine.Append(" ").Append(Format(ToString(index), 11));
                         ulong address = GetULong();
                         linkLine.Append(" #").Append(ToHexString(address));
+                        break;
+                    }
+                    case LinkCode.once:
+                    {
+                        uint index = GetUInt();
+                        linkLine.Append(" ").Append(Format(ToString(index), 11));
                         break;
                     }
                 }

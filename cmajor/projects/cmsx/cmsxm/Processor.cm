@@ -16,23 +16,15 @@ namespace cmsx.machine
         }
         public void Run()
         {
-            try
-            {
-                Boot();
-                DoRun();
-                DoExit();
-            }
-            catch (const Exception& ex)
-            {
-                Console.Error() << "processor: " << ex.ToString() << endl();
-                RtExit(1);
-            }
+            Boot();
+            DoRun();
+            DoExit();
         }
         public void Exit()
         {
             exiting = true;
         }
-        public nothrow ulong SaveContext(ulong virtualTranslateionRegisterValue, ulong sp, ulong* retValRegAddress)
+        public nothrow ulong SaveContext(ulong virtualTranslateionRegisterValue, ulong sp, ulong* regAXAddress, ulong* regBXAddress)
         {
             Memory& mem = machine.GetMemory();
             ulong prevRV = regs.GetSpecial(Registers.rV);
@@ -79,9 +71,18 @@ namespace cmsx.machine
             #assert(rg < 256u);
             for (int i = cast<int>(rg); i < 256; ++i)
             {
-                if (retValRegAddress != null && i == 255u)
+                switch (i)
                 {
-                    *retValRegAddress = sp;
+                    case regAX:
+                    {
+                        if (regAXAddress != null) *regAXAddress = sp;
+                        break;
+                    }
+                    case regBX:
+                    {
+                        if (regBXAddress != null) *regBXAddress = sp;
+                        break;
+                    }
                 }
                 mem.WriteULong(sp, regs.Get(cast<byte>(i)), Protection.write);
                 sp = sp + 8u;
@@ -103,13 +104,13 @@ namespace cmsx.machine
             sp = sp - 8u;
             ulong rl = mem.ReadULong(sp, Protection.read);
             regs.SetSpecial(Registers.rL, rl);
-            for (int i = cast<int>(rg); i < 256; ++i)
+            for (int i = 255; i >= cast<int>(rg); --i)
             {
                 sp = sp - 8u;
                 regs.Set(cast<byte>(i), mem.ReadULong(sp, Protection.read));
             }
             int n = cast<int>(rl);
-            for (int i = 0; i < n; ++i)
+            for (int i = n - 1; i >= 0; --i)
             {
                 sp = sp - 8u;
                 regs.Set(cast<byte>(i), mem.ReadULong(sp, Protection.read));
@@ -148,8 +149,7 @@ namespace cmsx.machine
         }
         private void DoRun()
         {
-            Clock clock(machine);
-            ClockDriver clockDriver(clock);
+            ClockDriver clockDriver(Clock.Instance());
             Memory& mem = machine.GetMemory();
             ulong pc = regs.GetPC();
             while (pc != invalidAddress && !exiting)
@@ -283,7 +283,7 @@ namespace cmsx.machine
                 }
             }
         }
-        private nothrow void HandleInterrupt(byte irq, ulong handlerPtrAddress)
+        private void HandleInterrupt(byte irq, ulong handlerPtrAddress)
         {
             ulong prevRV = regs.GetSpecial(Registers.rV);
             bool inKernelMode = IsProcessorInKernelMode(regs);
@@ -302,11 +302,7 @@ namespace cmsx.machine
             }
             else
             {
-                if (!Machine.GetFlag(Machine.Flags.quiet))
-                {
-                    Console.Error() << "cannot handle " << GetInterruptName(irq) << " interrupt " << ToString(irq) << ", handler address is null" << endl();
-                }
-                RtExit(1);
+                Panic("cannot handle " + GetInterruptName(irq) + " interrupt " + ToString(irq) + ", handler address is null");
             }
             if (!inKernelMode)
             {

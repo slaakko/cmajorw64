@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -93,7 +93,7 @@ namespace CmajorTasks
                 {
                     if ((char)readResult == '\n')
                     {
-                        Log.LogMessage(UTF8.Decode(stdoutBytes.ToArray()));
+                        Log.LogMessage(MessageImportance.High, UTF8.Decode(stdoutBytes.ToArray()));
                         stdoutBytes.Clear();
                     }
                     else if ((char)readResult  != '\r')
@@ -104,7 +104,7 @@ namespace CmajorTasks
                 }
                 while (stdoutBytes.Count() > 0)
                 {
-                    Log.LogMessage(UTF8.Decode(stdoutBytes.ToArray()));
+                    Log.LogMessage(MessageImportance.High, UTF8.Decode(stdoutBytes.ToArray()));
                     stdoutBytes.Clear();
                     readResult = cmc.StandardOutput.BaseStream.ReadByte();
                     while (readResult != -1)

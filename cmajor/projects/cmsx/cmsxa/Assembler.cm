@@ -18,62 +18,9 @@ namespace cmsx.assembly
     public class Assembler : Visitor
     {
         public Assembler(const string& objectFileName) :
-            objectFile(objectFileName), stage(Stage.resolve), currentSegment(Segment.text), currentSection(objectFile.codeSection), currentInstruction(null), currentSymbol(null), currentValue(),
+            objectFile(objectFileName, true), stage(Stage.resolve), currentSegment(Segment.text), currentSection(objectFile.codeSection), currentInstruction(null), currentSymbol(null), currentValue(),
             currentFunctionSymbol(null), currentStructureSymbol(null)
         {
-            InstallStandardSymbols();
-        }
-        public void InstallStandardSymbols()
-        {
-            Symbol* ax = new Symbol();
-            ax->index = -1;
-            ax->name = "ax";
-            ax->segment = Segment.unknown;
-            ax->linkage = Linkage.internal_;
-            ax->value = Value(Value.Flag.register, cmsx.machine.regAX, ax);
-            objectFile.GetSymbolTable().AddSymbol(ax);
-            Symbol* bx = new Symbol();
-            bx->index = -1;
-            bx->name = "bx";
-            bx->segment = Segment.unknown;
-            bx->linkage = Linkage.internal_;
-            bx->value = Value(Value.Flag.register, cmsx.machine.regBX, bx);
-            objectFile.GetSymbolTable().AddSymbol(bx);
-            Symbol* cx = new Symbol();
-            cx->index = -1;
-            cx->name = "cx";
-            cx->segment = Segment.unknown;
-            cx->linkage = Linkage.internal_;
-            cx->value = Value(Value.Flag.register, cmsx.machine.regCX, cx);
-            objectFile.GetSymbolTable().AddSymbol(cx);
-            Symbol* dx = new Symbol();
-            dx->index = -1;
-            dx->name = "dx";
-            dx->segment = Segment.unknown;
-            dx->linkage = Linkage.internal_;
-            dx->value = Value(Value.Flag.register, cmsx.machine.regDX, dx);
-            objectFile.GetSymbolTable().AddSymbol(dx);
-            Symbol* ex = new Symbol();
-            ex->index = -1;
-            ex->name = "ex";
-            ex->segment = Segment.unknown;
-            ex->linkage = Linkage.internal_;
-            ex->value = Value(Value.Flag.register, cmsx.machine.regEX, ex);
-            objectFile.GetSymbolTable().AddSymbol(ex);
-            Symbol* sp = new Symbol();
-            sp->index = -1;
-            sp->name = "sp";
-            sp->segment = Segment.unknown;
-            sp->linkage = Linkage.internal_;
-            sp->value = Value(Value.Flag.register, cmsx.machine.regSP, sp);
-            objectFile.GetSymbolTable().AddSymbol(sp);
-            Symbol* fp = new Symbol();
-            fp->index = -1;
-            fp->name = "fp";
-            fp->segment = Segment.unknown;
-            fp->linkage = Linkage.internal_;
-            fp->value = Value(Value.Flag.register, cmsx.machine.regFP, fp);
-            objectFile.GetSymbolTable().AddSymbol(fp);
         }
         public void Assemble(List<UniquePtr<Instruction>>& instructions)
         {
@@ -268,19 +215,6 @@ namespace cmsx.assembly
                 Error(currentInstruction->opCode->name + " instruction can appear only in .CODE section", currentInstruction->opCode->span);
             }
             objectFile.linkSection->EmitByte(LinkCode.forwardLongJump);
-            objectFile.linkSection->EmitUInt(cast<uint>(symbol->index));
-            objectFile.linkSection->EmitULong(objectFile.codeSection->Address());
-            objectFile.codeSection->EmitByte(cmsx.machine.JMP);
-            objectFile.codeSection->EmitLongOffset(cast<uint>(-1));
-        }
-        public void EmitFarJump(Symbol* symbol)
-        {
-            #assert(symbol->index != -1);
-            if (currentSegment != Segment.text)
-            {
-                Error(currentInstruction->opCode->name + " instruction can appear only in .CODE section", currentInstruction->opCode->span);
-            }
-            objectFile.linkSection->EmitByte(LinkCode.farJump);
             objectFile.linkSection->EmitUInt(cast<uint>(symbol->index));
             objectFile.linkSection->EmitULong(objectFile.codeSection->Address());
             objectFile.codeSection->EmitByte(cmsx.machine.JMP);
@@ -498,6 +432,7 @@ namespace cmsx.assembly
                     }
                     symbol->start = 0u;
                     symbol->length = 0u;
+                    symbol->section = currentSection;
                     objectFile.GetSymbolTable().AddSymbol(symbol);
                     if (currentSegment == Segment.data)
                     {
@@ -536,10 +471,11 @@ namespace cmsx.assembly
                     currentSymbol->index = -1;
                     currentSymbol->name = node.name;
                     currentSymbol->segment = Segment.unknown;
-                    currentSymbol->linkage = Linkage.external;
+                    currentSymbol->linkage = Linkage.undefined;
                     currentSymbol->value = Value(Value.Flag.undefined, undefinedValue, currentSymbol);
                     currentSymbol->start = 0u;
                     currentSymbol->length = 0u;
+                    currentSymbol->section = currentSection;
                     objectFile.GetSymbolTable().AddSymbol(currentSymbol);
                 }
                 currentValue = currentSymbol->value;
@@ -561,6 +497,7 @@ namespace cmsx.assembly
                     currentSymbol->value = Value(Value.Flag.undefined, undefinedValue, currentSymbol);
                     currentSymbol->start = 0u;
                     currentSymbol->length = 0u;
+                    currentSymbol->section = currentSection;
                     objectFile.GetSymbolTable().AddSymbol(currentSymbol);
                 }
             }
@@ -582,6 +519,8 @@ namespace cmsx.assembly
                 if (currentSymbol != null)
                 {
                     currentSymbol->linkage = Linkage.once;
+                    objectFile.linkSection->EmitByte(LinkCode.once);
+                    objectFile.linkSection->EmitUInt(cast<uint>(currentSymbol->index));
                 }
                 else
                 {
@@ -601,8 +540,9 @@ namespace cmsx.assembly
                     currentSymbol->index = -1;
                     currentSymbol->name = node.name;
                     currentSymbol->segment = Segment.unknown;
-                    currentSymbol->linkage = Linkage.external;
+                    currentSymbol->linkage = Linkage.undefined;
                     currentSymbol->value = Value(Value.Flag.undefined, undefinedValue, currentSymbol);
+                    currentSymbol->section = currentSection;
                     objectFile.GetSymbolTable().AddSymbol(currentSymbol);
                 }
                 objectFile.linkSection->EmitByte(LinkCode.farOcta);

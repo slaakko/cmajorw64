@@ -3,6 +3,12 @@ using System.Collections;
 
 namespace cmsx.machine
 {
+    public void Panic(const string& message)
+    {
+        Clock.Instance().Stop();
+        throw Exception(message);
+    }
+
     public class Machine
     {
         public enum Flags : byte
@@ -10,7 +16,8 @@ namespace cmsx.machine
             none = 0u,
             verbose = 1u << 0u,
             quiet = 1u << 1u,
-            debug = 1u << 2u
+            debug = 1u << 2u,
+            runProgram = 1u << 3u
         }
         public static inline nothrow void SetFlag(Flags flag)
         {
@@ -226,6 +233,10 @@ namespace cmsx.machine
             AddInst(new Jmpb());
             AddInst(new Go());
             AddInst(new Goi());
+            AddInst(new Call());
+            AddInst(new Calli());
+            AddInst(new Ret());
+            AddInst(new Swym());
             AddInst(new Bn());
             AddInst(new Bnb());
             AddInst(new Bz());
@@ -296,5 +307,10 @@ namespace cmsx.machine
         private Processor processor;
         private Memory memory;
         private ulong kernelRootPageAddress;
+    }
+
+    public Machine& GetMachine()
+    {
+        return Machine.Instance();
     }
 }
