@@ -2,6 +2,11 @@ using System;
 using System.Collections;
 using System.IO;
 
+public enum State
+{
+    edit, info, promptFileName, promptSave
+}
+
 class Screen
 {
     public nothrow Screen()
@@ -27,123 +32,327 @@ class Screen
     public nothrow void GetDimensions()
     {
         RtGetMaxYX(&rows, &cols);
-        textRows = rows - 2;
+        textRows = rows - 1;
     }
     public int rows;
     public int cols;
     public int textRows;
 }
 
-class Position
-{
-    public nothrow Position(int lineNumber_, int charIndex_) : lineNumber(lineNumber_), charIndex(charIndex_)
-    {
-    }
-    public int lineNumber;
-    public int charIndex;
-}
-
-public bool operator==(const Position& left, const Position& right)
-{
-    return left.lineNumber == right.lineNumber && left.charIndex == right.charIndex;
-}
-
-public bool operator<(const Position& left, const Position& right)
-{
-    if (left.lineNumber < right.lineNumber) return true;
-    if (left.lineNumber > right.lineNumber) return false;
-    return left.charIndex < right.charIndex;
-}
-
 class Editor
 {
-    public nothrow Editor(Screen& screen_) : screen(screen_), rowOffset(0), colOffset(0), cursorRow(0), cursorCol(0), dirty(false)
+    public nothrow Editor(Screen& screen_) : screen(screen_), rowOffset(0), colOffset(0), cursorRow(0), cursorCol(0), dirty(false), fileName(), state(State.edit)
     {
     }
-    public void OpenFile(const string& fileName)
+    public void OpenFile(const string& fileName_)
     {
-        lines.Clear();
-        List<string> utf8Lines = File.ReadAllLines(fileName);
-        for (const string& utf8Line : utf8Lines)
+        fileName = fileName_;
+        if (File.Exists(fileName))
         {
-            lines.Add(ToUtf32(utf8Line));
+            lines.Clear();
+            List<string> utf8Lines = File.ReadAllLines(fileName);
+            for (const string& utf8Line : utf8Lines)
+            {
+                lines.Add(ToUtf32(utf8Line));
+            }
         }
         dirty = false;
         Print();
+    }
+    public void Save()
+    {
+        if (fileName.IsEmpty())
+        {
+            Prompt("Enter filename: ", State.promptFileName);
+        }
+        else
+        {
+            StreamWriter writer = File.CreateText(fileName);
+            for (const ustring& line : lines)
+            {
+                writer.WriteLine(ToUtf8(line));
+            }
+            dirty = false;
+            Prompt("File '" + fileName + "' saved.", State.info);
+            Sleep(Duration.FromSeconds(3));
+            state = State.edit;
+            RtNoEcho();
+            RtRaw();
+            Print();
+        }
     }
     public void Run()
     {
         while (true)
         {
             int ch = RtGetCh();
-            if (ch >= 0 && ch < 32 || ch >= specialKeyStart && ch <= specialKeyEnd) 
+            if (state == State.edit)
             {
-                if (ch == keyEnter)
+                if (ch >= 0 && ch < 32 || ch >= specialKeyStart && ch <= specialKeyEnd) 
                 {
-                    
+                    if (ch == keyEnter)
+                    {
+                        Enter();
+                    }
+                    else if (ch == keyBackspace)
+                    {
+                        Backspace();
+                    }
+                    else if (ch == keyDel)
+                    {
+                        Delete();
+                    }
+                    else if (ch == keyControlY)
+                    {
+                        DeleteCurrentLine();
+                    }
+                    else if (ch == keyControlS)
+                    {
+                        Save();
+                    }
+                    else if (ch == keyLeft)
+                    {
+                        CursorLeft();
+                    }
+                    else if (ch == keyRight)
+                    {
+                        CursorRight();
+                    }
+                    else if (ch == keyUp)
+                    {
+                        CursorUp();
+                    }
+                    else if (ch == keyDown)
+                    {
+                        CursorDown();
+                    }
+                    else if (ch == keyPgUp)
+                    {
+                        CursorPageUp();
+                    }
+                    else if (ch == keyPgDown)
+                    {
+                        CursorPageDown();
+                    }
+                    else if (ch == keyHome)
+                    {
+                        CursorToBeginningOfLine();
+                    }
+                    else if (ch == keyEnd)
+                    {
+                        CursorToEndOfLine();
+                    }
+                    else if (ch == keyControlHome || ch == keyF3)
+                    {
+                        CursorToBeginningOfFile();
+                    }
+                    else if (ch == keyControlEnd || ch == keyF4)
+                    {
+                        CursorToEndOfFile();
+                    }
+                    else if (ch == keyResize)
+                    {
+                        screen.GetDimensions();
+                        Print();
+                    }
+                    else if (ch == keyEscape)
+                    {
+                        if (dirty)
+                        {
+                            Prompt("Save changes? (y/n)", State.promptSave);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
                 }
-                else if (ch == keyBackspace)
+                else if (ch >= 32 && ch < specialKeyStart) 
                 {
-                    
-                }
-                else if (ch == keyDel)
-                {
-                }
-                else if (ch == keyLeft)
-                {
-                    CursorLeft();
-                }
-                else if (ch == keyRight)
-                {
-                    CursorRight();
-                }
-                else if (ch == keyUp)
-                {
-                    CursorUp();
-                }
-                else if (ch == keyDown)
-                {
-                    CursorDown();
-                }
-                else if (ch == keyPgUp)
-                {
-                    CursorPageUp();
-                }
-                else if (ch == keyPgDown)
-                {
-                    CursorPageDown();
-                }
-                else if (ch == keyHome)
-                {
-                    CursorToBeginningOfLine();
-                }
-                else if (ch == keyEnd)
-                {
-                    CursorToEndOfLine();
-                }
-                else if (ch == keyControlHome)
-                {
-                    CursorToBeginningOfFile();
-                }
-                else if (ch == keyControlEnd)
-                {
-                    CursorToEndOfFile();
-                }
-                else if (ch == keyResize)
-                {
-                    screen.GetDimensions();
-                    Print();
-                }
-                else if (ch == keyControlK)
-                {
-                    break;
+                    InsertChar(cast<uchar>(ch));
                 }
             }
-            else if (ch >= 32 && ch < specialKeyStart) 
+            else
             {
-                
+                if (state == State.promptFileName)
+                {
+                    if (ch == keyEnter)
+                    {
+                        if (fileName.IsEmpty())
+                        {
+                            Prompt("no file name given", State.info);
+                            Sleep(Duration.FromSeconds(3));
+                            state = State.edit;
+                            RtNoEcho();
+                            RtRaw();
+                            Print();
+                        }
+                        else
+                        {
+                            Save();
+                        }
+                    }
+                    else if (ch == keyEscape)
+                    {
+                        state = State.edit;
+                        RtNoEcho();
+                        RtRaw();
+                        Print();
+                    }
+                    else if (ch >= 32 && ch < specialKeyStart)
+                    {
+                        fileName.Append(cast<char>(ch));
+                    }
+                }
+                else if (state == State.promptSave)
+                {
+                    if (ch == keyEscape)
+                    {
+                        state = State.edit;
+                        RtNoEcho();
+                        RtRaw();
+                        Print();
+                    }
+                    else if (ch >= 32 && ch < specialKeyStart)
+                    {
+                        if (cast<char>(ch) == 'y')
+                        {
+                            Save();
+                            if (state == State.edit)
+                            {
+                                break;
+                            }
+                        }
+                        else if (cast<char>(ch) == 'n')
+                        {
+                            break;
+                        }
+                    }
+                }
             }
         }
+    }
+    private void Prompt(const string& promptText, State state_)
+    {
+        state = state_;
+        screen.MoveCursorTo(screen.rows - 1, 0);
+        for (char c : promptText)
+        {
+            RtAddCh(cast<int>(c));
+        }
+        RtClearToEol();
+        RtEcho();
+        RtNoRaw();
+        RtRefresh();
+    }
+    private void InsertChar(uchar c)
+    {
+        int lineNumber = cursorRow + rowOffset;
+        while (lineNumber >= lines.Count())
+        {
+            lines.Add(ustring());
+        }
+        int charIndex = cursorCol + colOffset;
+        ustring line = lines[lineNumber];
+        if (charIndex < line.Length())
+        {
+            line = line.Substring(0, charIndex) + c + line.Substring(charIndex);
+        }
+        else
+        {
+            line.Append(c);
+        }
+        lines[lineNumber] = line;
+        dirty = true;
+        PrintLine(cursorRow, lineNumber);
+        CursorRight();
+        PrintStatus();
+        screen.Refresh();
+    }
+    private void Delete()
+    {
+        bool print = false;
+        int lineNumber = cursorRow + rowOffset;
+        if (lineNumber < lines.Count())
+        {
+            int charIndex = cursorCol + colOffset;
+            ustring line = lines[lineNumber];
+            if (lineNumber < lines.Count() - 1 && charIndex >= line.Length())
+            {
+                line.Append(lines[lineNumber + 1]);
+                lines.Remove(lines.Begin() + lineNumber + 1);
+                print = true;
+            }
+            else if (lineNumber == lines.Count() - 1 && charIndex >= line.Length())
+            {
+                if (line.IsEmpty())
+                {
+                    lines.RemoveLast();
+                    Print();
+                }
+                return;
+            }
+            else
+            {
+                line = line.Substring(0, charIndex) + line.Substring(charIndex + 1);
+            }
+            lines[lineNumber] = line;
+            dirty = true;
+            if (print)
+            {
+                Print();
+            }
+            else
+            {
+                PrintLine(cursorRow, lineNumber);
+                PrintStatus();
+                screen.Refresh();
+            }
+        }
+    }
+    private void DeleteCurrentLine()
+    {
+        int lineNumber = cursorRow + rowOffset;
+        if (lineNumber < lines.Count())
+        {
+            lines.Remove(lines.Begin() + lineNumber);
+            dirty = true;
+            Print();
+        }
+    }
+    private void Backspace()
+    {
+        int lineNumber = cursorRow + rowOffset;
+        int charIndex = cursorCol + colOffset;
+        if (lineNumber > 0 || charIndex > 0)
+        {
+            CursorLeft();
+            Delete();
+            dirty = true;
+            Print();
+        }
+    }
+    private void Enter()
+    {
+        int lineNumber = cursorRow + rowOffset;
+        if (lineNumber < lines.Count())
+        {
+            int charIndex = cursorCol + colOffset;
+            ustring tail = lines[lineNumber].Substring(charIndex);
+            lines[lineNumber] = lines[lineNumber].Substring(0, charIndex);
+            lines.Insert(lines.Begin() + lineNumber + 1, tail);
+            dirty = true;
+            Print();
+        }
+        else
+        {
+            lines.Add(ustring());
+            dirty = true;
+            PrintStatus();
+            screen.Refresh();
+        }
+        CursorToEndOfLine();
+        CursorRight();
     }
     private void PrintLine(int row, int lineNumber)
     {
@@ -180,6 +389,11 @@ class Editor
     private void PrintStatus()
     {
         screen.MoveCursorTo(screen.rows - 1, 0);
+        for (char c : fileName)
+        {
+            RtAddCh(cast<int>(c));
+        }
+        RtAddCh(cast<int>(' '));
         if (dirty)
         {
             RtAddCh(cast<int>('*'));
@@ -444,6 +658,8 @@ class Editor
     private int cursorRow;
     private int cursorCol;
     private bool dirty;
+    private string fileName;
+    private State state;
 }
 
 int main(int argc, const char** argv)

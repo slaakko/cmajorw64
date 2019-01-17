@@ -623,7 +623,7 @@ namespace cmsx.kernel
         return process;
     }
 
-    public void CreateInitAndIdleProcessess(Machine& machine, ProcessTable& processTable)
+    public void CreateInitAndIdleProcesses(Machine& machine, ProcessTable& processTable)
     {
         Process* idleProcess = processTable.GetIdle();
         InitializeIdleProcess(machine, processTable, idleProcess);

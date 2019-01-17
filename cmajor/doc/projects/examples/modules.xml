@@ -4,6 +4,9 @@
  <module name="Calculator"/>
  <module name="Hello"/>
  <module name="HexDump"/>
+ <module name="keys"/>
+ <module name="ms"/>
  <module name="rex"/>
+ <module name="sted"/>
  <module name="xpq"/>
 </modules>

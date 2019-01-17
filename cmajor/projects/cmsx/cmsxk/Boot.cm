@@ -78,7 +78,7 @@ namespace cmsx.kernel
         }
         else
         {
-            CreateInitAndIdleProcessess(machine, processTable);
+            CreateInitAndIdleProcesses(machine, processTable);
         }
         Schedule(machine, processTable);
         SetProcessorToUserMode(regs);

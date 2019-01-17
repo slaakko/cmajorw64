@@ -4,22 +4,15 @@
  </files>
  <namespace docPath="../../rex/doc/ns_.html" extPath="rex/doc/ns_.html" id="ns_" name="">
   <functions>
-   <function docPath="../../rex/doc/../index.html#function_PrintHelp_F3AFA512C96C0735F4AD8289F9D07605175DC520" extPath="rex/doc/../index.html#function_PrintHelp_F3AFA512C96C0735F4AD8289F9D07605175DC520" fileName="rex/rex.cm" filePath="../../rex/file/rex.cm.html" id="function_PrintHelp_F3AFA512C96C0735F4AD8289F9D07605175DC520" kind="Function" line="11" name="PrintHelp" returnType="c7cee213-39ce-41b4-8e6f-6bc43d6a5807" specifiers=""/>
-   <function docPath="../../rex/doc/../index.html#function_Version_49E5DEDA3895024808383EF2AA540720DC396359" extPath="rex/doc/../index.html#function_Version_49E5DEDA3895024808383EF2AA540720DC396359" fileName="rex/rex.cm" filePath="../../rex/file/rex.cm.html" id="function_Version_49E5DEDA3895024808383EF2AA540720DC396359" kind="Function" line="6" name="Version" returnType="6be20933-e25e-40e1-be61-501c01b65684" specifiers="public"/>
-   <function docPath="../../rex/doc/../index.html#function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" extPath="rex/doc/../index.html#function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" fileName="rex/rex.cm" filePath="../../rex/file/rex.cm.html" id="function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" kind="Function" line="25" name="main" returnType="141128e3-e6e4-4bca-89d7-238a956a72d6" specifiers="">
+   <function docPath="../../rex/doc/../index.html#function_PrintHelp_F3AFA512C96C0735F4AD8289F9D07605175DC520" extPath="rex/doc/../index.html#function_PrintHelp_F3AFA512C96C0735F4AD8289F9D07605175DC520" fileName="rex/rex.cm" filePath="../../rex/file/rex.cm.html" id="function_PrintHelp_F3AFA512C96C0735F4AD8289F9D07605175DC520" kind="Function" line="11" name="PrintHelp" returnType="80d5b4dc-3753-4a11-8e39-570424166784" specifiers=""/>
+   <function docPath="../../rex/doc/../index.html#function_Version_49E5DEDA3895024808383EF2AA540720DC396359" extPath="rex/doc/../index.html#function_Version_49E5DEDA3895024808383EF2AA540720DC396359" fileName="rex/rex.cm" filePath="../../rex/file/rex.cm.html" id="function_Version_49E5DEDA3895024808383EF2AA540720DC396359" kind="Function" line="6" name="Version" returnType="b8163d66-a233-4d58-af22-d209dabbd5cf" specifiers="public"/>
+   <function docPath="../../rex/doc/../index.html#function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" extPath="rex/doc/../index.html#function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" fileName="rex/rex.cm" filePath="../../rex/file/rex.cm.html" id="function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" kind="Function" line="25" name="main" returnType="ba351ded-10b7-46e0-aaf8-478ac63ed46d" specifiers="">
     <parameters>
-     <parameter id="parameter_argc_AA11952084E5FEBCC47757F6863509258BF262FF" name="argc" type="141128e3-e6e4-4bca-89d7-238a956a72d6"/>
-     <parameter id="parameter_argv_A77642CC652C3A88362DD414B9B6D479ADFED46E" name="argv" type="117c5065-31bd-404b-9e13-9d5a2a647ebe"/>
+     <parameter id="parameter_argc_AA11952084E5FEBCC47757F6863509258BF262FF" name="argc" type="ba351ded-10b7-46e0-aaf8-478ac63ed46d"/>
+     <parameter id="parameter_argv_A77642CC652C3A88362DD414B9B6D479ADFED46E" name="argv" type="c566fb2c-a4d2-4b95-a983-5e529a902484"/>
     </parameters>
    </function>
   </functions>
  </namespace>
- <types>
-  <derivedType id="117c5065-31bd-404b-9e13-9d5a2a647ebe" name="const char**">
-   <derivation name="const"/>
-   <derivation baseType="34b92c0a-af7c-4187-ae77-d47430e09189"/>
-   <derivation name="*"/>
-   <derivation name="*"/>
-  </derivedType>
- </types>
+ <types/>
 </symbolTable>

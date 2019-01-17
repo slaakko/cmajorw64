@@ -1684,7 +1684,11 @@ std::vector<TypedefSymbol*> SymbolTableXmlBuilder::GetTypedefs(ContainerSymbol& 
     {
         if (member->GetSymbolType() == SymbolType::typedefSymbol && member->IsProject())
         {
-            typedefs.push_back(static_cast<TypedefSymbol*>(member.get()));
+            Node* node = symbolTable.GetNodeNoThrow(member.get());
+            if (node)
+            {
+                typedefs.push_back(static_cast<TypedefSymbol*>(member.get()));
+            }
         }
     }
     std::sort(typedefs.begin(), typedefs.end(), ByCodeName());

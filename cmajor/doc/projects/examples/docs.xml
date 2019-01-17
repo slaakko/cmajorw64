@@ -35,4 +35,33 @@
       Prints command line arguments to console.
     </desc>
   </doc>
+  <doc id="ms">
+    <desc>
+       Executes a command given as argument and prints its duration in milliseconds.
+    </desc>
+  </doc>
+  <doc id="sted">
+    <desc>
+      Simple full screen text editor that runs on the Windows command window or Linux terminal window.
+    </desc>
+    <details title="Keys">
+      <p><strong>ESC</strong>             : exit from the editor (prompts for saving changes, if file changed)</p>
+      <p><strong>CTRL-S</strong>          : save (prompts for a file name if file name is empty)</p>
+      <p><strong>ENTER</strong>           : enter line</p>
+      <p><strong>CURSOR KEYS</strong>     : moving the cursor</p>
+      <p><strong>PAGE UP/DOWN</strong>    : move page up or down</p>
+      <p><strong>HOME/END</strong>        : move to start/end of the line</p>
+      <p><strong>CTRL-HOME or F3</strong> : move to the start of the document</p>
+      <p><strong>CTRL-END or F4</strong>  : move to the end of the document</p>
+      <p><strong>BACKSPACE</strong>       : delete a character from the left of the cursor</p>
+      <p><strong>DELETE</strong>          : delete a character from the right of the cursor</p>
+      <p><strong>CTRL-Y</strong>          : delete current line</p>
+    </details>
+  </doc>
+  <doc id="keys">
+    <desc>
+        Prints key codes obtained from the curses library.
+    </desc>
+  </doc>
+
 </docs>

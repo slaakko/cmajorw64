@@ -17,25 +17,25 @@
   <table>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span></td>
-    <td xml:space="preserve"><a href="../../System.Text.Parsing/doc/class_CharSetParser_1549A5D12A015735356B2B65DB64C4AF85157B9A.html#constructor_CharSetParser_D6E385FFA6E70831056E09A35F5F65D04FC23269">CharSetParser</a>(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;TEMPLATE_ARGUMENT_TYPE>&amp;&nbsp;s_)</td>
+    <td xml:space="preserve"><a href="../../System.Text.Parsing/doc/class_CharSetParser_1549A5D12A015735356B2B65DB64C4AF85157B9A.html#constructor_CharSetParser_D6E385FFA6E70831056E09A35F5F65D04FC23269">CharSetParser</a>(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">uchar</span>>&amp;&nbsp;s_)</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span></td>
-    <td xml:space="preserve"><a href="../../System.Text.Parsing/doc/class_CharSetParser_1549A5D12A015735356B2B65DB64C4AF85157B9A.html#constructor_CharSetParser_3AF8EC830BC4FD63B9BBFDD87DB7FA1C48ABEE53">CharSetParser</a>(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;TEMPLATE_ARGUMENT_TYPE>&amp;&nbsp;s_, TYPE&nbsp;inverse_)</td>
+    <td xml:space="preserve"><a href="../../System.Text.Parsing/doc/class_CharSetParser_1549A5D12A015735356B2B65DB64C4AF85157B9A.html#constructor_CharSetParser_3AF8EC830BC4FD63B9BBFDD87DB7FA1C48ABEE53">CharSetParser</a>(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">uchar</span>>&amp;&nbsp;s_, <span class="kw">bool</span>&nbsp;inverse_)</td>
    </tr>
   </table>
   <h2>Member Functions</h2>
   <table>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;RETURN_TYPE</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span></td>
     <td xml:space="preserve"><a href="../../System.Text.Parsing/doc/class_CharSetParser_1549A5D12A015735356B2B65DB64C4AF85157B9A.html#member_function_Accept_CharSetParser_EDDAD23ED5AC7D3468A1D0E3894D6F53F8E61B78">Accept</a>(<a href="../../System.Text.Parsing/doc/class_Visitor_019F0A77C04DF2CCE6FDB74DE512001C068902CF.html">Visitor</a>&amp;&nbsp;visitor)</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;RETURN_TYPE</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">void</span></td>
     <td xml:space="preserve"><a href="../../System.Text.Parsing/doc/class_CharSetParser_1549A5D12A015735356B2B65DB64C4AF85157B9A.html#member_function_InitRanges_CharSetParser_9D84074C5B128A9B0DEAC24F9EDC91A81CE7BC95">InitRanges</a>()</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;RETURN_TYPE</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span></td>
     <td xml:space="preserve"><a href="../../System.Text.Parsing/doc/class_CharSetParser_1549A5D12A015735356B2B65DB64C4AF85157B9A.html#member_function_Inverse_CharSetParser_4D82550F8A3C3CA3B335FAF07DF0BA583D026B2B">Inverse</a>()&nbsp;<span class="kw">const</span></td>
    </tr>
    <tr>
@@ -43,14 +43,14 @@
     <td xml:space="preserve"><a href="../../System.Text.Parsing/doc/class_CharSetParser_1549A5D12A015735356B2B65DB64C4AF85157B9A.html#member_function_Parse_CharSetParser_B3544751C1D537FCA7A2C9A6C44FFB499E685228">Parse</a>(<a href="../../System.Text.Parsing/doc/class_Scanner_E451B5D34DF80FB1309D09594F1750F137F6CF5A.html">Scanner</a>&amp;&nbsp;scanner, <a href="../../System.Base/doc/class_Stack_T_CAB2AD063212443437B477BD815360F469912604.html">Stack</a>&lt;<a href="../../System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a>&lt;<a href="../../System.Text.Parsing/doc/class_Object_4574CA0265BB8D8C5F355EB6E9674FC1FB8E4E66.html">Object</a>>>&amp;&nbsp;stack, <a href="../../System.Text.Parsing/doc/class_ParsingData_9F05BA66DA13D9A55E1E7FF50B19E250484C3A7B.html">ParsingData</a>*&nbsp;parsingData)</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;TEMPLATE_ARGUMENT_TYPE>&amp;</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">uchar</span>>&amp;</td>
     <td xml:space="preserve"><a href="../../System.Text.Parsing/doc/class_CharSetParser_1549A5D12A015735356B2B65DB64C4AF85157B9A.html#member_function_Set_CharSetParser_6FBBF4222832B5A701AD96AC8FB7E356EF0F6369">Set</a>()&nbsp;<span class="kw">const</span></td>
    </tr>
   </table>
   <h2>Member Variables</h2>
   <table>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;VARIABLE_TYPE</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">bool</span></td>
     <td xml:space="preserve">inverse</td>
    </tr>
    <tr>
@@ -58,20 +58,20 @@
     <td xml:space="preserve">ranges</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;TEMPLATE_ARGUMENT_TYPE></td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">uchar</span>></td>
     <td xml:space="preserve">s</td>
    </tr>
   </table>
   <h2>Constructor&amp; Destructor Details</h2>
   <h3 id="constructor_CharSetParser_D6E385FFA6E70831056E09A35F5F65D04FC23269" xml:space="preserve">CharSetParser&nbsp;Constructor</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;CharSetParser(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;TEMPLATE_ARGUMENT_TYPE>&amp;&nbsp;s_)</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;CharSetParser(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">uchar</span>>&amp;&nbsp;s_)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Text.Parsing/file/Primitive.cm.html#112">112</a>&nbsp;of&nbsp;<a href="../../System.Text.Parsing/file/Primitive.cm.html">System.Text.Parsing/Primitive.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="constructor_CharSetParser_3AF8EC830BC4FD63B9BBFDD87DB7FA1C48ABEE53" xml:space="preserve">CharSetParser&nbsp;Constructor</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;CharSetParser(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;TEMPLATE_ARGUMENT_TYPE>&amp;&nbsp;s_, TYPE&nbsp;inverse_)</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;CharSetParser(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">uchar</span>>&amp;&nbsp;s_, <span class="kw">bool</span>&nbsp;inverse_)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Text.Parsing/file/Primitive.cm.html#116">116</a>&nbsp;of&nbsp;<a href="../../System.Text.Parsing/file/Primitive.cm.html">System.Text.Parsing/Primitive.cm</a></span>
   <br/>
@@ -79,21 +79,21 @@
   <hr/>
   <h2>Member Function Details</h2>
   <h3 id="member_function_Accept_CharSetParser_EDDAD23ED5AC7D3468A1D0E3894D6F53F8E61B78" xml:space="preserve">Accept&nbsp;Member Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;RETURN_TYPE&nbsp;Accept(<a href="../../System.Text.Parsing/doc/class_Visitor_019F0A77C04DF2CCE6FDB74DE512001C068902CF.html">Visitor</a>&amp;&nbsp;visitor)</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;Accept(<a href="../../System.Text.Parsing/doc/class_Visitor_019F0A77C04DF2CCE6FDB74DE512001C068902CF.html">Visitor</a>&amp;&nbsp;visitor)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Text.Parsing/file/Primitive.cm.html#153">153</a>&nbsp;of&nbsp;<a href="../../System.Text.Parsing/file/Primitive.cm.html">System.Text.Parsing/Primitive.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_InitRanges_CharSetParser_9D84074C5B128A9B0DEAC24F9EDC91A81CE7BC95" xml:space="preserve">InitRanges&nbsp;Member Function</h3>
-  <h4 xml:space="preserve"><span class="kw">private</span>&nbsp;RETURN_TYPE&nbsp;InitRanges()</h4>
+  <h4 xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">void</span>&nbsp;InitRanges()</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Text.Parsing/file/Primitive.cm.html#157">157</a>&nbsp;of&nbsp;<a href="../../System.Text.Parsing/file/Primitive.cm.html">System.Text.Parsing/Primitive.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_Inverse_CharSetParser_4D82550F8A3C3CA3B335FAF07DF0BA583D026B2B" xml:space="preserve">Inverse&nbsp;Member Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;RETURN_TYPE&nbsp;Inverse()</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;Inverse()</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Text.Parsing/file/Primitive.cm.html#124">124</a>&nbsp;of&nbsp;<a href="../../System.Text.Parsing/file/Primitive.cm.html">System.Text.Parsing/Primitive.cm</a></span>
   <br/>
@@ -107,7 +107,7 @@
   <br/>
   <hr/>
   <h3 id="member_function_Set_CharSetParser_6FBBF4222832B5A701AD96AC8FB7E356EF0F6369" xml:space="preserve">Set&nbsp;Member Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;TEMPLATE_ARGUMENT_TYPE>&amp;&nbsp;Set()</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">uchar</span>>&amp;&nbsp;Set()</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Text.Parsing/file/Primitive.cm.html#120">120</a>&nbsp;of&nbsp;<a href="../../System.Text.Parsing/file/Primitive.cm.html">System.Text.Parsing/Primitive.cm</a></span>
   <br/>
