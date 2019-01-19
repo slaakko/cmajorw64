@@ -5,7 +5,7 @@ namespace cmsx.kernel
 {
     public const char* KernelVersion()
     {
-        return "1.0.0";
+        return "0.1.0";
     }
 
     public nothrow void InitializeInterruptVector(Machine& machine)

@@ -9,3 +9,4 @@ project <cmsxlink/cmsxlink.cmp>;
 project <cmsxm/cmsxm.cmp>;
 project <cmsxo/cmsxo.cmp>;
 project <cmsxu/cmsxu.cmp>;
+activeProject cmsx;

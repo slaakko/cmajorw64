@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -2319,6 +2319,19 @@ namespace cmdevenv
             {
                 MessageBox.Show(ex.Message);
             }
+        }
+        private async void systemXToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string cmajorRootDir = Environment.GetEnvironmentVariable("CMAJOR_ROOT");
+                await OpenProjectOrSolution(Path.Combine(Path.Combine(Path.Combine(cmajorRootDir, "projects"), "cmsx"), "cmsx.cms"));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
         }
         private void profileToolStripMenuItem_Click(object sender, EventArgs e)
         {

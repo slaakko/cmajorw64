@@ -32,9 +32,9 @@ void Terminate(Machine& machine)
     {
         int pid = kernel.GetProgramPID();
         Process* process = kernel.GetProcessTable().GetProcess(pid);
-        if (process != null)
+        if (process != null && Machine.GetFlag(Machine.Flags.verbose))
         {
-            Console.Out() << "program exited with code " << process->exitCode << endl();
+            Console.Out() << "program exited with code " << process->exitCode << "." << endl();
         }
     }
     Registers& regs = machine.GetRegisters();

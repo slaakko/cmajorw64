@@ -205,7 +205,7 @@ namespace cmsx.machine
         }
         private void DoExit()
         {
-            if (!Machine.GetFlag(Machine.Flags.quiet))
+            if (Machine.GetFlag(Machine.Flags.verbose))
             {
                 Console.Out() << "machine exit." << endl();
             }

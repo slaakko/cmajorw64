@@ -171,6 +171,7 @@ namespace cmdevenv
             this.addExistingProjectFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.addProjectReferenceDialog = new System.Windows.Forms.OpenFileDialog();
             this.addExistingTextFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.systemXToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.editorSplitContainer)).BeginInit();
             this.editorSplitContainer.Panel2.SuspendLayout();
@@ -292,6 +293,7 @@ namespace cmdevenv
             this.systemLibraryToolStripMenuItem,
             this.examplesToolStripMenuItem,
             this.parserGeneratorToolStripMenuItem,
+            this.systemXToolStripMenuItem,
             this.unitTestsToolStripMenuItem});
             this.toolStripMenuItem14.Name = "toolStripMenuItem14";
             this.toolStripMenuItem14.Size = new System.Drawing.Size(244, 22);
@@ -300,28 +302,28 @@ namespace cmdevenv
             // systemLibraryToolStripMenuItem
             // 
             this.systemLibraryToolStripMenuItem.Name = "systemLibraryToolStripMenuItem";
-            this.systemLibraryToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.systemLibraryToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.systemLibraryToolStripMenuItem.Text = "System Library";
             this.systemLibraryToolStripMenuItem.Click += new System.EventHandler(this.systemLibraryToolStripMenuItem_Click);
             // 
             // examplesToolStripMenuItem
             // 
             this.examplesToolStripMenuItem.Name = "examplesToolStripMenuItem";
-            this.examplesToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.examplesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.examplesToolStripMenuItem.Text = "Examples";
             this.examplesToolStripMenuItem.Click += new System.EventHandler(this.examplesToolStripMenuItem_Click);
             // 
             // parserGeneratorToolStripMenuItem
             // 
             this.parserGeneratorToolStripMenuItem.Name = "parserGeneratorToolStripMenuItem";
-            this.parserGeneratorToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.parserGeneratorToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.parserGeneratorToolStripMenuItem.Text = "Parser Generator";
             this.parserGeneratorToolStripMenuItem.Click += new System.EventHandler(this.parserGeneratorToolStripMenuItem_Click);
             // 
             // unitTestsToolStripMenuItem
             // 
             this.unitTestsToolStripMenuItem.Name = "unitTestsToolStripMenuItem";
-            this.unitTestsToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.unitTestsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.unitTestsToolStripMenuItem.Text = "Unit Tests";
             this.unitTestsToolStripMenuItem.Click += new System.EventHandler(this.unitTestsToolStripMenuItem_Click);
             // 
@@ -1273,6 +1275,13 @@ namespace cmdevenv
             this.addExistingTextFileDialog.DefaultExt = "txt";
             this.addExistingTextFileDialog.Filter = "Text files|*.txt|All files|*.*";
             // 
+            // systemXToolStripMenuItem
+            // 
+            this.systemXToolStripMenuItem.Name = "systemXToolStripMenuItem";
+            this.systemXToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.systemXToolStripMenuItem.Text = "System X";
+            this.systemXToolStripMenuItem.Click += new System.EventHandler(this.systemXToolStripMenuItem_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1456,6 +1465,7 @@ namespace cmdevenv
         private System.Windows.Forms.ToolStripMenuItem runUnitTestsInCurrentSolutionToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem15;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem18;
+        private System.Windows.Forms.ToolStripMenuItem systemXToolStripMenuItem;
     }
 }
 

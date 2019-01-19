@@ -6,7 +6,7 @@ source <Assembler.cm>;
 source <Assembly.cm>;
 source <AssemblyInstruction.cm>;
 source <AssemblyParser.cm>;
-source <Visitor.cm>;
 text <AssemblyParser.parser>;
 text <AssemblyParser.pl>;
 text <AssemblyParser.pp>;
+source <Visitor.cm>;
