@@ -13,10 +13,10 @@ LIBRARIES = ../lib/libutil.a ../lib/libcodedom.a ../lib/libparsing.a ../lib/libx
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 ifeq ($(config),debug)
-    soname=libcmrtd.so.3.1.0
+    soname=libcmrtd.so.3.2.0
     sobasename=libcmrtd
 else
-    soname=libcmrt.so.3.1.0
+    soname=libcmrt.so.3.2.0
     sobasename=libcmrt
 endif
 
