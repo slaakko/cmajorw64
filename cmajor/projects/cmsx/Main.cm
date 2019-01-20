@@ -102,6 +102,27 @@ void Run()
     }
 }
 
+public const char* Version()
+{
+   return "0.1.0";
+}
+
+public void PrintHelp()
+{
+    Console.Out() << "Cmajor System X Driver version " << Version() << endl();
+    Console.Out() << "Usage: cmsx [cmsx-options] [ EXECUTABLE [args] ]" << endl();
+    Console.Out() << "Run/debug EXECUTABLE in System X virtual machine with args." << endl();
+    Console.Out() << "cmsx-options:" << endl();
+    Console.Out() << "--help (-h)" << endl();
+    Console.Out() << "  print help" << endl();
+    Console.Out() << "--verbose (-v)" << endl();
+    Console.Out() << "  be verbose" << endl();
+    Console.Out() << "--quiet (-q)" << endl();
+    Console.Out() << "  be quiet" << endl();
+    //Console.Out() << "--debug (-d)" << endl();
+    //Console.Out() << "  debug EXECUTABLE" << endl();
+}
+
 int main(int argc, const char** argv)
 {
     Debug.Start();
@@ -115,7 +136,12 @@ int main(int argc, const char** argv)
             string arg = argv[i];
             if (cmsxOptions && arg.StartsWith("-"))
             {
-                if (arg == "--verbose" || arg == "-v")
+                if (arg == "--help" || arg == "-h")
+                {
+                    PrintHelp();
+                    return 0;
+                }
+                else if (arg == "--verbose" || arg == "-v")
                 {
                     Machine.SetFlag(Machine.Flags.verbose);
                 }

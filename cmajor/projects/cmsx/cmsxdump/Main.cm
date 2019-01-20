@@ -54,6 +54,11 @@ int main(int argc, const char** argv)
         {
             Console.Out() << "Cmajor System X Dumper version " << Version() << endl();
         }
+        if (fileNames.IsEmpty())
+        {
+            PrintHelp();
+            throw Exception("no files given");
+        }
         for (const string& fileName : fileNames)
         {
             Console.Out() << fileName << ":" << endl();

@@ -46,6 +46,7 @@ int main(int argc, const char** argv)
         ulong stackSize = 64u * cast<ulong>(1024u);
         ulong poolSize = 64u * cast<ulong>(1024u);
         string executableFileName = GetFullPath("a.out");
+        bool userFilesGiven = false;
         for (int i = 1; i < argc; ++i)
         {
             string arg = argv[i];
@@ -95,12 +96,18 @@ int main(int argc, const char** argv)
             else
             {
                 fileNames.Add(GetFullPath(arg));
+                userFilesGiven = true;
             }
         }
         if (executableFileName.IsEmpty())
         {
             PrintHelp();
             throw Exception("output executable file name missing");
+        }
+        if (!userFilesGiven)
+        {
+            PrintHelp();
+            throw Exception("no object or library files given");
         }
         if (verbose)
         {
