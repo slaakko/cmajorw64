@@ -4,11 +4,11 @@
     <tabSize>4</tabSize>
     <infoDelaySecs>10</infoDelaySecs>
     <formSizeX>1834</formSizeX>
-    <formSizeY>982</formSizeY>
-    <formTop>0</formTop>
+    <formSizeY>961</formSizeY>
+    <formTop>21</formTop>
     <formLeft>0</formLeft>
-    <textVisX>182</textVisX>
-    <textVisY>182</textVisY>
+    <textVisX>156</textVisX>
+    <textVisY>156</textVisY>
     <textVisW>1637</textVisW>
     <textVisH>740</textVisH>
     <toolColWidth>97</toolColWidth>
@@ -28,6 +28,18 @@
     <maxRecentProjects>10</maxRecentProjects>
     <recentProjects>
         <recentProject>
+            <path>D:\work\cmajorw64\cmajor\projects\koe\koe.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>D:\work\cmajorw64\cmajor\system\System.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>D:\work\cmajorw64_\cmajor\projects\koe\koe.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
             <path>D:\work\cmajorw64\cmajor\projects\cmsx\cmsx.cms</path>
             <openFiles />
         </recentProject>
@@ -44,14 +56,6 @@
             <openFiles />
         </recentProject>
         <recentProject>
-            <path>D:\work\cmajorw64\cmajor\system\System.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>D:\work\cmajorw64\cmajor\projects\koe\koe.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
             <path>D:\work\cmajorw64\cmajor\projects\tools\cpp2cm\cpp2cm.cms</path>
             <openFiles />
         </recentProject>
@@ -61,10 +65,6 @@
         </recentProject>
         <recentProject>
             <path>C:\Users\Seppo\cmajorw64\cmajor\projects\boolTest\boolTest.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\system\System.cms</path>
             <openFiles />
         </recentProject>
     </recentProjects>

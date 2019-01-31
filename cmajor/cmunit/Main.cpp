@@ -71,7 +71,7 @@ using namespace cmajor::emitter;
 using namespace cmajor::dom;
 using namespace cmajor::xpath;
 
-const char* version = "3.2.0";
+const char* version = "3.3.0";
 
 void PrintHelp()
 {
